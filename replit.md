@@ -1,7 +1,7 @@
-# LucaGraphy — Site vitrine premium de calligraphie arabe
+# LookaGraphy — Site vitrine premium de calligraphie arabe/japonaise
 
 ## Description
-Site vitrine premium pour LucaGraphy, atelier de calligraphie arabe de Luca. Site haut de gamme, artistique et immersif, au croisement d'un portfolio d'artiste, d'une galerie d'art, d'un site culturel et d'une boutique.
+Site vitrine premium pour **LookaGraphy**, calligraphe Looka (Paris). Identité double arabo-française et japonaise, fusion calligraphique unique. Site haut de gamme, artistique et immersif : portfolio d'artiste, galerie d'art, boutique, ateliers.
 
 ## Stack technique
 - **Next.js 14** (App Router)

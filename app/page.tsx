@@ -6,7 +6,7 @@ import { artistData, ateliersData, expositionsData, evenementsData, galerieData 
 
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: 'easeOut' } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: 'easeOut' as const } },
 };
 
 const stagger = {
@@ -246,7 +246,7 @@ export default function Home() {
             initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 1, ease: 'easeOut' }}
+            transition={{ duration: 1, ease: 'easeOut' as const }}
             className="img-zoom"
             style={{
               aspectRatio: '3/4',
