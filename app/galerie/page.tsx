@@ -61,7 +61,7 @@ export default function GaleriePage() {
       </section>
 
       {/* Filtres */}
-      <section className="py-10 px-6" style={{ background: '#FAF7F2', borderBottom: '1px solid rgba(61,43,31,0.08)' }}>
+      <section className="py-10 section-pad" style={{ background: '#FAF7F2', borderBottom: '1px solid rgba(61,43,31,0.08)' }}>
         <div className="max-w-6xl mx-auto flex flex-wrap gap-3 justify-center">
           {styles.map((style) => (
             <button
@@ -87,8 +87,8 @@ export default function GaleriePage() {
       </section>
 
       {/* Grille */}
-      <section className="py-16 px-6 pb-32" style={{ background: '#F5F0E8' }}>
-        <div className="max-w-6xl mx-auto">
+      <section className="py-16 section-pad pb-32" style={{ background: '#F5F0E8' }}>
+        <div style={{ maxWidth: "72rem", marginLeft: "auto", marginRight: "auto" }}>
           <motion.div
             layout
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"

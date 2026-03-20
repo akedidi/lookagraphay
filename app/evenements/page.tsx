@@ -60,8 +60,8 @@ export default function EvenementsPage() {
       </section>
 
       {/* À venir */}
-      <section className="py-24 px-6" style={{ background: '#F5F0E8' }}>
-        <div className="max-w-4xl mx-auto">
+      <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
+        <div style={{ maxWidth: "56rem", marginLeft: "auto", marginRight: "auto" }}>
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -207,8 +207,8 @@ export default function EvenementsPage() {
       </section>
 
       {/* Passés */}
-      <section className="py-20 px-6" style={{ background: '#2A2520' }}>
-        <div className="max-w-4xl mx-auto">
+      <section className="py-20 section-pad" style={{ background: '#2A2520' }}>
+        <div style={{ maxWidth: "56rem", marginLeft: "auto", marginRight: "auto" }}>
           <motion.div
             initial="hidden"
             whileInView="visible"

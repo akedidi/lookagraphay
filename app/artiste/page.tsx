@@ -63,8 +63,8 @@ export default function ArtistePage() {
       </section>
 
       {/* Bio + portrait */}
-      <section className="py-24 px-6" style={{ background: '#F5F0E8' }}>
-        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-16 items-start">
+      <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-16 items-start" style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto' }}>
           {/* Portrait placeholder */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -173,7 +173,7 @@ export default function ArtistePage() {
       </section>
 
       {/* Citation centrale */}
-      <section className="py-24 px-6 text-center" style={{ background: '#2A2520' }}>
+      <section className="py-24 section-pad text-center" style={{ background: '#2A2520' }}>
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -212,8 +212,8 @@ export default function ArtistePage() {
       </section>
 
       {/* Démarche */}
-      <section className="py-24 px-6" style={{ background: '#F5F0E8' }}>
-        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16">
+      <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16" style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto' }}>
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -326,7 +326,7 @@ export default function ArtistePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 px-6 text-center" style={{ background: '#3D2B1F' }}>
+      <section className="py-20 section-pad text-center" style={{ background: '#3D2B1F' }}>
         <motion.div
           initial="hidden"
           whileInView="visible"

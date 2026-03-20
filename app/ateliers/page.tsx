@@ -66,8 +66,8 @@ export default function AteliersPage() {
       </section>
 
       {/* Stats rapides */}
-      <section className="py-14 px-6" style={{ background: '#FAF7F2', borderBottom: '1px solid rgba(61,43,31,0.08)' }}>
-        <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+      <section className="py-14 section-pad" style={{ background: '#FAF7F2', borderBottom: '1px solid rgba(61,43,31,0.08)' }}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center" style={{ maxWidth: '48rem', marginLeft: 'auto', marginRight: 'auto' }}>
           {[
             { label: 'Horaire', value: 'Samedi', desc: 'à 14h' },
             { label: 'Lieu', value: 'Montparnasse', desc: 'Paris' },
@@ -120,13 +120,14 @@ export default function AteliersPage() {
       </section>
 
       {/* Philosophie du cours */}
-      <section className="py-28 px-6" style={{ background: '#F5F0E8' }}>
-        <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+      <section className="py-28 section-pad" style={{ background: '#F5F0E8' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center" style={{ maxWidth: '56rem', marginLeft: 'auto', marginRight: 'auto' }}>
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}
+            className="max-w-xl mx-auto lg:max-w-none lg:mx-0"
           >
             <span
               style={{
@@ -201,8 +202,8 @@ export default function AteliersPage() {
       </section>
 
       {/* Contenu du cours */}
-      <section className="py-24 px-6" style={{ background: '#1A1209' }}>
-        <div className="max-w-4xl mx-auto">
+      <section className="py-24 section-pad" style={{ background: '#1A1209' }}>
+        <div style={{ maxWidth: "56rem", marginLeft: "auto", marginRight: "auto" }}>
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -281,8 +282,8 @@ export default function AteliersPage() {
       </section>
 
       {/* Infos & Inscription */}
-      <section className="py-28 px-6" style={{ background: '#FAF7F2' }}>
-        <div className="max-w-4xl mx-auto">
+      <section className="py-28 section-pad" style={{ background: '#FAF7F2' }}>
+        <div style={{ maxWidth: "56rem", marginLeft: "auto", marginRight: "auto" }}>
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -475,7 +476,7 @@ export default function AteliersPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 px-6" style={{ background: '#2A2520' }}>
+      <section className="py-20 section-pad" style={{ background: '#2A2520' }}>
         <div className="max-w-3xl mx-auto">
           <motion.div
             initial="hidden"

@@ -72,7 +72,7 @@ export default function StorePage() {
 
       {/* Filtres */}
       <section
-        className="py-8 px-6"
+        className="py-8 section-pad"
         style={{ background: '#FAF7F2', borderBottom: '1px solid rgba(61,43,31,0.08)' }}
       >
         <div className="max-w-6xl mx-auto flex flex-wrap gap-3 justify-center">
@@ -100,8 +100,8 @@ export default function StorePage() {
       </section>
 
       {/* Produits */}
-      <section className="py-16 px-6 pb-32" style={{ background: '#F5F0E8' }}>
-        <div className="max-w-6xl mx-auto">
+      <section className="py-16 section-pad pb-32" style={{ background: '#F5F0E8' }}>
+        <div style={{ maxWidth: "72rem", marginLeft: "auto", marginRight: "auto" }}>
           <motion.div
             layout
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
@@ -270,7 +270,7 @@ export default function StorePage() {
       </section>
 
       {/* Note acquisition */}
-      <section className="py-16 px-6 text-center" style={{ background: '#1A1209' }}>
+      <section className="py-16 section-pad text-center" style={{ background: '#1A1209' }}>
         <motion.div
           initial="hidden"
           whileInView="visible"

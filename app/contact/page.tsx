@@ -98,15 +98,15 @@ export default function ContactPage() {
       </section>
 
       {/* Formulaire */}
-      <section className="py-24 px-6" style={{ background: '#F5F0E8' }}>
-        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-16">
+      <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-16" style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto' }}>
           {/* Sidebar */}
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}
-            className="lg:col-span-2"
+            className="lg:col-span-2 max-w-lg mx-auto lg:max-w-none lg:mx-0"
           >
             <span
               style={{

@@ -54,8 +54,8 @@ export default function ExpositionsPage() {
 
       {/* À venir */}
       {aVenir.length > 0 && (
-        <section className="py-24 px-6" style={{ background: '#F5F0E8' }}>
-          <div className="max-w-5xl mx-auto">
+        <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
+          <div style={{ maxWidth: "64rem", marginLeft: "auto", marginRight: "auto" }}>
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -204,8 +204,8 @@ export default function ExpositionsPage() {
       )}
 
       {/* Passées */}
-      <section className="py-24 px-6" style={{ background: '#2A2520' }}>
-        <div className="max-w-5xl mx-auto">
+      <section className="py-24 section-pad" style={{ background: '#2A2520' }}>
+        <div style={{ maxWidth: "64rem", marginLeft: "auto", marginRight: "auto" }}>
           <motion.div
             initial="hidden"
             whileInView="visible"

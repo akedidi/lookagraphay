@@ -153,7 +153,7 @@ export default function Home() {
       </section>
 
       {/* ── INTRO PHRASE ── */}
-      <section className="py-24 px-6 text-center" style={{ background: '#1A1209' }}>
+      <section className="py-24 section-pad text-center" style={{ background: '#1A1209' }}>
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -188,13 +188,14 @@ export default function Home() {
       </section>
 
       {/* ── L'ARTISTE ── */}
-      <section className="py-24 px-6" style={{ background: '#F5F0E8' }}>
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center" style={{ maxWidth: '72rem', marginLeft: 'auto', marginRight: 'auto' }}>
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-80px' }}
             variants={fadeUp}
+            className="max-w-xl mx-auto lg:max-w-none lg:mx-0"
           >
             <span
               style={{
@@ -300,8 +301,8 @@ export default function Home() {
       </section>
 
       {/* ── ATELIERS ── */}
-      <section className="py-24 px-6" style={{ background: '#2A2520' }}>
-        <div className="max-w-6xl mx-auto">
+      <section className="py-24 section-pad" style={{ background: '#2A2520' }}>
+        <div style={{ maxWidth: "72rem", marginLeft: "auto", marginRight: "auto" }}>
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -354,7 +355,8 @@ export default function Home() {
             whileInView="visible"
             viewport={{ once: true, margin: '-60px' }}
             variants={stagger}
-            className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12 max-w-3xl mx-auto"
+            className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12"
+            style={{ maxWidth: '48rem', marginLeft: 'auto', marginRight: 'auto' }}
           >
             {ateliersData.map((atelier) => (
               <motion.div
@@ -462,8 +464,8 @@ export default function Home() {
       </section>
 
       {/* ── GALERIE PREVIEW ── */}
-      <section className="py-24 px-6" style={{ background: '#F5F0E8' }}>
-        <div className="max-w-6xl mx-auto">
+      <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
+        <div style={{ maxWidth: "72rem", marginLeft: "auto", marginRight: "auto" }}>
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -587,8 +589,8 @@ export default function Home() {
       </section>
 
       {/* ── EXPOSITIONS ── */}
-      <section className="py-24 px-6" style={{ background: '#1A1209' }}>
-        <div className="max-w-5xl mx-auto">
+      <section className="py-24 section-pad" style={{ background: '#1A1209' }}>
+        <div style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto' }}>
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -715,7 +717,7 @@ export default function Home() {
 
       {/* ── CTA FINAL ── */}
       <section
-        className="py-32 px-6 text-center relative overflow-hidden"
+        className="py-32 section-pad text-center relative overflow-hidden"
         style={{ background: '#3D2B1F' }}
       >
         <div
