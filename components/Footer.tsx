@@ -26,7 +26,7 @@ export default function Footer() {
                 marginBottom: '0.5rem',
               }}
             >
-              LucaGraphy
+              LookaGraphy
             </div>
             <div
               style={{
@@ -171,7 +171,7 @@ export default function Footer() {
               color: 'rgba(245,240,232,0.3)',
             }}
           >
-            © {new Date().getFullYear()} LucaGraphy — Tous droits réservés
+            © {new Date().getFullYear()} LookaGraphy — Tous droits réservés
           </span>
           <Link
             href="/mentions-legales"

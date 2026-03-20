@@ -111,7 +111,7 @@ export default function ArtistePage() {
                   color: 'rgba(245,240,232,0.3)',
                 }}
               >
-                Luca — Calligraphe
+                Looka — Calligraphe
               </p>
             </div>
           </motion.div>
@@ -206,7 +206,7 @@ export default function ArtistePage() {
               fontStyle: 'normal',
             }}
           >
-            — Luca
+            — Looka
           </cite>
         </motion.div>
       </section>
@@ -257,7 +257,7 @@ export default function ArtistePage() {
                 color: '#3D2B1F',
               }}
             >
-              La démarche de Luca est à la fois spirituelle et sensible. Chaque session de création commence par un temps de silence, d'attention au souffle, avant que le calame ne touche le papier. Elle explore les espaces entre tradition et contemporanéité, entre l'Orient qui l'a formée et l'Occident où elle crée.
+              La démarche de Looka est à la fois spirituelle et sensible. Chaque session de création commence par un temps de silence, d'attention au souffle, avant que le calame ne touche le papier. Elle explore les espaces entre tradition et contemporanéité, entre l'Orient qui l'a formée et l'Occident où elle crée.
             </p>
           </motion.div>
 
@@ -342,7 +342,7 @@ export default function ArtistePage() {
               marginBottom: '2rem',
             }}
           >
-            Découvrir les ateliers ou les œuvres de Luca
+            Découvrir les ateliers ou les œuvres de Looka
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/ateliers" className="btn-gold">Ateliers</Link>

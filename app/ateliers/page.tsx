@@ -70,7 +70,7 @@ export default function AteliersPage() {
           {[
             { label: 'Petits groupes', value: '6 à 10', desc: 'places par session' },
             { label: 'Durée', value: '3h', desc: 'par séance' },
-            { label: 'Lieu', value: 'Paris 11e', desc: 'Atelier LucaGraphy' },
+            { label: 'Lieu', value: 'Paris 11e', desc: 'Atelier LookaGraphy' },
           ].map((item, i) => (
             <motion.div
               key={i}

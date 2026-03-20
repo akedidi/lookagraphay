@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     'ateliers calligraphie',
     'art islamique',
     'cours calligraphie',
-    'LucaGraphy',
+    'LookaGraphy',
     'exposition calligraphie',
   ],
   openGraph: {

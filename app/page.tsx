@@ -95,7 +95,7 @@ export default function Home() {
               marginBottom: '1.5rem',
             }}
           >
-            Luca<span style={{ color: '#C9A84C' }}>Graphy</span>
+            Looka<span style={{ color: '#C9A84C' }}>Graphy</span>
           </h1>
 
           <p
@@ -182,7 +182,7 @@ export default function Home() {
             <em style={{ color: '#C9A84C' }}>c'est une danse de l'encre.</em>"
           </p>
           <div className="mt-8" style={{ color: 'rgba(245,240,232,0.3)', fontSize: '0.65rem', letterSpacing: '0.25em', fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase' }}>
-            — Luca
+            — Looka
           </div>
         </motion.div>
       </section>
@@ -220,7 +220,7 @@ export default function Home() {
                 marginBottom: '1.5rem',
               }}
             >
-              Luca —<br />
+              Looka —<br />
               <em>Calligraphe</em>
             </h2>
             <span className="gold-line" style={{ margin: '0 0 2rem' }} />

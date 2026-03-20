@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { siteConfig } from '@/lib/data';
+import Image from 'next/image';
 
 const links = [
   { href: '/', label: 'Accueil' },
@@ -39,32 +39,44 @@ export default function Navbar() {
         }}
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <Link href="/" className="flex flex-col" style={{ textDecoration: 'none' }}>
-            <span
+          <Link href="/" className="flex items-center gap-3" style={{ textDecoration: 'none' }}>
+            <Image
+              src="/images/logo.png"
+              alt="LookaGraphy"
+              width={44}
+              height={44}
               style={{
-                fontFamily: 'Cormorant Garamond, serif',
-                fontSize: '1.4rem',
-                fontWeight: 300,
-                letterSpacing: '0.15em',
-                color: '#F5F0E8',
-                lineHeight: 1,
+                filter: 'brightness(0) invert(1)',
+                opacity: 0.92,
               }}
-            >
-              LucaGraphy
-            </span>
-            <span
-              style={{
-                fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.55rem',
-                fontWeight: 400,
-                letterSpacing: '0.35em',
-                textTransform: 'uppercase',
-                color: '#C9A84C',
-                marginTop: '3px',
-              }}
-            >
-              Calligraphie Arabe
-            </span>
+            />
+            <div className="flex flex-col">
+              <span
+                style={{
+                  fontFamily: 'Cormorant Garamond, serif',
+                  fontSize: '1.35rem',
+                  fontWeight: 300,
+                  letterSpacing: '0.15em',
+                  color: '#F5F0E8',
+                  lineHeight: 1,
+                }}
+              >
+                LookaGraphy
+              </span>
+              <span
+                style={{
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontSize: '0.52rem',
+                  fontWeight: 400,
+                  letterSpacing: '0.35em',
+                  textTransform: 'uppercase',
+                  color: '#C9A84C',
+                  marginTop: '3px',
+                }}
+              >
+                Calligraphie Arabe
+              </span>
+            </div>
           </Link>
 
           {/* Desktop nav */}
@@ -119,6 +131,13 @@ export default function Navbar() {
           transform: menuOpen ? 'translateY(0)' : 'translateY(-10px)',
         }}
       >
+        <Image
+          src="/images/logo.png"
+          alt="LookaGraphy"
+          width={60}
+          height={60}
+          style={{ filter: 'brightness(0) invert(1)', opacity: 0.3, marginBottom: '2rem' }}
+        />
         <ul className="flex flex-col items-center gap-8">
           {links.map((l) => (
             <li key={l.href}>
@@ -133,7 +152,6 @@ export default function Navbar() {
             </li>
           ))}
         </ul>
-        <div className="mt-12 ornament">لـ</div>
       </div>
     </>
   );

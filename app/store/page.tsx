@@ -65,7 +65,7 @@ export default function StorePage() {
               margin: '0 auto',
             }}
           >
-            Chaque pièce est unique, réalisée à la main. Acquérir une œuvre de Luca, c'est accueillir un fragment de présence.
+            Chaque pièce est unique, réalisée à la main. Acquérir une œuvre de Looka, c'est accueillir un fragment de présence.
           </p>
         </div>
       </section>
@@ -300,7 +300,7 @@ export default function StorePage() {
               marginBottom: '2rem',
             }}
           >
-            Vous souhaitez une œuvre personnalisée — un mot, un prénom, un verset — calligraphié dans un style particulier ? Contactez Luca pour discuter de votre projet.
+            Vous souhaitez une œuvre personnalisée — un mot, un prénom, un verset — calligraphié dans un style particulier ? Contactez Looka pour discuter de votre projet.
           </p>
           <a href="/contact" className="btn-gold">
             Demander une création sur mesure

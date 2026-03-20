@@ -147,7 +147,7 @@ export default function ContactPage() {
                 marginBottom: '2.5rem',
               }}
             >
-              Luca répond personnellement à chaque message. Pour les inscriptions aux ateliers, les acquisitions ou toute question, n'hésitez pas à écrire.
+              Looka répond personnellement à chaque message. Pour les inscriptions aux ateliers, les acquisitions ou toute question, n'hésitez pas à écrire.
             </p>
 
             <div className="flex flex-col gap-4">
@@ -181,7 +181,7 @@ export default function ContactPage() {
                     textDecoration: 'none',
                   }}
                 >
-                  @lucagraphy
+                  @lookagraphy
                 </a>
               </div>
               <div>
@@ -249,7 +249,7 @@ export default function ContactPage() {
                     lineHeight: 1.7,
                   }}
                 >
-                  Luca vous répondra dans les meilleurs délais.<br />
+                  Looka vous répondra dans les meilleurs délais.<br />
                   Merci pour votre message.
                 </p>
               </div>

@@ -38,7 +38,7 @@ export default function MentionsLegalesPage() {
           {[
             {
               titre: 'Éditeur du site',
-              content: `LucaGraphy\nSite web : lucagraphy.fr\nEmail : contact@lucagraphy.fr\nSiège social : Paris, France`,
+              content: `LookaGraphy\nSite web : lookagraphy.fr\nEmail : contact@lookagraphy.fr\nSiège social : Paris, France`,
             },
             {
               titre: 'Hébergement',
@@ -47,12 +47,12 @@ export default function MentionsLegalesPage() {
             {
               titre: 'Propriété intellectuelle',
               content:
-                "L'ensemble des contenus présents sur ce site (textes, images, œuvres calligraphiques, vidéos, logos) sont protégés par le droit d'auteur et restent la propriété exclusive de LucaGraphy. Toute reproduction, même partielle, est interdite sans autorisation écrite préalable.",
+                "L'ensemble des contenus présents sur ce site (textes, images, œuvres calligraphiques, vidéos, logos) sont protégés par le droit d'auteur et restent la propriété exclusive de LookaGraphy. Toute reproduction, même partielle, est interdite sans autorisation écrite préalable.",
             },
             {
               titre: 'Données personnelles',
               content:
-                "Les données collectées via le formulaire de contact sont utilisées uniquement pour répondre à vos demandes. Elles ne sont pas transmises à des tiers. Conformément à la loi Informatique et Libertés et au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression. Pour exercer ce droit, contactez : contact@lucagraphy.fr",
+                "Les données collectées via le formulaire de contact sont utilisées uniquement pour répondre à vos demandes. Elles ne sont pas transmises à des tiers. Conformément à la loi Informatique et Libertés et au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression. Pour exercer ce droit, contactez : contact@lookagraphy.fr",
             },
             {
               titre: 'Cookies',
@@ -62,7 +62,7 @@ export default function MentionsLegalesPage() {
             {
               titre: 'Limitation de responsabilité',
               content:
-                "LucaGraphy ne saurait être tenu responsable des dommages directs ou indirects causés au matériel de l'utilisateur lors de l'accès au site. Les liens hypertextes mis en place dans le cadre du présent site web en direction d'autres ressources présentes sur le réseau internet ne sauraient engager la responsabilité de LucaGraphy.",
+                "LookaGraphy ne saurait être tenu responsable des dommages directs ou indirects causés au matériel de l'utilisateur lors de l'accès au site. Les liens hypertextes mis en place dans le cadre du présent site web en direction d'autres ressources présentes sur le réseau internet ne sauraient engager la responsabilité de LookaGraphy.",
             },
           ].map((section, i) => (
             <motion.div

@@ -1,18 +1,18 @@
 export const siteConfig = {
-  name: "LucaGraphy",
+  name: "LookaGraphy",
   tagline: "L'art de la calligraphie arabe",
   description:
-    "LucaGraphy est l'atelier de calligraphie arabe de Luca — artiste, enseignante et passeure d'un art millénaire entre Orient et Occident.",
-  email: "contact@lucagraphy.fr",
-  instagram: "https://instagram.com/lucagraphy",
-  paypalEmail: "contact@lucagraphy.fr",
+    "LookaGraphy est l'atelier de calligraphie arabe de Looka — artiste, enseignante et passeure d'un art millénaire entre Orient et Occident.",
+  email: "contact@lookagraphy.fr",
+  instagram: "https://instagram.com/lookagraphy",
+  paypalEmail: "contact@lookagraphy.fr",
 };
 
 export const artistData = {
-  name: "Luca",
-  fullName: "Luca — Calligraphe",
+  name: "Looka",
+  fullName: "Looka — Calligraphe",
   bio: [
-    "Née entre deux langues et deux rives, Luca a découvert la calligraphie arabe comme on découvre une langue secrète — par le geste, le silence, la répétition. Formée auprès de maîtres calligraphes au Maroc et en Orient, elle a fait de cette pratique le fil conducteur de sa vie artistique.",
+    "Née entre deux langues et deux rives, Looka a découvert la calligraphie arabe comme on découvre une langue secrète — par le geste, le silence, la répétition. Formée auprès de maîtres calligraphes au Maroc et en Orient, elle a fait de cette pratique le fil conducteur de sa vie artistique.",
     "Sa démarche est à la fois spirituelle et sensible : chaque lettre tracée est une méditation, chaque œuvre une conversation entre la tradition et la contemporanéité. Elle enseigne, crée et transmet avec la conviction que la calligraphie arabe est un art vivant, universel, qui parle à tous.",
     "Basée à Paris, son atelier est un espace de création et de transmission, ouvert à ceux qui souhaitent découvrir la beauté du geste calligraphique.",
   ],
@@ -36,7 +36,7 @@ export const ateliersData = [
     semestre: "Printemps 2026",
     dates: "Du 15 mars au 21 juin 2026",
     horaires: "Samedi de 10h à 13h",
-    lieu: "Atelier LucaGraphy, Paris 11e",
+    lieu: "Atelier LookaGraphy, Paris 11e",
     places: 8,
     placesRestantes: 3,
     prix: 480,
@@ -51,7 +51,7 @@ export const ateliersData = [
       "Réalisation d'une œuvre personnelle",
     ],
     materiel: "Fourni par l'atelier pour les 3 premières séances",
-    paypalLink: "https://paypal.me/lucagraphy/480",
+    paypalLink: "https://paypal.me/lookagraphy/480",
   },
   {
     id: "semestre-2-2026",
@@ -60,7 +60,7 @@ export const ateliersData = [
     semestre: "Automne 2026",
     dates: "Du 12 septembre au 12 décembre 2026",
     horaires: "Samedi de 14h à 17h",
-    lieu: "Atelier LucaGraphy, Paris 11e",
+    lieu: "Atelier LookaGraphy, Paris 11e",
     places: 6,
     placesRestantes: 6,
     prix: 560,
@@ -75,7 +75,7 @@ export const ateliersData = [
       "Présentation d'un portfolio personnel",
     ],
     materiel: "Liste fournie à l'inscription",
-    paypalLink: "https://paypal.me/lucagraphy/560",
+    paypalLink: "https://paypal.me/lookagraphy/560",
   },
   {
     id: "stage-ete-2026",
@@ -84,7 +84,7 @@ export const ateliersData = [
     semestre: "Été 2026",
     dates: "Du 6 au 10 juillet 2026",
     horaires: "Lundi au vendredi, 10h à 16h",
-    lieu: "Atelier LucaGraphy, Paris 11e",
+    lieu: "Atelier LookaGraphy, Paris 11e",
     places: 10,
     placesRestantes: 5,
     prix: 390,
@@ -98,7 +98,7 @@ export const ateliersData = [
       "Vernissage privé des œuvres réalisées",
     ],
     materiel: "Tout le matériel fourni",
-    paypalLink: "https://paypal.me/lucagraphy/390",
+    paypalLink: "https://paypal.me/lookagraphy/390",
   },
 ];
 
@@ -110,7 +110,7 @@ export const expositionsData = [
     dates: "12 avril — 3 mai 2026",
     statut: "à venir",
     description:
-      "Une série de douze grandes compositions en encre de chine sur papier aquarelle japonais. Luca explore les espaces vides entre les lettres — le silence comme élément central de la calligraphie.",
+      "Une série de douze grandes compositions en encre de chine sur papier aquarelle japonais. Looka explore les espaces vides entre les lettres — le silence comme élément central de la calligraphie.",
     image: "/images/expo-silence.jpg",
   },
   {
@@ -120,7 +120,7 @@ export const expositionsData = [
     dates: "Octobre — Novembre 2025",
     statut: "passé",
     description:
-      "Exposition collective réunissant douze calligraphes de la Méditerranée. Luca y présentait six œuvres monumentales en style Diwani sur soie.",
+      "Exposition collective réunissant douze calligraphes de la Méditerranée. Looka y présentait six œuvres monumentales en style Diwani sur soie.",
     image: "/images/expo-mouvement.jpg",
   },
   {
@@ -145,7 +145,7 @@ export const evenementsData = [
     type: "Vernissage",
     statut: "à venir",
     description:
-      "Soirée d'inauguration de l'exposition Silences Écrits. Luca sera présente pour partager sa démarche artistique autour d'un verre.",
+      "Soirée d'inauguration de l'exposition Silences Écrits. Looka sera présente pour partager sa démarche artistique autour d'un verre.",
   },
   {
     id: "evt-demo-2026",
@@ -156,14 +156,14 @@ export const evenementsData = [
     type: "Performance",
     statut: "à venir",
     description:
-      "Luca réalise en direct une œuvre calligraphique devant le public. Un moment rare et contemplatif.",
+      "Looka réalise en direct une œuvre calligraphique devant le public. Un moment rare et contemplatif.",
   },
   {
     id: "evt-atelier-ouvert-2026",
     titre: "Portes Ouvertes de l'Atelier",
     date: "24 mai 2026",
     heure: "14h00 — 18h00",
-    lieu: "Atelier LucaGraphy, Paris 11e",
+    lieu: "Atelier LookaGraphy, Paris 11e",
     type: "Portes ouvertes",
     statut: "à venir",
     description:
@@ -178,7 +178,7 @@ export const evenementsData = [
     type: "Conférence",
     statut: "passé",
     description:
-      "Luca a participé à une table ronde sur la place de la calligraphie arabe dans l'art contemporain.",
+      "Looka a participé à une table ronde sur la place de la calligraphie arabe dans l'art contemporain.",
   },
 ];
 
@@ -271,7 +271,7 @@ export const storeData = [
     prix: 1800,
     image: "/images/oeuvre-1.jpg",
     disponible: true,
-    paypalLink: "https://paypal.me/lucagraphy/1800",
+    paypalLink: "https://paypal.me/lookagraphy/1800",
     description:
       "Œuvre originale unique sur papier Fabriano, encadrée sur demande.",
   },
@@ -282,7 +282,7 @@ export const storeData = [
     prix: 2200,
     image: "/images/oeuvre-2.jpg",
     disponible: true,
-    paypalLink: "https://paypal.me/lucagraphy/2200",
+    paypalLink: "https://paypal.me/lookagraphy/2200",
     description: "Encre et aquarelle sur papier japonais. Œuvre unique, certificat inclus.",
   },
   {
@@ -292,7 +292,7 @@ export const storeData = [
     prix: 950,
     image: "/images/oeuvre-5.jpg",
     disponible: true,
-    paypalLink: "https://paypal.me/lucagraphy/950",
+    paypalLink: "https://paypal.me/lookagraphy/950",
     description: "Encre et feuille d'or sur papier Arches. Format 60 × 40 cm.",
   },
   {
@@ -302,7 +302,7 @@ export const storeData = [
     prix: 120,
     image: "/images/oeuvre-1.jpg",
     disponible: true,
-    paypalLink: "https://paypal.me/lucagraphy/120",
+    paypalLink: "https://paypal.me/lookagraphy/120",
     description:
       "Reproduction fine art sur papier Hahnemühle, tirage numéroté à 30 exemplaires, signée.",
   },
@@ -313,7 +313,7 @@ export const storeData = [
     prix: 65,
     image: "/images/objet-carnet.jpg",
     disponible: true,
-    paypalLink: "https://paypal.me/lucagraphy/65",
+    paypalLink: "https://paypal.me/lookagraphy/65",
     description:
       "Carnet artisanal à couverture en cuir gravée d'une calligraphie originale. Papier vergé 120g.",
   },
@@ -324,7 +324,7 @@ export const storeData = [
     prix: 35,
     image: "/images/objet-marque.jpg",
     disponible: true,
-    paypalLink: "https://paypal.me/lucagraphy/35",
+    paypalLink: "https://paypal.me/lookagraphy/35",
     description:
       "Set de 5 marque-pages en papier aquarelle, calligraphiés à la main. Mots : Nur, Sabr, Hubb, Hilm, Shukr.",
   },
