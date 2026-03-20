@@ -476,13 +476,13 @@ export default function AteliersPage() {
 
       {/* FAQ */}
       <section className="py-20 section-pad" style={{ background: '#2A2520' }}>
-        <div className="max-w-3xl mx-auto">
+        <div style={{ maxWidth: '48rem', marginLeft: 'auto', marginRight: 'auto' }}>
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}
-            className="text-center mb-14"
+            style={{ textAlign: 'center', marginBottom: '3.5rem' }}
           >
             <h2
               style={{
