@@ -60,34 +60,24 @@ export const ateliersData = [
 
 export const expositionsData = [
   {
-    id: "expo-2026-silence",
-    titre: "Silences Écrits",
-    lieu: "Galerie Nour, Paris 4e",
-    dates: "12 avril — 3 mai 2026",
-    statut: "à venir",
-    description:
-      "Une série de douze grandes compositions en encre de chine sur papier aquarelle japonais. Looka explore les espaces vides entre les lettres — le silence comme élément central de la calligraphie.",
-    image: "/images/expo-silence.jpg",
-  },
-  {
-    id: "expo-2025-mouvement",
-    titre: "Du Geste à la Lettre",
-    lieu: "Institut du Monde Arabe, Paris",
-    dates: "Octobre — Novembre 2025",
+    id: "expo-elegance-encree",
+    titre: "Élégance Encrée",
+    lieu: "Paris 5e",
+    dates: "Paris Ve arrondissement",
     statut: "passé",
     description:
-      "Exposition collective réunissant douze calligraphes de la Méditerranée. Looka y présentait six œuvres monumentales en style Diwani sur soie.",
-    image: "/images/expo-mouvement.jpg",
+      "L'exposition « Élégance Encrée » honore la beauté intemporelle des traits tracés par l'encre et le calame, deux outils de l'art de la calligraphie arabe, sublimant ainsi les paroles émouvantes de poésie et les valeurs humaines.\n\nIl s'agit d'une célébration de l'art et de la tradition, une fusion harmonieuse entre l'esthétique et le spirituel. En parcourant cette exposition, les visiteurs découvrent non seulement la beauté des lignes tracées par l'encre japonaise et le calame, mais aussi la profondeur des messages véhiculés à travers ces œuvres.",
+    image: "/images/expo-elegance.jpg",
   },
   {
-    id: "expo-2025-racines",
-    titre: "Racines et Encres",
-    lieu: "Maison de la Culture du Maroc, Paris",
-    dates: "Mars — Avril 2025",
+    id: "expo-looka-eleves",
+    titre: "Looka et ses élèves",
+    lieu: "La Curiosité, Paris 5e",
+    dates: "Vernissage — samedi 7 septembre",
     statut: "passé",
     description:
-      "Solo show explorant les liens entre calligraphie arabe et mémoire familiale. Une trentaine d'œuvres intimes et monumentales.",
-    image: "/images/expo-racines.jpg",
+      "Looka expose ses œuvres et invite ses élèves à présenter leurs progrès au cours de l'année précédente de cours de calligraphie. Venez découvrir leurs créations lors de ce vernissage à « La Curiosité », Paris Ve.",
+    image: "/images/expo-eleves.jpg",
   },
 ];
 

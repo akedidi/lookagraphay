@@ -16,8 +16,15 @@ export default function ExpositionsPage() {
     <div style={{ background: '#F5F0E8' }}>
       {/* Header */}
       <section
-        className="flex flex-col items-center justify-center text-center px-6 pt-40 pb-20"
-        style={{ background: '#1A1209' }}
+        style={{
+          background: '#1A1209',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          padding: '10rem 1.5rem 5rem',
+        }}
       >
         <div className="page-header-anim">
           <span
@@ -43,25 +50,43 @@ export default function ExpositionsPage() {
               lineHeight: 1.1,
             }}
           >
-            Expositions
+            Expositions{' '}
+            <span style={{ fontStyle: 'italic', opacity: 0.5 }}>— Exhibitions</span>
           </h1>
           <span
-            className="block mx-auto mt-6"
-            style={{ width: 60, height: 1, background: '#C9A84C' }}
+            style={{
+              display: 'block',
+              width: 60,
+              height: 1,
+              background: '#C9A84C',
+              margin: '1.5rem auto',
+            }}
           />
+          <p
+            style={{
+              fontFamily: 'Montserrat, sans-serif',
+              fontWeight: 300,
+              fontSize: '0.78rem',
+              letterSpacing: '0.1em',
+              color: 'rgba(245,240,232,0.5)',
+              maxWidth: '32rem',
+            }}
+          >
+            Toutes les expositions et les lieux de rencontres avec Looka
+          </p>
         </div>
       </section>
 
       {/* À venir */}
       {aVenir.length > 0 && (
-        <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
-          <div style={{ maxWidth: "64rem", marginLeft: "auto", marginRight: "auto" }}>
+        <section style={{ background: '#F5F0E8', padding: '6rem 1.5rem' }}>
+          <div style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto' }}>
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
               variants={fadeUp}
-              className="mb-14"
+              style={{ marginBottom: '3.5rem' }}
             >
               <span
                 style={{
@@ -87,10 +112,18 @@ export default function ExpositionsPage() {
               >
                 Expositions à venir
               </h2>
-              <span style={{ display: 'block', width: 40, height: 1, background: '#C9A84C', marginTop: '1.5rem' }} />
+              <span
+                style={{
+                  display: 'block',
+                  width: 40,
+                  height: 1,
+                  background: '#C9A84C',
+                  marginTop: '1.5rem',
+                }}
+              />
             </motion.div>
 
-            <div className="flex flex-col gap-12">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
               {aVenir.map((expo, i) => (
                 <motion.article
                   key={expo.id}
@@ -106,7 +139,6 @@ export default function ExpositionsPage() {
                     paddingTop: '3rem',
                   }}
                 >
-                  {/* Visuel */}
                   <div
                     style={{
                       aspectRatio: '4/5',
@@ -128,8 +160,7 @@ export default function ExpositionsPage() {
                     </div>
                   </div>
 
-                  {/* Info */}
-                  <div className="flex flex-col justify-center">
+                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <span
                       style={{
                         display: 'inline-block',
@@ -182,19 +213,29 @@ export default function ExpositionsPage() {
                       {expo.dates}
                     </p>
                     <span
-                      style={{ display: 'block', width: 40, height: 1, background: 'rgba(61,43,31,0.2)', marginBottom: '1.5rem' }}
-                    />
-                    <p
                       style={{
-                        fontFamily: 'Montserrat, sans-serif',
-                        fontWeight: 300,
-                        fontSize: '0.78rem',
-                        lineHeight: 1.9,
-                        color: '#3D2B1F',
+                        display: 'block',
+                        width: 40,
+                        height: 1,
+                        background: 'rgba(61,43,31,0.2)',
+                        marginBottom: '1.5rem',
                       }}
-                    >
-                      {expo.description}
-                    </p>
+                    />
+                    {expo.description.split('\n\n').map((para, pi) => (
+                      <p
+                        key={pi}
+                        style={{
+                          fontFamily: 'Montserrat, sans-serif',
+                          fontWeight: 300,
+                          fontSize: '0.78rem',
+                          lineHeight: 1.9,
+                          color: '#3D2B1F',
+                          marginBottom: pi < expo.description.split('\n\n').length - 1 ? '1rem' : 0,
+                        }}
+                      >
+                        {para}
+                      </p>
+                    ))}
                   </div>
                 </motion.article>
               ))}
@@ -204,14 +245,14 @@ export default function ExpositionsPage() {
       )}
 
       {/* Passées */}
-      <section className="py-24 section-pad" style={{ background: '#2A2520' }}>
-        <div style={{ maxWidth: "64rem", marginLeft: "auto", marginRight: "auto" }}>
+      <section style={{ background: '#2A2520', padding: '6rem 1.5rem' }}>
+        <div style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto' }}>
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}
-            className="mb-14"
+            style={{ marginBottom: '3.5rem' }}
           >
             <span
               style={{
@@ -237,74 +278,97 @@ export default function ExpositionsPage() {
             >
               Expositions passées
             </h2>
-            <span style={{ display: 'block', width: 40, height: 1, background: '#C9A84C', marginTop: '1.5rem' }} />
+            <span
+              style={{
+                display: 'block',
+                width: 40,
+                height: 1,
+                background: '#C9A84C',
+                marginTop: '1.5rem',
+              }}
+            />
           </motion.div>
 
-          <div className="flex flex-col gap-0">
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
             {passes.map((expo, i) => (
-              <motion.div
+              <motion.article
                 key={expo.id}
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: i * 0.15, duration: 0.8 }}
                 style={{
-                  borderTop: '1px solid rgba(201,168,76,0.1)',
-                  padding: '2.5rem 0',
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 3fr',
-                  gap: '3rem',
-                  alignItems: 'start',
+                  borderTop: '1px solid rgba(201,168,76,0.15)',
+                  padding: '3.5rem 0',
                 }}
               >
-                <div>
-                  <p
-                    style={{
-                      fontFamily: 'Cormorant Garamond, serif',
-                      fontSize: '0.9rem',
-                      color: 'rgba(245,240,232,0.35)',
-                      lineHeight: 1.5,
-                    }}
-                  >
-                    {expo.dates}
-                  </p>
+                {/* En-tête expo */}
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 3fr',
+                    gap: '3rem',
+                    alignItems: 'start',
+                    marginBottom: '2rem',
+                  }}
+                >
+                  <div>
+                    <p
+                      style={{
+                        fontFamily: 'Cormorant Garamond, serif',
+                        fontSize: '0.9rem',
+                        color: 'rgba(245,240,232,0.35)',
+                        lineHeight: 1.6,
+                        fontStyle: 'italic',
+                      }}
+                    >
+                      {expo.dates}
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: 'Montserrat, sans-serif',
+                        fontSize: '0.6rem',
+                        color: '#C9A84C',
+                        letterSpacing: '0.15em',
+                        textTransform: 'uppercase',
+                        marginTop: '0.5rem',
+                      }}
+                    >
+                      {expo.lieu}
+                    </p>
+                  </div>
+                  <div>
+                    <h3
+                      style={{
+                        fontFamily: 'Cormorant Garamond, serif',
+                        fontWeight: 400,
+                        fontSize: 'clamp(1.6rem, 3vw, 2.2rem)',
+                        color: '#F5F0E8',
+                        marginBottom: '1.5rem',
+                        lineHeight: 1.2,
+                        letterSpacing: '0.03em',
+                      }}
+                    >
+                      « {expo.titre} »
+                    </h3>
+                    {expo.description.split('\n\n').map((para, pi) => (
+                      <p
+                        key={pi}
+                        style={{
+                          fontFamily: 'Montserrat, sans-serif',
+                          fontSize: '0.78rem',
+                          fontWeight: 300,
+                          lineHeight: 1.9,
+                          color: 'rgba(245,240,232,0.55)',
+                          marginBottom: pi < expo.description.split('\n\n').length - 1 ? '1rem' : 0,
+                        }}
+                      >
+                        {para}
+                      </p>
+                    ))}
+                  </div>
                 </div>
-                <div>
-                  <h3
-                    style={{
-                      fontFamily: 'Cormorant Garamond, serif',
-                      fontWeight: 400,
-                      fontSize: '1.5rem',
-                      color: 'rgba(245,240,232,0.7)',
-                      marginBottom: '0.5rem',
-                    }}
-                  >
-                    {expo.titre}
-                  </h3>
-                  <p
-                    style={{
-                      fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.65rem',
-                      color: '#C9A84C',
-                      letterSpacing: '0.12em',
-                      marginBottom: '0.75rem',
-                    }}
-                  >
-                    {expo.lieu}
-                  </p>
-                  <p
-                    style={{
-                      fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.72rem',
-                      fontWeight: 300,
-                      lineHeight: 1.7,
-                      color: 'rgba(245,240,232,0.4)',
-                    }}
-                  >
-                    {expo.description}
-                  </p>
-                </div>
-              </motion.div>
+              </motion.article>
             ))}
           </div>
         </div>
