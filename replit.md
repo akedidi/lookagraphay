@@ -83,6 +83,18 @@ Tout le contenu mock est dans `lib/data.ts` :
 - `galerieData` — œuvres avec prix et disponibilité
 - `storeData` — produits avec liens PayPal
 
+## Typographies (next/font/google)
+Les polices sont chargées via `next/font/google` dans `app/layout.tsx` (download au build, servi localement — pas de requête externe Google à chaque rendu) :
+- `cormorant` → variable CSS `--font-cormorant`
+- `montserrat` → variable CSS `--font-montserrat`
+Ces variables sont référencées dans `globals.css` via `@theme`.
+
+## Correctifs importants appliqués
+1. **Boucle de recompilation infinie** — root cause : `.local/state/` (fichiers Replit écrits en continu) surveillés par le webpack watcher. Fix : `watchOptions.ignored` dans `next.config.js` pour exclure `.local/**`, `.cache/**`, `.git/**`, `.next/**`, `node_modules/**`.
+2. **tsconfig.tsbuildinfo** — déplacé vers `.next/cache/` via `"tsBuildInfoFile"` pour ne pas déclencher le watcher.
+3. **Hydration mismatch `<link>`** — `@import url(https://fonts.google...)` retiré de `globals.css` ; `<link>` manuel retiré du layout. Remplacé par `next/font/google`.
+4. **`import type { Metadata }` dans composant client** — retiré de `app/artiste/page.tsx`.
+
 ## Workflow
 - Démarrage : `npm run dev` (port 5000)
 - Build : `npm run build`

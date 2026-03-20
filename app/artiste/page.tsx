@@ -3,7 +3,6 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { artistData } from '@/lib/data';
-import type { Metadata } from 'next';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
