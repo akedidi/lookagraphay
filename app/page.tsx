@@ -36,6 +36,7 @@ export default function Home() {
           loop
           playsInline
           preload="auto"
+          poster="/images/hero-poster.jpg"
           style={{ zIndex: 0 }}
         >
           <source src="/videos/video-hero-wide.mp4" type="video/mp4" />
@@ -48,6 +49,7 @@ export default function Home() {
           loop
           playsInline
           preload="auto"
+          poster="/images/hero-poster.jpg"
           style={{ zIndex: 0 }}
         >
           <source src="/videos/video-hero-vertical.mp4" type="video/mp4" />
