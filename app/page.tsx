@@ -90,15 +90,6 @@ export default function Home() {
 
         {/* Hero content */}
         <div style={{ position: 'relative', textAlign: 'center', padding: '0 1.5rem', zIndex: 3 }}>
-          <div className="hero-ornament">
-            <div
-              className="ornament mb-8"
-              style={{ fontSize: '1.2rem', letterSpacing: '0.5em' }}
-            >
-              ﷽
-            </div>
-          </div>
-
           <h1
             className="hero-title"
             style={{
