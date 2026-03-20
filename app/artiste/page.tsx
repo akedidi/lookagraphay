@@ -148,8 +148,8 @@ export default function ArtistePage() {
                 marginBottom: '2rem',
               }}
             >
-              Entre deux rives,<br />
-              <em>un seul geste.</em>
+              Entre Orient et Occident,<br />
+              <em>une écriture unique.</em>
             </h2>
             <span style={{ display: 'block', width: 40, height: 1, background: '#C9A84C', marginBottom: '2rem' }} />
 
@@ -244,8 +244,8 @@ export default function ArtistePage() {
                 marginBottom: '1.5rem',
               }}
             >
-              Le geste comme<br />
-              <em>méditation</em>
+              Un style<br />
+              <em>distinctif et personnel</em>
             </h2>
             <span style={{ display: 'block', width: 40, height: 1, background: '#C9A84C', marginBottom: '1.5rem' }} />
             <p
@@ -257,7 +257,7 @@ export default function ArtistePage() {
                 color: '#3D2B1F',
               }}
             >
-              La démarche de Looka est à la fois spirituelle et sensible. Chaque session de création commence par un temps de silence, d'attention au souffle, avant que le calame ne touche le papier. Elle explore les espaces entre tradition et contemporanéité, entre l'Orient qui l'a formée et l'Occident où elle crée.
+              Dans un audacieux défi artistique, Looka présente les lettres arabes de haut en bas, à la manière des caractères japonais. Elle mêle des formes classiques à ses propres créations de lettres originales, forgiant un langage calligraphique qui célèbre la rencontre entre les civilisations — une ode à l'universalité humaine.
             </p>
           </motion.div>
 

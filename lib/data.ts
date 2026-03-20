@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "LookaGraphy",
   tagline: "L'art de la calligraphie arabe",
   description:
-    "LookaGraphy est l'atelier de calligraphie arabe de Looka — artiste, enseignante et passeure d'un art millénaire entre Orient et Occident.",
+    "LookaGraphy est l'univers calligraphique de Looka — artiste parisienne qui fusionne calligraphie arabe et japonaise en un style distinctif, célébrant la beauté et l'universalité humaine.",
   email: "contact@lookagraphy.fr",
   instagram: "https://instagram.com/lookagraphy",
   paypalEmail: "contact@lookagraphy.fr",
@@ -12,18 +12,19 @@ export const artistData = {
   name: "Looka",
   fullName: "Looka — Calligraphe",
   bio: [
-    "Née entre deux langues et deux rives, Looka a découvert la calligraphie arabe comme on découvre une langue secrète — par le geste, le silence, la répétition. Formée auprès de maîtres calligraphes au Maroc et en Orient, elle a fait de cette pratique le fil conducteur de sa vie artistique.",
-    "Sa démarche est à la fois spirituelle et sensible : chaque lettre tracée est une méditation, chaque œuvre une conversation entre la tradition et la contemporanéité. Elle enseigne, crée et transmet avec la conviction que la calligraphie arabe est un art vivant, universel, qui parle à tous.",
-    "Basée à Paris, son atelier est un espace de création et de transmission, ouvert à ceux qui souhaitent découvrir la beauté du geste calligraphique.",
+    "Looka est une passionnée de calligraphie, distinguée par une identité créative unique.",
+    "Honorant sa double culture arabo-musulmane et française, Looka a été captivée par les subtilités des arts islamiques. Lors de ses séjours au Japon, elle s'est émerveillée devant l'écriture japonaise, lue de droite à gauche, rappelant les particularités de l'écriture arabe. Dans un audacieux défi artistique, Looka intègre ces deux sphères calligraphiques dans ses œuvres, présentant les lettres arabes de haut en bas, à la manière des caractères japonais.",
+    "Son style s'enrichit encore par l'incorporation de lettres issues de différents styles de calligraphie, mêlant des formes classiques à ses propres créations de lettres originales, créant ainsi un style distinctif et personnel.",
+    "Son travail révèle une approche libérée et personnelle, une ode à la vie, à la beauté et à l'universalité humaine. Inspirée par la poésie arabe révolutionnaire, la littérature soufie, et les anciens poèmes porteurs de messages puissants, Looka aspire à célébrer les valeurs universelles fondamentales à travers son art.",
   ],
   quote:
-    "Chaque lettre arabe est un univers. La calligraphie n'est pas une écriture — c'est une danse de l'encre.",
+    "J'écris l'arabe comme le japonais — de haut en bas — pour rappeler que la beauté n'a pas de frontières.",
   inspirations: [
-    "Les manuscrits andalous du XIIIe siècle",
-    "La lumière rasante du Sahara au crépuscule",
-    "L'architecture de la mosquée de Cordoue",
-    "La poésie de Rumi et d'Al-Mutanabbi",
-    "Le geste du peintre gestural occidental",
+    "La poésie arabe révolutionnaire",
+    "La littérature soufie et ses messages universels",
+    "L'écriture japonaise verticale et ses résonances",
+    "Les arts islamiques classiques",
+    "Sa double culture arabo-musulmane et française",
   ],
   image: "/images/artist.jpg",
 };
