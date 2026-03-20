@@ -95,7 +95,7 @@ export default function EvenementsPage() {
             <span style={{ display: 'block', width: 40, height: 1, background: '#C9A84C', marginTop: '1.5rem' }} />
           </motion.div>
 
-          <div className="flex flex-col gap-0">
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
             {aVenir.map((evt, i) => (
               <motion.article
                 key={evt.id}

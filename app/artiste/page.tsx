@@ -295,7 +295,7 @@ export default function ArtistePage() {
               <em>le geste</em>
             </h2>
             <span style={{ display: 'block', width: 40, height: 1, background: '#C9A84C', marginBottom: '1.5rem' }} />
-            <ul className="flex flex-col gap-4">
+            <ul style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', listStyle: 'none', padding: 0, margin: 0 }}>
               {artistData.inspirations.map((insp, i) => (
                 <li
                   key={i}
@@ -343,7 +343,7 @@ export default function ArtistePage() {
           >
             Découvrir les ateliers ou les œuvres de Looka
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', justifyContent: 'center' }}>
             <Link href="/ateliers" className="btn-gold">Ateliers</Link>
             <Link href="/galerie" className="btn-gold">Galerie</Link>
           </div>

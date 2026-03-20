@@ -132,7 +132,7 @@ export default function Home() {
             la calligraphie arabe comme acte de présence.
           </p>
 
-          <div className="hero-cta flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="hero-cta" style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', justifyContent: 'center' }}>
             <Link href="/galerie" className="btn-gold">
               Découvrir les œuvres
             </Link>
@@ -788,7 +788,7 @@ export default function Home() {
           >
             Rejoignez un atelier, acquérez une œuvre ou prenez contact pour un projet unique.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', justifyContent: 'center' }}>
             <Link href="/ateliers" className="btn-gold">
               Rejoindre un atelier
             </Link>

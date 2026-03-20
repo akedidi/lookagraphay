@@ -151,12 +151,12 @@ export default function StorePage() {
                         top: '1rem',
                         left: '1rem',
                         fontFamily: 'Montserrat, sans-serif',
-                        fontSize: '0.82rem',
+                        fontSize: '0.75rem',
                         letterSpacing: '0.25em',
                         textTransform: 'uppercase',
                         color: '#C9A84C',
-                        background: 'rgba(26,18,9,0.7)',
-                        padding: '0.2rem 0.5rem',
+                        background: 'rgba(26,18,9,0.75)',
+                        padding: '0.35rem 0.75rem',
                       }}
                     >
                       {item.categorie}
@@ -224,7 +224,7 @@ export default function StorePage() {
                       {item.description}
                     </p>
 
-                    <div className="flex items-center justify-between mt-auto">
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: '1rem' }}>
                       <span
                         style={{
                           fontFamily: 'Cormorant Garamond, serif',
@@ -242,7 +242,7 @@ export default function StorePage() {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="btn-gold"
-                          style={{ fontSize: '0.85rem', padding: '0.65rem 1.2rem' }}
+                          style={{ fontSize: '0.72rem', padding: '0.75rem 1.25rem' }}
                         >
                           Acheter via PayPal
                         </a>

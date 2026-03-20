@@ -149,7 +149,7 @@ export default function ContactPage() {
               Looka répond personnellement à chaque message. Pour les inscriptions aux ateliers, les acquisitions ou toute question, n'hésitez pas à écrire.
             </p>
 
-            <div className="flex flex-col gap-4">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div>
                 <span style={labelStyle}>Email</span>
                 <a
@@ -253,8 +253,8 @@ export default function ContactPage() {
                 </p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-8">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '2rem' }}>
                   <div>
                     <label style={labelStyle}>Nom & Prénom</label>
                     <input
