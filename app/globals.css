@@ -135,6 +135,30 @@ h1, h2, h3, h4, h5, h6 {
   transform: scale(1.04);
 }
 
+/* Hero videos - explicit CSS instead of Tailwind responsive classes */
+.hero-video-desktop {
+  display: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+@media (min-width: 768px) {
+  .hero-video-desktop { display: block; }
+}
+.hero-video-mobile {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+@media (min-width: 768px) {
+  .hero-video-mobile { display: none; }
+}
+
 /* Hero overlay */
 .hero-overlay {
   background: linear-gradient(

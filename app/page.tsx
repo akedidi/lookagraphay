@@ -23,7 +23,7 @@ export default function Home() {
       >
         {/* Desktop video */}
         <video
-          className="hidden md:block absolute inset-0 w-full h-full object-cover"
+          className="hero-video-desktop"
           autoPlay
           muted
           loop
@@ -34,7 +34,7 @@ export default function Home() {
         </video>
         {/* Mobile video */}
         <video
-          className="block md:hidden absolute inset-0 w-full h-full object-cover"
+          className="hero-video-mobile"
           autoPlay
           muted
           loop
