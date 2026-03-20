@@ -362,8 +362,15 @@ export default function Home() {
             whileInView="visible"
             viewport={{ once: true, margin: '-60px' }}
             variants={stagger}
-            className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12"
-            style={{ maxWidth: '48rem', marginLeft: 'auto', marginRight: 'auto' }}
+            style={{
+              maxWidth: '48rem',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+              marginBottom: '3.5rem',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '2.5rem',
+            }}
           >
             {ateliersData.map((atelier) => (
               <motion.div
@@ -462,7 +469,7 @@ export default function Home() {
             </motion.div>
           </motion.div>
 
-          <div className="text-center">
+          <div style={{ textAlign: 'center' }}>
             <Link href="/ateliers" className="btn-gold">
               Voir tous les ateliers
             </Link>
