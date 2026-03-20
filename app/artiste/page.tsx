@@ -20,7 +20,7 @@ export default function ArtistePage() {
           <span
             style={{
               fontFamily: 'Montserrat, sans-serif',
-              fontSize: '0.6rem',
+              fontSize: '0.75rem',
               letterSpacing: '0.45em',
               textTransform: 'uppercase',
               color: '#C9A84C',
@@ -104,10 +104,10 @@ export default function ArtistePage() {
               <p
                 style={{
                   fontFamily: 'Montserrat, sans-serif',
-                  fontSize: '0.55rem',
+                  fontSize: '0.85rem',
                   letterSpacing: '0.3em',
                   textTransform: 'uppercase',
-                  color: 'rgba(245,240,232,0.3)',
+                  color: 'rgba(245,240,232,0.7)',
                 }}
               >
                 Looka — Calligraphe
@@ -126,7 +126,7 @@ export default function ArtistePage() {
             <span
               style={{
                 fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.6rem',
+                fontSize: '0.75rem',
                 letterSpacing: '0.4em',
                 textTransform: 'uppercase',
                 color: '#C9A84C',
@@ -198,7 +198,7 @@ export default function ArtistePage() {
           <cite
             style={{
               fontFamily: 'Montserrat, sans-serif',
-              fontSize: '0.6rem',
+              fontSize: '0.75rem',
               letterSpacing: '0.3em',
               textTransform: 'uppercase',
               color: '#C9A84C',
@@ -222,7 +222,7 @@ export default function ArtistePage() {
             <span
               style={{
                 fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.6rem',
+                fontSize: '0.75rem',
                 letterSpacing: '0.4em',
                 textTransform: 'uppercase',
                 color: '#C9A84C',
@@ -270,7 +270,7 @@ export default function ArtistePage() {
             <span
               style={{
                 fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.6rem',
+                fontSize: '0.75rem',
                 letterSpacing: '0.4em',
                 textTransform: 'uppercase',
                 color: '#C9A84C',
@@ -305,7 +305,7 @@ export default function ArtistePage() {
                     gap: '1rem',
                   }}
                 >
-                  <span style={{ color: '#C9A84C', fontSize: '0.7rem' }}>◆</span>
+                  <span style={{ color: '#C9A84C', fontSize: '0.82rem' }}>◆</span>
                   <span
                     style={{
                       fontFamily: 'Montserrat, sans-serif',

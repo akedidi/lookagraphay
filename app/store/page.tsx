@@ -27,7 +27,7 @@ export default function StorePage() {
           <span
             style={{
               fontFamily: 'Montserrat, sans-serif',
-              fontSize: '0.6rem',
+              fontSize: '0.75rem',
               letterSpacing: '0.45em',
               textTransform: 'uppercase',
               color: '#C9A84C',
@@ -59,7 +59,7 @@ export default function StorePage() {
               fontWeight: 300,
               fontSize: '0.75rem',
               lineHeight: 1.8,
-              color: 'rgba(245,240,232,0.5)',
+              color: 'rgba(245,240,232,0.82)',
               maxWidth: 480,
               margin: '0 auto',
             }}
@@ -81,7 +81,7 @@ export default function StorePage() {
               onClick={() => setFilter(cat)}
               style={{
                 fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.6rem',
+                fontSize: '0.75rem',
                 letterSpacing: '0.25em',
                 textTransform: 'uppercase',
                 padding: '0.5rem 1.5rem',
@@ -151,7 +151,7 @@ export default function StorePage() {
                         top: '1rem',
                         left: '1rem',
                         fontFamily: 'Montserrat, sans-serif',
-                        fontSize: '0.5rem',
+                        fontSize: '0.82rem',
                         letterSpacing: '0.25em',
                         textTransform: 'uppercase',
                         color: '#C9A84C',
@@ -176,7 +176,7 @@ export default function StorePage() {
                         <span
                           style={{
                             fontFamily: 'Montserrat, sans-serif',
-                            fontSize: '0.6rem',
+                            fontSize: '0.75rem',
                             letterSpacing: '0.3em',
                             textTransform: 'uppercase',
                             color: 'rgba(245,240,232,0.6)',
@@ -213,7 +213,7 @@ export default function StorePage() {
                     <p
                       style={{
                         fontFamily: 'Montserrat, sans-serif',
-                        fontSize: '0.7rem',
+                        fontSize: '0.82rem',
                         fontWeight: 300,
                         lineHeight: 1.7,
                         color: 'rgba(61,43,31,0.6)',
@@ -242,7 +242,7 @@ export default function StorePage() {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="btn-gold"
-                          style={{ fontSize: '0.55rem', padding: '0.65rem 1.2rem' }}
+                          style={{ fontSize: '0.85rem', padding: '0.65rem 1.2rem' }}
                         >
                           Acheter via PayPal
                         </a>
@@ -250,7 +250,7 @@ export default function StorePage() {
                         <span
                           style={{
                             fontFamily: 'Montserrat, sans-serif',
-                            fontSize: '0.55rem',
+                            fontSize: '0.85rem',
                             color: 'rgba(61,43,31,0.35)',
                             textTransform: 'uppercase',
                             letterSpacing: '0.2em',
@@ -295,7 +295,7 @@ export default function StorePage() {
               fontWeight: 300,
               fontSize: '0.75rem',
               lineHeight: 1.8,
-              color: 'rgba(245,240,232,0.5)',
+              color: 'rgba(245,240,232,0.82)',
               marginBottom: '2rem',
             }}
           >

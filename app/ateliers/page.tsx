@@ -21,7 +21,7 @@ export default function AteliersPage() {
           <span
             style={{
               fontFamily: 'Montserrat, sans-serif',
-              fontSize: '0.6rem',
+              fontSize: '0.75rem',
               letterSpacing: '0.45em',
               textTransform: 'uppercase',
               color: '#C9A84C',
@@ -54,7 +54,7 @@ export default function AteliersPage() {
               fontWeight: 300,
               fontSize: '0.8rem',
               lineHeight: 1.9,
-              color: 'rgba(245,240,232,0.55)',
+              color: 'rgba(245,240,232,0.85)',
               maxWidth: 560,
               margin: '0 auto',
             }}
@@ -406,7 +406,7 @@ export default function AteliersPage() {
                     key={i}
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.72rem',
+                      fontSize: '0.85rem',
                       fontWeight: 300,
                       color: '#3D2B1F',
                       lineHeight: 1.7,
@@ -454,7 +454,7 @@ export default function AteliersPage() {
                     fontFamily: 'Montserrat, sans-serif',
                     fontSize: '0.75rem',
                     fontWeight: 300,
-                    color: 'rgba(245,240,232,0.5)',
+                    color: 'rgba(245,240,232,0.82)',
                     lineHeight: 1.8,
                     marginBottom: '2rem',
                   }}
@@ -538,7 +538,7 @@ export default function AteliersPage() {
                   fontFamily: 'Montserrat, sans-serif',
                   fontSize: '0.75rem',
                   fontWeight: 300,
-                  color: 'rgba(245,240,232,0.5)',
+                  color: 'rgba(245,240,232,0.82)',
                   lineHeight: 1.8,
                 }}
               >

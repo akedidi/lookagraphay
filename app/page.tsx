@@ -150,10 +150,10 @@ export default function Home() {
           <span
             style={{
               fontFamily: 'Montserrat, sans-serif',
-              fontSize: '0.55rem',
+              fontSize: '0.85rem',
               letterSpacing: '0.35em',
               textTransform: 'uppercase',
-              color: 'rgba(245,240,232,0.4)',
+              color: 'rgba(245,240,232,0.75)',
             }}
           >
             Défiler
@@ -197,7 +197,7 @@ export default function Home() {
             La calligraphie n'est pas une écriture —<br />
             <em style={{ color: '#C9A84C' }}>c'est une danse de l'encre.</em>"
           </p>
-          <div className="mt-8" style={{ color: 'rgba(245,240,232,0.3)', fontSize: '0.65rem', letterSpacing: '0.25em', fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase' }}>
+          <div className="mt-8" style={{ color: 'rgba(245,240,232,0.7)', fontSize: '0.8rem', letterSpacing: '0.25em', fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase' }}>
             — Looka
           </div>
         </motion.div>
@@ -216,7 +216,7 @@ export default function Home() {
             <span
               style={{
                 fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.6rem',
+                fontSize: '0.75rem',
                 letterSpacing: '0.4em',
                 textTransform: 'uppercase',
                 color: '#C9A84C',
@@ -303,10 +303,10 @@ export default function Home() {
               <p
                 style={{
                   fontFamily: 'Montserrat, sans-serif',
-                  fontSize: '0.6rem',
+                  fontSize: '0.75rem',
                   letterSpacing: '0.3em',
                   textTransform: 'uppercase',
-                  color: 'rgba(245,240,232,0.3)',
+                  color: 'rgba(245,240,232,0.7)',
                 }}
               >
                 Portrait de l'artiste
@@ -329,7 +329,7 @@ export default function Home() {
             <span
               style={{
                 fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.6rem',
+                fontSize: '0.75rem',
                 letterSpacing: '0.4em',
                 textTransform: 'uppercase',
                 color: '#C9A84C',
@@ -357,7 +357,7 @@ export default function Home() {
                 fontWeight: 300,
                 fontSize: '0.8rem',
                 lineHeight: 1.8,
-                color: 'rgba(245,240,232,0.55)',
+                color: 'rgba(245,240,232,0.85)',
                 maxWidth: 500,
                 margin: '0 auto',
               }}
@@ -389,7 +389,7 @@ export default function Home() {
                 <span
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
-                    fontSize: '0.55rem',
+                    fontSize: '0.85rem',
                     letterSpacing: '0.3em',
                     textTransform: 'uppercase',
                     color: '#C9A84C',
@@ -416,10 +416,10 @@ export default function Home() {
                 <p
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
-                    fontSize: '0.7rem',
+                    fontSize: '0.82rem',
                     fontWeight: 300,
                     lineHeight: 1.7,
-                    color: 'rgba(245,240,232,0.5)',
+                    color: 'rgba(245,240,232,0.82)',
                     marginBottom: '1.5rem',
                   }}
                 >
@@ -430,7 +430,7 @@ export default function Home() {
                 <span
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
-                    fontSize: '0.55rem',
+                    fontSize: '0.85rem',
                     letterSpacing: '0.2em',
                     color: '#C9A84C',
                     textTransform: 'uppercase',
@@ -459,7 +459,7 @@ export default function Home() {
                   fontFamily: 'Cormorant Garamond, serif',
                   fontStyle: 'italic',
                   fontSize: '1.15rem',
-                  color: 'rgba(245,240,232,0.55)',
+                  color: 'rgba(245,240,232,0.85)',
                   lineHeight: 1.6,
                 }}
               >
@@ -492,7 +492,7 @@ export default function Home() {
             <span
               style={{
                 fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.6rem',
+                fontSize: '0.75rem',
                 letterSpacing: '0.4em',
                 textTransform: 'uppercase',
                 color: '#C9A84C',
@@ -584,7 +584,7 @@ export default function Home() {
                   <p
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.6rem',
+                      fontSize: '0.75rem',
                       color: '#C9A84C',
                       letterSpacing: '0.2em',
                     }}
@@ -617,7 +617,7 @@ export default function Home() {
             <span
               style={{
                 fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.6rem',
+                fontSize: '0.75rem',
                 letterSpacing: '0.4em',
                 textTransform: 'uppercase',
                 color: '#C9A84C',
@@ -663,7 +663,7 @@ export default function Home() {
                   <span
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.55rem',
+                      fontSize: '0.85rem',
                       letterSpacing: '0.25em',
                       textTransform: 'uppercase',
                       color: '#C9A84C',
@@ -677,7 +677,7 @@ export default function Home() {
                     style={{
                       fontFamily: 'Cormorant Garamond, serif',
                       fontSize: '0.9rem',
-                      color: 'rgba(245,240,232,0.4)',
+                      color: 'rgba(245,240,232,0.75)',
                       lineHeight: 1.5,
                     }}
                   >
@@ -700,7 +700,7 @@ export default function Home() {
                   <p
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.65rem',
+                      fontSize: '0.8rem',
                       letterSpacing: '0.15em',
                       color: '#C9A84C',
                       marginBottom: '1rem',
@@ -714,7 +714,7 @@ export default function Home() {
                       fontSize: '0.75rem',
                       fontWeight: 300,
                       lineHeight: 1.7,
-                      color: 'rgba(245,240,232,0.5)',
+                      color: 'rgba(245,240,232,0.82)',
                     }}
                   >
                     {expo.description}
@@ -780,7 +780,7 @@ export default function Home() {
               fontFamily: 'Montserrat, sans-serif',
               fontWeight: 300,
               fontSize: '0.8rem',
-              color: 'rgba(245,240,232,0.55)',
+              color: 'rgba(245,240,232,0.85)',
               lineHeight: 1.8,
               maxWidth: 450,
               margin: '0 auto 2.5rem',

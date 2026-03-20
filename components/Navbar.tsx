@@ -84,7 +84,7 @@ export default function Navbar() {
               <span
                 style={{
                   fontFamily: 'Montserrat, sans-serif',
-                  fontSize: '0.52rem',
+                  fontSize: '0.62rem',
                   fontWeight: 400,
                   letterSpacing: '0.35em',
                   textTransform: 'uppercase',

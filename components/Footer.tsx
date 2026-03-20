@@ -31,7 +31,7 @@ export default function Footer() {
             <div
               style={{
                 fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.6rem',
+                fontSize: '0.75rem',
                 letterSpacing: '0.35em',
                 textTransform: 'uppercase',
                 color: '#C9A84C',
@@ -46,7 +46,7 @@ export default function Footer() {
                 fontSize: '0.75rem',
                 fontWeight: 300,
                 lineHeight: 1.8,
-                color: 'rgba(245,240,232,0.5)',
+                color: 'rgba(245,240,232,0.82)',
                 maxWidth: '260px',
               }}
             >
@@ -60,7 +60,7 @@ export default function Footer() {
             <h4
               style={{
                 fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.6rem',
+                fontSize: '0.75rem',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 color: '#C9A84C',
@@ -83,10 +83,10 @@ export default function Footer() {
                     href={l.href}
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.7rem',
+                      fontSize: '0.82rem',
                       fontWeight: 300,
                       letterSpacing: '0.1em',
-                      color: 'rgba(245,240,232,0.5)',
+                      color: 'rgba(245,240,232,0.82)',
                       textDecoration: 'none',
                       transition: 'color 0.3s',
                     }}
@@ -105,7 +105,7 @@ export default function Footer() {
             <h4
               style={{
                 fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.6rem',
+                fontSize: '0.75rem',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 color: '#C9A84C',
@@ -119,9 +119,9 @@ export default function Footer() {
                 href={`mailto:${siteConfig.email}`}
                 style={{
                   fontFamily: 'Montserrat, sans-serif',
-                  fontSize: '0.7rem',
+                  fontSize: '0.82rem',
                   fontWeight: 300,
-                  color: 'rgba(245,240,232,0.5)',
+                  color: 'rgba(245,240,232,0.82)',
                   textDecoration: 'none',
                   transition: 'color 0.3s',
                 }}
@@ -136,9 +136,9 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 style={{
                   fontFamily: 'Montserrat, sans-serif',
-                  fontSize: '0.7rem',
+                  fontSize: '0.82rem',
                   fontWeight: 300,
-                  color: 'rgba(245,240,232,0.5)',
+                  color: 'rgba(245,240,232,0.82)',
                   textDecoration: 'none',
                   transition: 'color 0.3s',
                 }}
@@ -166,9 +166,9 @@ export default function Footer() {
           <span
             style={{
               fontFamily: 'Montserrat, sans-serif',
-              fontSize: '0.6rem',
+              fontSize: '0.75rem',
               letterSpacing: '0.15em',
-              color: 'rgba(245,240,232,0.3)',
+              color: 'rgba(245,240,232,0.7)',
             }}
           >
             © {new Date().getFullYear()} LookaGraphy — Tous droits réservés
@@ -177,9 +177,9 @@ export default function Footer() {
             href="/mentions-legales"
             style={{
               fontFamily: 'Montserrat, sans-serif',
-              fontSize: '0.6rem',
+              fontSize: '0.75rem',
               letterSpacing: '0.15em',
-              color: 'rgba(245,240,232,0.3)',
+              color: 'rgba(245,240,232,0.7)',
               textDecoration: 'none',
               transition: 'color 0.3s',
             }}

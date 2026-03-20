@@ -30,7 +30,7 @@ export default function GaleriePage() {
           <span
             style={{
               fontFamily: 'Montserrat, sans-serif',
-              fontSize: '0.6rem',
+              fontSize: '0.75rem',
               letterSpacing: '0.45em',
               textTransform: 'uppercase',
               color: '#C9A84C',
@@ -68,7 +68,7 @@ export default function GaleriePage() {
               onClick={() => setFilter(style)}
               style={{
                 fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.6rem',
+                fontSize: '0.75rem',
                 letterSpacing: '0.25em',
                 textTransform: 'uppercase',
                 padding: '0.5rem 1.5rem',
@@ -163,7 +163,7 @@ export default function GaleriePage() {
                     <p
                       style={{
                         fontFamily: 'Montserrat, sans-serif',
-                        fontSize: '0.55rem',
+                        fontSize: '0.85rem',
                         letterSpacing: '0.2em',
                         color: '#C9A84C',
                         textTransform: 'uppercase',
@@ -176,8 +176,8 @@ export default function GaleriePage() {
                       <span
                         style={{
                           fontFamily: 'Montserrat, sans-serif',
-                          fontSize: '0.65rem',
-                          color: 'rgba(245,240,232,0.5)',
+                          fontSize: '0.8rem',
+                          color: 'rgba(245,240,232,0.82)',
                         }}
                       >
                         {oeuvre.dimensions}
@@ -186,7 +186,7 @@ export default function GaleriePage() {
                         <span
                           style={{
                             fontFamily: 'Montserrat, sans-serif',
-                            fontSize: '0.55rem',
+                            fontSize: '0.85rem',
                             color: '#C9A84C',
                             letterSpacing: '0.15em',
                             textTransform: 'uppercase',
@@ -282,7 +282,7 @@ export default function GaleriePage() {
                   onClick={() => setSelected(null)}
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
-                    fontSize: '0.6rem',
+                    fontSize: '0.75rem',
                     letterSpacing: '0.25em',
                     color: '#C9A84C',
                     background: 'none',
@@ -301,7 +301,7 @@ export default function GaleriePage() {
                 <span
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
-                    fontSize: '0.55rem',
+                    fontSize: '0.85rem',
                     letterSpacing: '0.3em',
                     textTransform: 'uppercase',
                     color: '#C9A84C',
@@ -349,7 +349,7 @@ export default function GaleriePage() {
                       <span
                         style={{
                           fontFamily: 'Montserrat, sans-serif',
-                          fontSize: '0.55rem',
+                          fontSize: '0.85rem',
                           letterSpacing: '0.25em',
                           textTransform: 'uppercase',
                           color: '#C9A84C',
@@ -360,7 +360,7 @@ export default function GaleriePage() {
                       <p
                         style={{
                           fontFamily: 'Montserrat, sans-serif',
-                          fontSize: '0.72rem',
+                          fontSize: '0.85rem',
                           fontWeight: 300,
                           color: '#3D2B1F',
                         }}
@@ -385,7 +385,7 @@ export default function GaleriePage() {
                   <span
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.55rem',
+                      fontSize: '0.85rem',
                       color: selected.disponible ? '#C9A84C' : 'rgba(61,43,31,0.4)',
                       textTransform: 'uppercase',
                       letterSpacing: '0.15em',

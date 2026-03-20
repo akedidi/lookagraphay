@@ -39,7 +39,7 @@ export default function ContactPage() {
     borderBottom: '1px solid rgba(61,43,31,0.25)',
     padding: '0.75rem 0',
     fontFamily: 'Montserrat, sans-serif',
-    fontSize: '0.78rem',
+    fontSize: '0.875rem',
     fontWeight: 300,
     color: '#1A1209',
     letterSpacing: '0.05em',
@@ -49,7 +49,7 @@ export default function ContactPage() {
 
   const labelStyle = {
     fontFamily: 'Montserrat, sans-serif',
-    fontSize: '0.55rem',
+    fontSize: '0.85rem',
     letterSpacing: '0.35em',
     textTransform: 'uppercase' as const,
     color: '#C9A84C',
@@ -67,7 +67,7 @@ export default function ContactPage() {
           <span
             style={{
               fontFamily: 'Montserrat, sans-serif',
-              fontSize: '0.6rem',
+              fontSize: '0.75rem',
               letterSpacing: '0.45em',
               textTransform: 'uppercase',
               color: '#C9A84C',
@@ -110,7 +110,7 @@ export default function ContactPage() {
             <span
               style={{
                 fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.6rem',
+                fontSize: '0.75rem',
                 letterSpacing: '0.4em',
                 textTransform: 'uppercase',
                 color: '#C9A84C',
@@ -140,7 +140,7 @@ export default function ContactPage() {
               style={{
                 fontFamily: 'Montserrat, sans-serif',
                 fontWeight: 300,
-                fontSize: '0.78rem',
+                fontSize: '0.875rem',
                 lineHeight: 1.9,
                 color: '#3D2B1F',
                 marginBottom: '2.5rem',
@@ -156,7 +156,7 @@ export default function ContactPage() {
                   href={`mailto:${siteConfig.email}`}
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
-                    fontSize: '0.78rem',
+                    fontSize: '0.875rem',
                     fontWeight: 300,
                     color: '#3D2B1F',
                     textDecoration: 'none',
@@ -174,7 +174,7 @@ export default function ContactPage() {
                   rel="noopener noreferrer"
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
-                    fontSize: '0.78rem',
+                    fontSize: '0.875rem',
                     fontWeight: 300,
                     color: '#3D2B1F',
                     textDecoration: 'none',
@@ -188,7 +188,7 @@ export default function ContactPage() {
                 <span
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
-                    fontSize: '0.78rem',
+                    fontSize: '0.875rem',
                     fontWeight: 300,
                     color: '#3D2B1F',
                   }}
@@ -243,7 +243,7 @@ export default function ContactPage() {
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
                     fontWeight: 300,
-                    fontSize: '0.78rem',
+                    fontSize: '0.875rem',
                     color: '#3D2B1F',
                     lineHeight: 1.7,
                   }}

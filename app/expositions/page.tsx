@@ -30,7 +30,7 @@ export default function ExpositionsPage() {
           <span
             style={{
               fontFamily: 'Montserrat, sans-serif',
-              fontSize: '0.6rem',
+              fontSize: '0.75rem',
               letterSpacing: '0.45em',
               textTransform: 'uppercase',
               color: '#C9A84C',
@@ -66,9 +66,9 @@ export default function ExpositionsPage() {
             style={{
               fontFamily: 'Montserrat, sans-serif',
               fontWeight: 300,
-              fontSize: '0.78rem',
+              fontSize: '0.875rem',
               letterSpacing: '0.1em',
-              color: 'rgba(245,240,232,0.5)',
+              color: 'rgba(245,240,232,0.82)',
               maxWidth: '32rem',
             }}
           >
@@ -91,7 +91,7 @@ export default function ExpositionsPage() {
               <span
                 style={{
                   fontFamily: 'Montserrat, sans-serif',
-                  fontSize: '0.6rem',
+                  fontSize: '0.75rem',
                   letterSpacing: '0.4em',
                   textTransform: 'uppercase',
                   color: '#C9A84C',
@@ -165,7 +165,7 @@ export default function ExpositionsPage() {
                       style={{
                         display: 'inline-block',
                         fontFamily: 'Montserrat, sans-serif',
-                        fontSize: '0.55rem',
+                        fontSize: '0.85rem',
                         letterSpacing: '0.3em',
                         textTransform: 'uppercase',
                         color: '#C9A84C',
@@ -193,7 +193,7 @@ export default function ExpositionsPage() {
                     <p
                       style={{
                         fontFamily: 'Montserrat, sans-serif',
-                        fontSize: '0.7rem',
+                        fontSize: '0.82rem',
                         color: '#C9A84C',
                         letterSpacing: '0.15em',
                         marginBottom: '0.5rem',
@@ -204,8 +204,8 @@ export default function ExpositionsPage() {
                     <p
                       style={{
                         fontFamily: 'Montserrat, sans-serif',
-                        fontSize: '0.7rem',
-                        color: 'rgba(61,43,31,0.5)',
+                        fontSize: '0.82rem',
+                        color: 'rgba(61,43,31,0.75)',
                         letterSpacing: '0.1em',
                         marginBottom: '1.5rem',
                       }}
@@ -227,7 +227,7 @@ export default function ExpositionsPage() {
                         style={{
                           fontFamily: 'Montserrat, sans-serif',
                           fontWeight: 300,
-                          fontSize: '0.78rem',
+                          fontSize: '0.875rem',
                           lineHeight: 1.9,
                           color: '#3D2B1F',
                           marginBottom: pi < expo.description.split('\n\n').length - 1 ? '1rem' : 0,
@@ -257,7 +257,7 @@ export default function ExpositionsPage() {
             <span
               style={{
                 fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.6rem',
+                fontSize: '0.75rem',
                 letterSpacing: '0.4em',
                 textTransform: 'uppercase',
                 color: '#C9A84C',
@@ -317,7 +317,7 @@ export default function ExpositionsPage() {
                       style={{
                         fontFamily: 'Cormorant Garamond, serif',
                         fontSize: '0.9rem',
-                        color: 'rgba(245,240,232,0.35)',
+                        color: 'rgba(245,240,232,0.72)',
                         lineHeight: 1.6,
                         fontStyle: 'italic',
                       }}
@@ -327,7 +327,7 @@ export default function ExpositionsPage() {
                     <p
                       style={{
                         fontFamily: 'Montserrat, sans-serif',
-                        fontSize: '0.6rem',
+                        fontSize: '0.75rem',
                         color: '#C9A84C',
                         letterSpacing: '0.15em',
                         textTransform: 'uppercase',
@@ -356,10 +356,10 @@ export default function ExpositionsPage() {
                         key={pi}
                         style={{
                           fontFamily: 'Montserrat, sans-serif',
-                          fontSize: '0.78rem',
+                          fontSize: '0.875rem',
                           fontWeight: 300,
                           lineHeight: 1.9,
-                          color: 'rgba(245,240,232,0.55)',
+                          color: 'rgba(245,240,232,0.85)',
                           marginBottom: pi < expo.description.split('\n\n').length - 1 ? '1rem' : 0,
                         }}
                       >

@@ -29,7 +29,7 @@ export default function EvenementsPage() {
           <span
             style={{
               fontFamily: 'Montserrat, sans-serif',
-              fontSize: '0.6rem',
+              fontSize: '0.75rem',
               letterSpacing: '0.45em',
               textTransform: 'uppercase',
               color: '#C9A84C',
@@ -71,7 +71,7 @@ export default function EvenementsPage() {
             <span
               style={{
                 fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.6rem',
+                fontSize: '0.75rem',
                 letterSpacing: '0.4em',
                 textTransform: 'uppercase',
                 color: '#C9A84C',
@@ -129,8 +129,8 @@ export default function EvenementsPage() {
                   <div
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.65rem',
-                      color: 'rgba(61,43,31,0.5)',
+                      fontSize: '0.8rem',
+                      color: 'rgba(61,43,31,0.75)',
                       letterSpacing: '0.1em',
                     }}
                   >
@@ -144,7 +144,7 @@ export default function EvenementsPage() {
                     style={{
                       display: 'inline-block',
                       fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.5rem',
+                      fontSize: '0.82rem',
                       letterSpacing: '0.25em',
                       textTransform: 'uppercase',
                       color: typeColors[evt.type] || '#C9A84C',
@@ -170,8 +170,8 @@ export default function EvenementsPage() {
                   <p
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.65rem',
-                      color: 'rgba(61,43,31,0.5)',
+                      fontSize: '0.8rem',
+                      color: 'rgba(61,43,31,0.75)',
                       marginBottom: '0.25rem',
                     }}
                   >
@@ -180,7 +180,7 @@ export default function EvenementsPage() {
                   <p
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.65rem',
+                      fontSize: '0.8rem',
                       color: '#C9A84C',
                       marginBottom: '1rem',
                     }}
@@ -218,7 +218,7 @@ export default function EvenementsPage() {
             <span
               style={{
                 fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.6rem',
+                fontSize: '0.75rem',
                 letterSpacing: '0.4em',
                 textTransform: 'uppercase',
                 color: '#C9A84C',
@@ -261,8 +261,8 @@ export default function EvenementsPage() {
               <span
                 style={{
                   fontFamily: 'Montserrat, sans-serif',
-                  fontSize: '0.65rem',
-                  color: 'rgba(245,240,232,0.3)',
+                  fontSize: '0.8rem',
+                  color: 'rgba(245,240,232,0.7)',
                 }}
               >
                 {evt.date}
@@ -281,7 +281,7 @@ export default function EvenementsPage() {
                 <p
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
-                    fontSize: '0.65rem',
+                    fontSize: '0.8rem',
                     color: 'rgba(201,168,76,0.5)',
                   }}
                 >
