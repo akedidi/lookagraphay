@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { artistData, ateliersData, expositionsData, evenementsData, galerieData } from '@/lib/data';
@@ -51,7 +50,7 @@ export default function Home() {
           style={{
             background:
               'linear-gradient(135deg, #1A1209 0%, #3D2B1F 40%, #2A2520 100%)',
-            zIndex: 0,
+            zIndex: -1,
           }}
         />
 
