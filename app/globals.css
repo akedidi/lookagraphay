@@ -1,0 +1,150 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Montserrat:wght@300;400;500;600&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-ivory: #F5F0E8;
+  --color-sand: #E8DFC8;
+  --color-inkbrown: #3D2B1F;
+  --color-inkdark: #1A1209;
+  --color-gold: #C9A84C;
+  --color-gold-light: #E4C97A;
+  --color-gold-dark: #A07830;
+  --color-charcoal: #2A2520;
+  --color-cream: #FAF7F2;
+
+  --font-serif: "Cormorant Garamond", Garamond, Georgia, serif;
+  --font-sans: "Montserrat", Inter, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #F5F0E8;
+  color: #1A1209;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #F5F0E8;
+}
+::-webkit-scrollbar-thumb {
+  background: #C9A84C;
+  border-radius: 2px;
+}
+
+/* Gold separator */
+.gold-line {
+  display: block;
+  width: 60px;
+  height: 1px;
+  background: #C9A84C;
+  margin: 1.5rem auto;
+}
+
+/* Arabic ornament */
+.ornament {
+  color: #C9A84C;
+  font-size: 1.5rem;
+  letter-spacing: 0.3em;
+  opacity: 0.6;
+}
+
+/* Fade in animation utility */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fadeUp 0.9s ease-out both;
+}
+
+/* Image hover zoom */
+.img-zoom {
+  overflow: hidden;
+}
+.img-zoom img {
+  transition: transform 0.8s ease;
+}
+.img-zoom:hover img {
+  transform: scale(1.04);
+}
+
+/* Hero overlay */
+.hero-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(26, 18, 9, 0.35) 0%,
+    rgba(26, 18, 9, 0.55) 60%,
+    rgba(26, 18, 9, 0.8) 100%
+  );
+}
+
+/* Nav link */
+.nav-link {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  font-weight: 400;
+  color: #F5F0E8;
+  opacity: 0.85;
+  transition: opacity 0.3s ease, color 0.3s ease;
+  text-decoration: none;
+}
+.nav-link:hover {
+  opacity: 1;
+  color: #E4C97A;
+}
+
+/* CTA button */
+.btn-gold {
+  display: inline-block;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  padding: 0.85rem 2.5rem;
+  border: 1px solid #C9A84C;
+  color: #C9A84C;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
+  text-decoration: none;
+}
+.btn-gold:hover {
+  background: #C9A84C;
+  color: #1A1209;
+}
+
+.btn-gold-solid {
+  background: #C9A84C;
+  color: #1A1209;
+}
+.btn-gold-solid:hover {
+  background: #A07830;
+  color: #F5F0E8;
+}
