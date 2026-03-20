@@ -171,6 +171,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Nav link */
 .nav-link {
+  display: inline-block;
   font-family: 'Montserrat', sans-serif;
   font-size: 0.7rem;
   letter-spacing: 0.25em;
@@ -180,6 +181,7 @@ h1, h2, h3, h4, h5, h6 {
   opacity: 0.85;
   transition: opacity 0.3s ease, color 0.3s ease;
   text-decoration: none;
+  padding: 0.75rem 0.5rem;
 }
 .nav-link:hover {
   opacity: 1;
