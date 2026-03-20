@@ -546,15 +546,6 @@ export default function AteliersPage() {
               </p>
             </motion.div>
           ))}
-          <div style={{ borderTop: '1px solid rgba(201,168,76,0.12)', paddingTop: '2rem', textAlign: 'center' }}>
-            <a
-              href={`mailto:${cours.contact}`}
-              className="btn-gold"
-              style={{ display: 'inline-block' }}
-            >
-              Écrire à Looka
-            </a>
-          </div>
         </div>
       </section>
     </div>
