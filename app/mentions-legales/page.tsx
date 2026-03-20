@@ -11,15 +11,14 @@ export default function MentionsLegalesPage() {
   return (
     <div style={{ background: '#F5F0E8' }}>
       <section
-        className="flex flex-col items-center justify-center text-center px-6 pt-40 pb-16"
-        style={{ background: '#1A1209' }}
+        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '10rem 1.5rem 4rem', background: '#1A1209' }}
       >
         <div className="page-header-anim">
           <h1
             style={{
               fontFamily: 'Cormorant Garamond, serif',
               fontWeight: 300,
-              fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+              fontSize: 'clamp(1.8rem, 3.5vw, 3rem)',
               color: '#F5F0E8',
               letterSpacing: '0.06em',
             }}

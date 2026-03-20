@@ -15,8 +15,7 @@ export default function AteliersPage() {
     <div style={{ background: '#F5F0E8' }}>
       {/* Header */}
       <section
-        className="flex flex-col items-center justify-center text-center px-6 pt-40 pb-24"
-        style={{ background: '#2A2520' }}
+        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '10rem 1.5rem 6rem', background: '#2A2520' }}
       >
         <div className="page-header-anim">
           <span
@@ -36,7 +35,7 @@ export default function AteliersPage() {
             style={{
               fontFamily: 'Cormorant Garamond, serif',
               fontWeight: 300,
-              fontSize: 'clamp(2.5rem, 6vw, 5rem)',
+              fontSize: 'clamp(1.8rem, 3.5vw, 3rem)',
               color: '#F5F0E8',
               letterSpacing: '0.06em',
               lineHeight: 1.1,

@@ -44,7 +44,7 @@ export default function ExpositionsPage() {
             style={{
               fontFamily: 'Cormorant Garamond, serif',
               fontWeight: 300,
-              fontSize: 'clamp(2.5rem, 6vw, 5rem)',
+              fontSize: 'clamp(1.8rem, 3.5vw, 3rem)',
               color: '#F5F0E8',
               letterSpacing: '0.06em',
               lineHeight: 1.1,
