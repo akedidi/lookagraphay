@@ -3,9 +3,9 @@ export const siteConfig = {
   tagline: "L'art de la calligraphie arabe",
   description:
     "LookaGraphy est l'univers calligraphique de Looka — artiste parisienne qui fusionne calligraphie arabe et japonaise en un style distinctif, célébrant la beauté et l'universalité humaine.",
-  email: "contact@lookagraphy.fr",
+  email: "looka.graphy@gmail.com",
   instagram: "https://instagram.com/lookagraphy",
-  paypalEmail: "contact@lookagraphy.fr",
+  paypalEmail: "looka.graphy@gmail.com",
 };
 
 export const artistData = {
@@ -31,75 +31,30 @@ export const artistData = {
 
 export const ateliersData = [
   {
-    id: "semestre-1-2026",
-    titre: "Calligraphie arabe — Niveau Fondation",
-    niveau: "Débutants",
-    semestre: "Printemps 2026",
-    dates: "Du 15 mars au 21 juin 2026",
-    horaires: "Samedi de 10h à 13h",
-    lieu: "Atelier LookaGraphy, Paris 11e",
-    places: 8,
-    placesRestantes: 3,
-    prix: 480,
-    description:
-      "Une initiation profonde à la calligraphie arabe classique. On commence par les fondations : tenir le calame, comprendre les proportions, maîtriser les lettres isolées du style Naskh avant d'aborder les liaisons et les premiers mots.",
-    programme: [
-      "Histoire et spiritualité de la calligraphie arabe",
-      "Prise en main du calame et de l'encre",
-      "L'alphabet en style Naskh — lettres isolées",
-      "Les liaisons et la composition de mots",
-      "Initiation à la composition artistique",
-      "Réalisation d'une œuvre personnelle",
-    ],
-    materiel: "Fourni par l'atelier pour les 3 premières séances",
-    paypalLink: "https://paypal.me/lookagraphy/480",
-  },
-  {
-    id: "semestre-2-2026",
-    titre: "Calligraphie arabe — Niveau Intermédiaire",
-    niveau: "Intermédiaires",
-    semestre: "Automne 2026",
-    dates: "Du 12 septembre au 12 décembre 2026",
-    horaires: "Samedi de 14h à 17h",
-    lieu: "Atelier LookaGraphy, Paris 11e",
-    places: 6,
-    placesRestantes: 6,
-    prix: 560,
-    description:
-      "Pour ceux qui maîtrisent les bases. On explore le style Thuluth et ses arabesques, la composition de textes poétiques, et on développe une sensibilité artistique propre.",
-    programme: [
-      "Approfondissement du style Naskh",
-      "Introduction au style Thuluth",
-      "Composition de versets et de poèmes",
-      "Travail sur le format et la mise en page",
-      "Dorure et rehaut à l'or",
-      "Présentation d'un portfolio personnel",
-    ],
-    materiel: "Liste fournie à l'inscription",
-    paypalLink: "https://paypal.me/lookagraphy/560",
-  },
-  {
-    id: "stage-ete-2026",
-    titre: "Stage Intensif d'Été",
+    id: "cours-semestriel",
+    titre: "Cours semestriel de Calligraphie",
     niveau: "Tous niveaux",
-    semestre: "Été 2026",
-    dates: "Du 6 au 10 juillet 2026",
-    horaires: "Lundi au vendredi, 10h à 16h",
-    lieu: "Atelier LookaGraphy, Paris 11e",
-    places: 10,
-    placesRestantes: 5,
-    prix: 390,
-    description:
-      "Cinq jours d'immersion totale dans le geste calligraphique. Une expérience intense, contemplative et transformatrice.",
-    programme: [
-      "Immersion dans les fondamentaux",
-      "Travaux pratiques quotidiens",
-      "Visite d'une exposition calligraphique",
-      "Séance de création libre",
-      "Vernissage privé des œuvres réalisées",
+    semestre: "2026",
+    dates: "Inscriptions ouvertes",
+    horaires: "Samedi à 14h",
+    lieu: "Atelier Montparnasse",
+    transport: [
+      "Métro : Montparnasse · Duroc · Falguière",
+      "Lignes 4, 6, 12, 13",
+      "Train : Gare Montparnasse",
     ],
-    materiel: "Tout le matériel fourni",
-    paypalLink: "https://paypal.me/lookagraphy/390",
+    description:
+      "Rejoignez notre cours semestriel pour explorer l'art de la calligraphie, éveillez votre créativité et goûtez à la satisfaction de créer de belles œuvres.",
+    philosophie:
+      "Ce cours n'est pas une simple leçon de calligraphie — il s'agit d'un moment de méditation, de voyage où chaque étape de l'apprentissage devient une source de plaisir et d'épanouissement. L'objectif est de créer un espace de créativité joyeuse et gratifiante.",
+    programme: [
+      "Découverte des outils : calame, encre, papier",
+      "Fondamentaux de la calligraphie arabe classique",
+      "Exploration du style fusion arabo-japonais de Looka",
+      "Composition de mots et de textes calligraphiés",
+      "Création de ses propres œuvres artistiques",
+    ],
+    contact: "looka.graphy@gmail.com",
   },
 ];
 

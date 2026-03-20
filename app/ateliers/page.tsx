@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 import { ateliersData } from '@/lib/data';
 
 const fadeUp = {
@@ -10,11 +9,13 @@ const fadeUp = {
 };
 
 export default function AteliersPage() {
+  const cours = ateliersData[0];
+
   return (
     <div style={{ background: '#F5F0E8' }}>
       {/* Header */}
       <section
-        className="flex flex-col items-center justify-center text-center px-6 pt-40 pb-20"
+        className="flex flex-col items-center justify-center text-center px-6 pt-40 pb-24"
         style={{ background: '#2A2520' }}
       >
         <div className="page-header-anim">
@@ -53,37 +54,37 @@ export default function AteliersPage() {
               fontFamily: 'Montserrat, sans-serif',
               fontWeight: 300,
               fontSize: '0.8rem',
-              lineHeight: 1.8,
+              lineHeight: 1.9,
               color: 'rgba(245,240,232,0.55)',
-              maxWidth: 520,
+              maxWidth: 560,
               margin: '0 auto',
             }}
           >
-            Des cours semestriels en petits groupes pour entrer dans la pratique calligraphique avec profondeur, patience et présence.
+            {cours.description}
           </p>
         </div>
       </section>
 
-      {/* Intro */}
-      <section className="py-16 px-6" style={{ background: '#F5F0E8' }}>
-        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
+      {/* Stats rapides */}
+      <section className="py-14 px-6" style={{ background: '#FAF7F2', borderBottom: '1px solid rgba(61,43,31,0.08)' }}>
+        <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           {[
-            { label: 'Petits groupes', value: '6 à 10', desc: 'places par session' },
-            { label: 'Durée', value: '3h', desc: 'par séance' },
-            { label: 'Lieu', value: 'Paris 11e', desc: 'Atelier LookaGraphy' },
+            { label: 'Horaire', value: 'Samedi', desc: 'à 14h' },
+            { label: 'Lieu', value: 'Montparnasse', desc: 'Paris' },
+            { label: 'Niveau', value: 'Tous', desc: 'niveaux acceptés' },
           ].map((item, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.15, duration: 0.7 }}
+              transition={{ delay: i * 0.12, duration: 0.7 }}
             >
               <div
                 style={{
                   fontFamily: 'Montserrat, sans-serif',
-                  fontSize: '0.55rem',
-                  letterSpacing: '0.35em',
+                  fontSize: '0.52rem',
+                  letterSpacing: '0.38em',
                   textTransform: 'uppercase',
                   color: '#C9A84C',
                   marginBottom: '0.5rem',
@@ -94,7 +95,7 @@ export default function AteliersPage() {
               <div
                 style={{
                   fontFamily: 'Cormorant Garamond, serif',
-                  fontSize: '2.5rem',
+                  fontSize: '2.2rem',
                   fontWeight: 300,
                   color: '#1A1209',
                   lineHeight: 1,
@@ -106,9 +107,9 @@ export default function AteliersPage() {
               <div
                 style={{
                   fontFamily: 'Montserrat, sans-serif',
-                  fontSize: '0.65rem',
+                  fontSize: '0.62rem',
                   color: '#3D2B1F',
-                  opacity: 0.6,
+                  opacity: 0.55,
                 }}
               >
                 {item.desc}
@@ -118,200 +119,363 @@ export default function AteliersPage() {
         </div>
       </section>
 
-      {/* Ateliers list */}
-      <section className="py-16 px-6 pb-32" style={{ background: '#F5F0E8' }}>
-        <div className="max-w-4xl mx-auto flex flex-col gap-8">
-          {ateliersData.map((atelier, i) => (
-            <motion.article
-              key={atelier.id}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: '-60px' }}
-              variants={fadeUp}
+      {/* Philosophie du cours */}
+      <section className="py-28 px-6" style={{ background: '#F5F0E8' }}>
+        <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
+          >
+            <span
               style={{
-                border: '1px solid rgba(61,43,31,0.15)',
-                background: '#FAF7F2',
-                overflow: 'hidden',
+                fontFamily: 'Montserrat, sans-serif',
+                fontSize: '0.58rem',
+                letterSpacing: '0.42em',
+                textTransform: 'uppercase',
+                color: '#C9A84C',
+                display: 'block',
+                marginBottom: '1.5rem',
               }}
             >
-              {/* Header */}
-              <div
-                style={{
-                  padding: '2.5rem',
-                  borderBottom: '1px solid rgba(61,43,31,0.08)',
-                  display: 'grid',
-                  gridTemplateColumns: '1fr auto',
-                  gap: '1.5rem',
-                  alignItems: 'start',
-                }}
-              >
-                <div>
-                  <span
-                    style={{
-                      fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.55rem',
-                      letterSpacing: '0.3em',
-                      textTransform: 'uppercase',
-                      color: '#C9A84C',
-                      display: 'block',
-                      marginBottom: '0.75rem',
-                    }}
-                  >
-                    {atelier.semestre} · {atelier.niveau}
-                  </span>
-                  <h2
-                    style={{
-                      fontFamily: 'Cormorant Garamond, serif',
-                      fontWeight: 400,
-                      fontSize: 'clamp(1.4rem, 2.5vw, 2rem)',
-                      color: '#1A1209',
-                      letterSpacing: '0.03em',
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {atelier.titre}
-                  </h2>
-                </div>
-                <div className="text-right">
-                  <div
-                    style={{
-                      fontFamily: 'Cormorant Garamond, serif',
-                      fontSize: '2rem',
-                      fontWeight: 300,
-                      color: '#C9A84C',
-                      lineHeight: 1,
-                    }}
-                  >
-                    {atelier.prix} €
-                  </div>
-                  <div
-                    style={{
-                      fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.55rem',
-                      letterSpacing: '0.2em',
-                      color:
-                        atelier.placesRestantes <= 2
-                          ? '#C9A84C'
-                          : 'rgba(61,43,31,0.5)',
-                      textTransform: 'uppercase',
-                      marginTop: '0.25rem',
-                    }}
-                  >
-                    {atelier.placesRestantes === 0
-                      ? 'Complet'
-                      : `${atelier.placesRestantes} place${atelier.placesRestantes > 1 ? 's' : ''} restante${atelier.placesRestantes > 1 ? 's' : ''}`}
-                  </div>
-                </div>
-              </div>
+              L'esprit du cours
+            </span>
+            <h2
+              style={{
+                fontFamily: 'Cormorant Garamond, serif',
+                fontWeight: 300,
+                fontSize: 'clamp(2rem, 3.5vw, 3rem)',
+                color: '#1A1209',
+                letterSpacing: '0.04em',
+                lineHeight: 1.2,
+                marginBottom: '1.5rem',
+              }}
+            >
+              Un moment de<br />
+              <em>méditation et de voyage</em>
+            </h2>
+            <span style={{ display: 'block', width: 40, height: 1, background: '#C9A84C', marginBottom: '2rem' }} />
+            <p
+              style={{
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 300,
+                fontSize: '0.82rem',
+                lineHeight: 2,
+                color: '#3D2B1F',
+              }}
+            >
+              {cours.philosophie}
+            </p>
+          </motion.div>
 
-              {/* Body */}
-              <div className="p-8 grid grid-cols-1 lg:grid-cols-5 gap-10">
-                {/* Infos pratiques */}
-                <div className="lg:col-span-2 flex flex-col gap-4">
-                  {[
-                    { label: 'Dates', value: atelier.dates },
-                    { label: 'Horaires', value: atelier.horaires },
-                    { label: 'Lieu', value: atelier.lieu },
-                    { label: 'Places', value: `${atelier.places} au total` },
-                    { label: 'Matériel', value: atelier.materiel },
-                  ].map((info) => (
-                    <div key={info.label}>
-                      <span
-                        style={{
-                          fontFamily: 'Montserrat, sans-serif',
-                          fontSize: '0.55rem',
-                          letterSpacing: '0.3em',
-                          textTransform: 'uppercase',
-                          color: '#C9A84C',
-                          display: 'block',
-                          marginBottom: '0.25rem',
-                        }}
-                      >
-                        {info.label}
-                      </span>
-                      <span
-                        style={{
-                          fontFamily: 'Montserrat, sans-serif',
-                          fontSize: '0.75rem',
-                          fontWeight: 300,
-                          color: '#3D2B1F',
-                          lineHeight: 1.5,
-                        }}
-                      >
-                        {info.value}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Description + Programme */}
-                <div className="lg:col-span-3">
-                  <p
-                    style={{
-                      fontFamily: 'Montserrat, sans-serif',
-                      fontWeight: 300,
-                      fontSize: '0.8rem',
-                      lineHeight: 1.9,
-                      color: '#3D2B1F',
-                      marginBottom: '2rem',
-                    }}
-                  >
-                    {atelier.description}
-                  </p>
-
-                  <span
-                    style={{
-                      fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.55rem',
-                      letterSpacing: '0.35em',
-                      textTransform: 'uppercase',
-                      color: '#C9A84C',
-                      display: 'block',
-                      marginBottom: '1rem',
-                    }}
-                  >
-                    Programme
-                  </span>
-                  <ul className="flex flex-col gap-2 mb-8">
-                    {atelier.programme.map((item, j) => (
-                      <li
-                        key={j}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'flex-start',
-                          gap: '0.75rem',
-                          fontFamily: 'Montserrat, sans-serif',
-                          fontSize: '0.75rem',
-                          fontWeight: 300,
-                          color: '#3D2B1F',
-                          lineHeight: 1.5,
-                        }}
-                      >
-                        <span style={{ color: '#C9A84C', marginTop: '2px', flexShrink: 0 }}>◆</span>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-
-                  {/* CTA PayPal */}
-                  <a
-                    href={atelier.paypalLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-gold btn-gold-solid"
-                    style={{ display: 'inline-block' }}
-                  >
-                    Réserver / Payer via PayPal
-                  </a>
-                </div>
-              </div>
-            </motion.article>
-          ))}
+          {/* Ornement calligraphique */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.2 }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              aspectRatio: '1',
+              background: 'linear-gradient(135deg, #2A2520 0%, #1A1209 100%)',
+            }}
+          >
+            <div
+              style={{
+                fontFamily: 'Cormorant Garamond, serif',
+                fontSize: 'clamp(5rem, 12vw, 10rem)',
+                color: '#C9A84C',
+                opacity: 0.25,
+                lineHeight: 1,
+                userSelect: 'none',
+                direction: 'rtl',
+              }}
+            >
+              خط
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* FAQ rapide */}
-      <section className="py-20 px-6" style={{ background: '#1A1209' }}>
+      {/* Contenu du cours */}
+      <section className="py-24 px-6" style={{ background: '#1A1209' }}>
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
+            className="text-center mb-16"
+          >
+            <span
+              style={{
+                fontFamily: 'Montserrat, sans-serif',
+                fontSize: '0.58rem',
+                letterSpacing: '0.42em',
+                textTransform: 'uppercase',
+                color: '#C9A84C',
+                display: 'block',
+                marginBottom: '1.2rem',
+              }}
+            >
+              Programme
+            </span>
+            <h2
+              style={{
+                fontFamily: 'Cormorant Garamond, serif',
+                fontWeight: 300,
+                fontSize: 'clamp(2rem, 4vw, 3rem)',
+                color: '#F5F0E8',
+                letterSpacing: '0.05em',
+              }}
+            >
+              Contenu du cours
+            </h2>
+            <span className="gold-line" />
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px" style={{ background: 'rgba(201,168,76,0.1)' }}>
+            {cours.programme.map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.6 }}
+                style={{
+                  background: '#1A1209',
+                  padding: '2.5rem 2rem',
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: 'Cormorant Garamond, serif',
+                    fontSize: '2rem',
+                    color: '#C9A84C',
+                    opacity: 0.25,
+                    lineHeight: 1,
+                    marginBottom: '1rem',
+                    fontWeight: 300,
+                  }}
+                >
+                  {String(i + 1).padStart(2, '0')}
+                </div>
+                <p
+                  style={{
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontSize: '0.75rem',
+                    fontWeight: 300,
+                    color: 'rgba(245,240,232,0.7)',
+                    lineHeight: 1.7,
+                  }}
+                >
+                  {item}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Infos & Inscription */}
+      <section className="py-28 px-6" style={{ background: '#FAF7F2' }}>
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
+            className="text-center mb-16"
+          >
+            <span
+              style={{
+                fontFamily: 'Montserrat, sans-serif',
+                fontSize: '0.58rem',
+                letterSpacing: '0.42em',
+                textTransform: 'uppercase',
+                color: '#C9A84C',
+                display: 'block',
+                marginBottom: '1.2rem',
+              }}
+            >
+              Rejoindre le cours
+            </span>
+            <h2
+              style={{
+                fontFamily: 'Cormorant Garamond, serif',
+                fontWeight: 300,
+                fontSize: 'clamp(2rem, 4vw, 3rem)',
+                color: '#1A1209',
+                letterSpacing: '0.05em',
+              }}
+            >
+              Infos & Inscription
+            </h2>
+            <span style={{ display: 'block', width: 50, height: 1, background: '#C9A84C', margin: '1.5rem auto 0' }} />
+          </motion.div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Infos pratiques */}
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUp}
+              style={{
+                border: '1px solid rgba(61,43,31,0.12)',
+                padding: '2.5rem',
+                background: '#F5F0E8',
+              }}
+            >
+              <h3
+                style={{
+                  fontFamily: 'Cormorant Garamond, serif',
+                  fontWeight: 400,
+                  fontSize: '1.4rem',
+                  color: '#1A1209',
+                  marginBottom: '2rem',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                Informations pratiques
+              </h3>
+
+              {[
+                { label: 'Horaire', value: cours.horaires },
+                { label: 'Adresse', value: cours.lieu },
+                { label: 'Niveau', value: cours.niveau },
+                { label: 'Disponibilité', value: cours.dates },
+              ].map((info) => (
+                <div
+                  key={info.label}
+                  style={{
+                    display: 'flex',
+                    gap: '1.5rem',
+                    paddingBottom: '1.25rem',
+                    marginBottom: '1.25rem',
+                    borderBottom: '1px solid rgba(61,43,31,0.08)',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: 'Montserrat, sans-serif',
+                      fontSize: '0.52rem',
+                      letterSpacing: '0.3em',
+                      textTransform: 'uppercase',
+                      color: '#C9A84C',
+                      minWidth: 90,
+                      paddingTop: '0.15rem',
+                    }}
+                  >
+                    {info.label}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: 'Montserrat, sans-serif',
+                      fontSize: '0.75rem',
+                      fontWeight: 300,
+                      color: '#3D2B1F',
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {info.value}
+                  </span>
+                </div>
+              ))}
+
+              {/* Transport */}
+              <div style={{ marginTop: '0.5rem' }}>
+                <span
+                  style={{
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontSize: '0.52rem',
+                    letterSpacing: '0.3em',
+                    textTransform: 'uppercase',
+                    color: '#C9A84C',
+                    display: 'block',
+                    marginBottom: '0.75rem',
+                  }}
+                >
+                  Accès
+                </span>
+                {cours.transport.map((ligne, i) => (
+                  <p
+                    key={i}
+                    style={{
+                      fontFamily: 'Montserrat, sans-serif',
+                      fontSize: '0.72rem',
+                      fontWeight: 300,
+                      color: '#3D2B1F',
+                      lineHeight: 1.7,
+                    }}
+                  >
+                    {ligne}
+                  </p>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Contact */}
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUp}
+              style={{
+                background: '#1A1209',
+                padding: '2.5rem',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                gap: '2rem',
+              }}
+            >
+              <div className="ornament" style={{ fontSize: '2rem', opacity: 0.3 }}>خ</div>
+              <div>
+                <h3
+                  style={{
+                    fontFamily: 'Cormorant Garamond, serif',
+                    fontWeight: 300,
+                    fontSize: '1.6rem',
+                    color: '#F5F0E8',
+                    letterSpacing: '0.04em',
+                    marginBottom: '1rem',
+                    lineHeight: 1.3,
+                  }}
+                >
+                  Inscription et<br />
+                  <em>informations</em>
+                </h3>
+                <p
+                  style={{
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontSize: '0.75rem',
+                    fontWeight: 300,
+                    color: 'rgba(245,240,232,0.5)',
+                    lineHeight: 1.8,
+                    marginBottom: '2rem',
+                  }}
+                >
+                  Pour vous inscrire ou obtenir plus d'informations, écrivez directement à Looka. Elle répond personnellement à chaque message.
+                </p>
+                <a
+                  href={`mailto:${cours.contact}`}
+                  className="btn-gold btn-gold-solid"
+                  style={{ display: 'inline-block' }}
+                >
+                  {cours.contact}
+                </a>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-20 px-6" style={{ background: '#2A2520' }}>
         <div className="max-w-3xl mx-auto">
           <motion.div
             initial="hidden"
@@ -336,15 +500,15 @@ export default function AteliersPage() {
           {[
             {
               q: 'Faut-il des connaissances en arabe ?',
-              r: "Aucune ! La calligraphie arabe est un art visuel. Vous n'avez pas besoin de lire ou parler arabe pour pratiquer.",
+              r: "Aucune ! La calligraphie arabe est avant tout un art visuel. Vous n'avez pas besoin de lire ou parler arabe pour pratiquer et créer de belles œuvres.",
             },
             {
-              q: 'Le matériel est-il fourni ?',
-              r: "Pour les ateliers de fondation, le matériel est inclus les premières séances. Une liste vous sera fournie à l'inscription.",
+              q: 'Le cours convient-il aux débutants complets ?',
+              r: "Absolument. Le cours accueille tous les niveaux. Que vous débutiez ou ayez déjà une pratique, Looka adapte l'enseignement à chaque participant.",
             },
             {
               q: "Comment s'inscrire ?",
-              r: "Cliquez sur 'Réserver via PayPal' pour sécuriser votre place. Vous pouvez aussi écrire via le formulaire de contact.",
+              r: `Écrivez à Looka par email à ${cours.contact} pour vous inscrire ou obtenir toutes les informations sur le cours (tarifs, dates, matériel).`,
             },
           ].map((faq, i) => (
             <motion.div
@@ -355,13 +519,13 @@ export default function AteliersPage() {
               transition={{ delay: i * 0.1 }}
               style={{
                 borderTop: '1px solid rgba(201,168,76,0.12)',
-                padding: '1.5rem 0',
+                padding: '1.75rem 0',
               }}
             >
               <h3
                 style={{
                   fontFamily: 'Cormorant Garamond, serif',
-                  fontSize: '1.1rem',
+                  fontSize: '1.15rem',
                   color: '#F5F0E8',
                   marginBottom: '0.75rem',
                   letterSpacing: '0.02em',
@@ -375,13 +539,22 @@ export default function AteliersPage() {
                   fontSize: '0.75rem',
                   fontWeight: 300,
                   color: 'rgba(245,240,232,0.5)',
-                  lineHeight: 1.7,
+                  lineHeight: 1.8,
                 }}
               >
                 {faq.r}
               </p>
             </motion.div>
           ))}
+          <div style={{ borderTop: '1px solid rgba(201,168,76,0.12)', paddingTop: '2rem', textAlign: 'center' }}>
+            <a
+              href={`mailto:${cours.contact}`}
+              className="btn-gold"
+              style={{ display: 'inline-block' }}
+            >
+              Écrire à Looka
+            </a>
+          </div>
         </div>
       </section>
     </div>

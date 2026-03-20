@@ -38,7 +38,7 @@ export default function MentionsLegalesPage() {
           {[
             {
               titre: 'Éditeur du site',
-              content: `LookaGraphy\nSite web : lookagraphy.fr\nEmail : contact@lookagraphy.fr\nSiège social : Paris, France`,
+              content: `LookaGraphy\nSite web : lookagraphy.fr\nEmail : looka.graphy@gmail.com\nSiège social : Paris, France`,
             },
             {
               titre: 'Hébergement',
@@ -52,7 +52,7 @@ export default function MentionsLegalesPage() {
             {
               titre: 'Données personnelles',
               content:
-                "Les données collectées via le formulaire de contact sont utilisées uniquement pour répondre à vos demandes. Elles ne sont pas transmises à des tiers. Conformément à la loi Informatique et Libertés et au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression. Pour exercer ce droit, contactez : contact@lookagraphy.fr",
+                "Les données collectées via le formulaire de contact sont utilisées uniquement pour répondre à vos demandes. Elles ne sont pas transmises à des tiers. Conformément à la loi Informatique et Libertés et au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression. Pour exercer ce droit, contactez : looka.graphy@gmail.com",
             },
             {
               titre: 'Cookies',
