@@ -1,9 +1,14 @@
 /** @type {import('next').NextConfig} */
+const replitDomain = process.env.REPLIT_DEV_DOMAIN;
+
 const nextConfig = {
   reactStrictMode: true,
   images: {
     unoptimized: true,
   },
+  ...(replitDomain && {
+    allowedDevOrigins: [replitDomain],
+  }),
   webpack: (config, { dev }) => {
     if (dev) {
       config.watchOptions = {
