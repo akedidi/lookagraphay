@@ -82,7 +82,7 @@ export default function AteliersPage() {
               <div
                 style={{
                   fontFamily: 'Montserrat, sans-serif',
-                  fontSize: '0.52rem',
+                  fontSize: '0.72rem',
                   letterSpacing: '0.38em',
                   textTransform: 'uppercase',
                   color: '#C9A84C',
@@ -106,9 +106,9 @@ export default function AteliersPage() {
               <div
                 style={{
                   fontFamily: 'Montserrat, sans-serif',
-                  fontSize: '0.62rem',
+                  fontSize: '0.78rem',
                   color: '#3D2B1F',
-                  opacity: 0.55,
+                  opacity: 0.75,
                 }}
               >
                 {item.desc}
@@ -131,7 +131,7 @@ export default function AteliersPage() {
             <span
               style={{
                 fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.58rem',
+                fontSize: '0.72rem',
                 letterSpacing: '0.42em',
                 textTransform: 'uppercase',
                 color: '#C9A84C',
@@ -213,7 +213,7 @@ export default function AteliersPage() {
             <span
               style={{
                 fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.58rem',
+                fontSize: '0.72rem',
                 letterSpacing: '0.42em',
                 textTransform: 'uppercase',
                 color: '#C9A84C',
@@ -268,7 +268,7 @@ export default function AteliersPage() {
                     fontFamily: 'Montserrat, sans-serif',
                     fontSize: '0.75rem',
                     fontWeight: 300,
-                    color: 'rgba(245,240,232,0.7)',
+                    color: 'rgba(245,240,232,0.87)',
                     lineHeight: 1.7,
                   }}
                 >
@@ -293,7 +293,7 @@ export default function AteliersPage() {
             <span
               style={{
                 fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.58rem',
+                fontSize: '0.72rem',
                 letterSpacing: '0.42em',
                 textTransform: 'uppercase',
                 color: '#C9A84C',
@@ -362,7 +362,7 @@ export default function AteliersPage() {
                   <span
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.52rem',
+                      fontSize: '0.72rem',
                       letterSpacing: '0.3em',
                       textTransform: 'uppercase',
                       color: '#C9A84C',
@@ -391,7 +391,7 @@ export default function AteliersPage() {
                 <span
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
-                    fontSize: '0.52rem',
+                    fontSize: '0.72rem',
                     letterSpacing: '0.3em',
                     textTransform: 'uppercase',
                     color: '#C9A84C',
