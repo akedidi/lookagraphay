@@ -1,0 +1,238 @@
+Je veux recréer de zéro un site vitrine premium pour une artiste en calligraphie arabe : LucaGraphy.fr.
+
+OBJECTIF GLOBAL  
+Créer un site extrêmement beau, raffiné, artistique, immersif et haut de gamme.  
+Le rendu doit être au niveau d’une galerie d’art contemporaine, d’un atelier d’artiste ou d’une maison d’édition élégante.
+
+--------------------------------------------------
+INSPIRATIONS OBLIGATOIRES
+
+Tu dois t’inspirer de ces deux sites :
+
+1) https://lookagraphy.fr/  
+→ structure, contenus, logique des cours, expositions, contact  
+
+2) https://www.artofthepen.com/  
+→ direction artistique, élégance, mise en valeur des œuvres, luxe discret  
+
+IMPORTANT :  
+- Ne copie jamais ces sites  
+- Ne reproduis pas leur structure exacte  
+- Inspire-toi uniquement du niveau de qualité  
+
+--------------------------------------------------
+REPRISE DE L’IDENTITÉ VISUELLE EXISTANTE (TRÈS IMPORTANT)
+
+Le site d’origine contient déjà une identité graphique forte (motifs, images, ambiance).  
+Je veux préserver cette identité visuelle.
+
+OBJECTIF :  
+Faire une version plus belle, plus raffinée et premium du site actuel, sans casser son ADN.
+
+ATTENTES :  
+- réutiliser les motifs et images existants  
+- conserver l’univers visuel  
+- réinterpréter les éléments de manière plus élégante  
+- garder la cohérence graphique globale  
+- enrichir sans dénaturer  
+
+IMPORTANT :  
+Le redesign doit être perçu comme une version sublimée du site existant, pas une rupture.
+
+--------------------------------------------------
+POSITIONNEMENT
+
+Le site LucaGraphy doit être à la croisée de :
+- portfolio d’artiste
+- galerie d’art
+- site culturel
+- association artistique
+- boutique
+
+--------------------------------------------------
+DIRECTION ARTISTIQUE (CRITIQUE)
+
+- minimaliste mais riche  
+- très élégant  
+- contemplatif  
+- haut de gamme  
+- jamais template  
+
+PALETTE :  
+- ivoire / sable  
+- noir profond  
+- brun encre  
+- touches dorées subtiles  
+
+TYPOGRAPHIE :  
+- serif élégante + sans-serif sobre  
+
+ANIMATIONS :  
+- très légères (fade, scroll)  
+- transitions fluides  
+
+--------------------------------------------------
+INTÉGRATION VIDÉOS BACKGROUND (CRITIQUE)
+
+Dans /public/videos/ :
+
+- video-hero-wide.mp4  
+- video-hero-vertical.mp4  
+
+OBJECTIF :  
+Créer un hero immersif avec vidéo en background.
+
+COMPORTEMENT :  
+- autoplay  
+- muted  
+- loop  
+- sans contrôles  
+
+RESPONSIVE :  
+- Desktop → video-hero-wide  
+- Mobile → video-hero-vertical  
+
+STYLE :  
+- overlay sombre léger  
+- texte lisible par-dessus  
+
+La vidéo doit transmettre :  
+liberté, geste artistique, contemplation.
+
+IMPORTANT :  
+Ce n’est pas un fond décoratif mais un élément central de l’expérience.
+
+--------------------------------------------------
+PAGES OBLIGATOIRES
+
+- Accueil  
+- L’Artiste  
+- Ateliers (cours semestriels)  
+- Expositions  
+- Événements (à venir + passés)  
+- Galerie / Œuvres  
+- Store  
+- Contact  
+- Mentions légales  
+
+--------------------------------------------------
+DÉTAIL DES PAGES
+
+ACCUEIL :  
+- hero vidéo immersif  
+- phrase poétique  
+- sections : artiste, ateliers, expositions, événements, œuvres  
+- CTA élégants  
+
+ARTISTE :  
+- biographie  
+- démarche  
+- inspirations  
+
+ATELIERS :  
+- cours semestriels (IMPORTANT)  
+- infos pratiques  
+- CTA inscription  
+
+EXPOSITIONS :  
+- liste + fiches  
+
+ÉVÉNEMENTS :  
+- futurs événements (dates visibles)  
+- événements passés  
+
+GALERIE :  
+- grille élégante  
+- fiches œuvres  
+
+--------------------------------------------------
+STORE (TRÈS IMPORTANT)
+
+Permettre d’acheter :
+- œuvres  
+- objets  
+
+UX :  
+- pas e-commerce classique  
+- rendu artistique  
+
+PAIEMENT :  
+- PayPal (donation / paiement simple)  
+- bouton : "Acheter via PayPal"  
+
+--------------------------------------------------
+PAIEMENT DES COURS (TRÈS IMPORTANT)
+
+Dans Ateliers :  
+- bouton : "Réserver / Payer via PayPal"  
+- paiement simple  
+
+--------------------------------------------------
+CONTACT
+
+- formulaire  
+- demandes : ateliers, achat, exposition, collaboration  
+
+--------------------------------------------------
+STACK TECHNIQUE
+
+- Next.js  
+- React  
+- Tailwind CSS  
+- Framer Motion léger  
+
+--------------------------------------------------
+GESTION CONTENU
+
+- données mock en français  
+- JSON ou TS  
+- facilement modifiable  
+
+--------------------------------------------------
+SEO
+
+- meta tags  
+- Open Graph  
+- structure propre  
+
+--------------------------------------------------
+TON
+
+- poétique  
+- culturel  
+- élégant  
+- sobre  
+
+--------------------------------------------------
+INTERDICTIONS
+
+- pas de template  
+- pas de design cheap  
+- pas de couleurs flashy  
+- pas de style startup  
+
+--------------------------------------------------
+PLAN
+
+1. analyser les inspirations  
+2. proposer direction artistique  
+3. créer structure  
+4. générer site  
+
+--------------------------------------------------
+OBJECTIF FINAL
+
+Créer un site qui donne immédiatement :
+- luxe discret  
+- immersion  
+- émotion  
+- crédibilité artistique  
+
+Pense :  
+“galerie d’art + calligraphie arabe + transmission + élégance”
+
+--------------------------------------------------
+IMPORTANT FINAL
+
+Je refuse toute solution générique.  
+Si le design ressemble à un template classique, recommence avec une direction artistique plus forte.
