@@ -197,7 +197,7 @@ export default function Home() {
             La calligraphie n'est pas une écriture —<br />
             <em style={{ color: '#C9A84C' }}>c'est une danse de l'encre.</em>"
           </p>
-          <div className="mt-8" style={{ color: 'rgba(245,240,232,0.7)', fontSize: '0.8rem', letterSpacing: '0.25em', fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase' }}>
+          <div className="mt-8" style={{ color: 'rgba(245,240,232,0.84)', fontSize: '0.8rem', letterSpacing: '0.25em', fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase' }}>
             — Looka
           </div>
         </motion.div>
@@ -306,7 +306,7 @@ export default function Home() {
                   fontSize: '0.75rem',
                   letterSpacing: '0.3em',
                   textTransform: 'uppercase',
-                  color: 'rgba(245,240,232,0.7)',
+                  color: 'rgba(245,240,232,0.84)',
                 }}
               >
                 Portrait de l'artiste
@@ -561,10 +561,14 @@ export default function Home() {
                   </div>
                 </div>
                 <div
-                  className="absolute inset-0 flex flex-col justify-end p-4"
                   style={{
-                    background:
-                      'linear-gradient(to top, rgba(26,18,9,0.9) 0%, transparent 60%)',
+                    position: 'absolute',
+                    inset: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-end',
+                    padding: '1rem',
+                    background: 'linear-gradient(to top, rgba(26,18,9,0.9) 0%, transparent 60%)',
                     opacity: 0,
                     transition: 'opacity 0.4s',
                   }}
@@ -733,12 +737,23 @@ export default function Home() {
 
       {/* ── CTA FINAL ── */}
       <section
-        className="py-32 section-pad text-center relative overflow-hidden"
-        style={{ background: '#3D2B1F' }}
+        style={{
+          background: '#3D2B1F',
+          padding: '8rem clamp(1.5rem, 5vw, 4rem)',
+          textAlign: 'center',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
       >
         <div
-          className="absolute inset-0 flex items-center justify-center"
-          style={{ zIndex: 0 }}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 0,
+          }}
         >
           <div
             style={{
@@ -758,8 +773,7 @@ export default function Home() {
           whileInView="visible"
           viewport={{ once: true, margin: '-80px' }}
           variants={fadeUp}
-          className="relative"
-          style={{ zIndex: 1 }}
+          style={{ zIndex: 1, position: 'relative' }}
         >
           <h2
             style={{

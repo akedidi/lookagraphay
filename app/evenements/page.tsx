@@ -262,7 +262,7 @@ export default function EvenementsPage() {
                 style={{
                   fontFamily: 'Montserrat, sans-serif',
                   fontSize: '0.8rem',
-                  color: 'rgba(245,240,232,0.7)',
+                  color: 'rgba(245,240,232,0.82)',
                 }}
               >
                 {evt.date}
@@ -272,7 +272,7 @@ export default function EvenementsPage() {
                   style={{
                     fontFamily: 'Cormorant Garamond, serif',
                     fontSize: '1.2rem',
-                    color: 'rgba(245,240,232,0.6)',
+                    color: 'rgba(245,240,232,0.88)',
                     marginBottom: '0.25rem',
                   }}
                 >
@@ -282,7 +282,7 @@ export default function EvenementsPage() {
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
                     fontSize: '0.8rem',
-                    color: 'rgba(201,168,76,0.5)',
+                    color: 'rgba(201,168,76,0.8)',
                   }}
                 >
                   {evt.lieu}

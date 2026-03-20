@@ -200,18 +200,23 @@ export default function GaleriePage() {
 
                   {/* Badge disponible */}
                   {oeuvre.disponible && (
-                    <div
+                    <span
                       style={{
                         position: 'absolute',
-                        top: '1rem',
-                        right: '1rem',
-                        width: 8,
-                        height: 8,
-                        borderRadius: '50%',
-                        background: '#C9A84C',
-                        opacity: 0.9,
+                        top: '0.75rem',
+                        right: '0.75rem',
+                        fontFamily: 'Montserrat, sans-serif',
+                        fontSize: '0.62rem',
+                        letterSpacing: '0.2em',
+                        textTransform: 'uppercase',
+                        color: '#C9A84C',
+                        background: 'rgba(26,18,9,0.75)',
+                        padding: '0.25rem 0.5rem',
+                        border: '1px solid rgba(201,168,76,0.4)',
                       }}
-                    />
+                    >
+                      Dispo
+                    </span>
                   )}
                 </motion.div>
               ))}

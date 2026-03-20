@@ -52,7 +52,7 @@ export default function ArtistePage() {
               fontFamily: 'Cormorant Garamond, serif',
               fontStyle: 'italic',
               fontSize: '1.1rem',
-              color: 'rgba(245,240,232,0.6)',
+              color: 'rgba(245,240,232,0.82)',
               letterSpacing: '0.04em',
             }}
           >
@@ -107,7 +107,7 @@ export default function ArtistePage() {
                   fontSize: '0.85rem',
                   letterSpacing: '0.3em',
                   textTransform: 'uppercase',
-                  color: 'rgba(245,240,232,0.7)',
+                  color: 'rgba(245,240,232,0.85)',
                 }}
               >
                 Looka — Calligraphe
@@ -337,7 +337,7 @@ export default function ArtistePage() {
               fontFamily: 'Cormorant Garamond, serif',
               fontStyle: 'italic',
               fontSize: '1.2rem',
-              color: 'rgba(245,240,232,0.7)',
+              color: 'rgba(245,240,232,0.85)',
               marginBottom: '2rem',
             }}
           >

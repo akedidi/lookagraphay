@@ -317,7 +317,7 @@ export default function ExpositionsPage() {
                       style={{
                         fontFamily: 'Cormorant Garamond, serif',
                         fontSize: '0.9rem',
-                        color: 'rgba(245,240,232,0.72)',
+                        color: 'rgba(245,240,232,0.88)',
                         lineHeight: 1.6,
                         fontStyle: 'italic',
                       }}

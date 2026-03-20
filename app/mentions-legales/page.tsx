@@ -11,7 +11,7 @@ export default function MentionsLegalesPage() {
   return (
     <div style={{ background: '#F5F0E8' }}>
       <section
-        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '10rem 1.5rem 4rem', background: '#1A1209' }}
+        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '7rem 1.5rem 4rem', background: '#1A1209' }}
       >
         <div className="page-header-anim">
           <h1
@@ -32,8 +32,8 @@ export default function MentionsLegalesPage() {
         </div>
       </section>
 
-      <section className="py-20 px-6" style={{ background: '#F5F0E8' }}>
-        <div className="max-w-3xl mx-auto">
+      <section style={{ background: '#F5F0E8', padding: '5rem clamp(1.5rem, 5vw, 4rem)' }}>
+        <div style={{ maxWidth: '48rem', marginLeft: 'auto', marginRight: 'auto' }}>
           {[
             {
               titre: 'Éditeur du site',
