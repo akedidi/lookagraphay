@@ -84,7 +84,7 @@ export default function Home() {
           title={muted ? 'Activer le son' : 'Couper le son'}
           style={{
             position: 'absolute',
-            top: '5.5rem',
+            top: '7rem',
             right: '1.5rem',
             zIndex: 10,
             background: 'rgba(26,18,9,0.45)',
