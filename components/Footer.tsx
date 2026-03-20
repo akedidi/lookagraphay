@@ -12,8 +12,15 @@ export default function Footer() {
         padding: '4rem 0 2rem',
       }}
     >
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+      <div style={{ maxWidth: '80rem', marginLeft: 'auto', marginRight: 'auto', padding: '0 1.5rem' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: '3rem',
+            marginBottom: '3rem',
+          }}
+        >
           {/* Brand */}
           <div>
             <div
@@ -55,51 +62,6 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Navigation */}
-          <div>
-            <h4
-              style={{
-                fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.75rem',
-                letterSpacing: '0.3em',
-                textTransform: 'uppercase',
-                color: '#C9A84C',
-                marginBottom: '1.5rem',
-              }}
-            >
-              Navigation
-            </h4>
-            <ul className="flex flex-col gap-3">
-              {[
-                { href: '/artiste', label: "L'Artiste" },
-                { href: '/ateliers', label: 'Ateliers' },
-                { href: '/expositions', label: 'Expositions' },
-                { href: '/galerie', label: 'Galerie' },
-                { href: '/store', label: 'Store' },
-                { href: '/contact', label: 'Contact' },
-              ].map((l) => (
-                <li key={l.href}>
-                  <Link
-                    href={l.href}
-                    style={{
-                      fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.82rem',
-                      fontWeight: 300,
-                      letterSpacing: '0.1em',
-                      color: 'rgba(245,240,232,0.82)',
-                      textDecoration: 'none',
-                      transition: 'color 0.3s',
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = '#C9A84C')}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(245,240,232,0.5)')}
-                  >
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
           {/* Contact */}
           <div>
             <h4
@@ -114,7 +76,7 @@ export default function Footer() {
             >
               Contact
             </h4>
-            <div className="flex flex-col gap-3">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               <a
                 href={`mailto:${siteConfig.email}`}
                 style={{
@@ -126,7 +88,7 @@ export default function Footer() {
                   transition: 'color 0.3s',
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = '#C9A84C')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(245,240,232,0.5)')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(245,240,232,0.82)')}
               >
                 {siteConfig.email}
               </a>
@@ -143,7 +105,7 @@ export default function Footer() {
                   transition: 'color 0.3s',
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = '#C9A84C')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(245,240,232,0.5)')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(245,240,232,0.82)')}
               >
                 Instagram
               </a>
@@ -184,7 +146,7 @@ export default function Footer() {
               transition: 'color 0.3s',
             }}
             onMouseEnter={(e) => (e.currentTarget.style.color = '#C9A84C')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(245,240,232,0.3)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(245,240,232,0.7)')}
           >
             Mentions légales
           </Link>
