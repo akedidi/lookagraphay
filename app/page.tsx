@@ -354,7 +354,7 @@ export default function Home() {
             whileInView="visible"
             viewport={{ once: true, margin: '-60px' }}
             variants={stagger}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
+            className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12 max-w-3xl mx-auto"
           >
             {ateliersData.map((atelier) => (
               <motion.div
@@ -365,7 +365,6 @@ export default function Home() {
                   padding: '2.5rem 2rem',
                   position: 'relative',
                   transition: 'border-color 0.3s',
-                  cursor: 'pointer',
                 }}
                 whileHover={{ borderColor: 'rgba(201,168,76,0.5)' }}
               >
@@ -395,14 +394,7 @@ export default function Home() {
                 >
                   {atelier.titre}
                 </h3>
-                <div
-                  style={{
-                    width: 30,
-                    height: 1,
-                    background: 'rgba(201,168,76,0.4)',
-                    marginBottom: '1rem',
-                  }}
-                />
+                <div style={{ width: 30, height: 1, background: 'rgba(201,168,76,0.4)', marginBottom: '1rem' }} />
                 <p
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
@@ -413,35 +405,52 @@ export default function Home() {
                     marginBottom: '1.5rem',
                   }}
                 >
-                  {atelier.dates}
-                  <br />
                   {atelier.horaires}
+                  <br />
+                  {atelier.lieu}
                 </p>
-                <div className="flex items-end justify-between">
-                  <span
-                    style={{
-                      fontFamily: 'Cormorant Garamond, serif',
-                      fontSize: '1.6rem',
-                      fontWeight: 300,
-                      color: '#C9A84C',
-                    }}
-                  >
-                    {atelier.prix} €
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.55rem',
-                      letterSpacing: '0.2em',
-                      color: 'rgba(245,240,232,0.35)',
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    {atelier.placesRestantes} places
-                  </span>
-                </div>
+                <span
+                  style={{
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontSize: '0.55rem',
+                    letterSpacing: '0.2em',
+                    color: '#C9A84C',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {atelier.dates}
+                </span>
               </motion.div>
             ))}
+            {/* Carte contact */}
+            <motion.div
+              variants={fadeUp}
+              style={{
+                border: '1px solid rgba(201,168,76,0.1)',
+                padding: '2.5rem 2rem',
+                background: 'rgba(201,168,76,0.04)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                gap: '1rem',
+              }}
+            >
+              <div className="ornament" style={{ fontSize: '1.8rem', opacity: 0.25 }}>خ</div>
+              <p
+                style={{
+                  fontFamily: 'Cormorant Garamond, serif',
+                  fontStyle: 'italic',
+                  fontSize: '1.15rem',
+                  color: 'rgba(245,240,232,0.55)',
+                  lineHeight: 1.6,
+                }}
+              >
+                Un moment de méditation et de créativité joyeuse.
+              </p>
+              <Link href="/ateliers" className="btn-gold" style={{ alignSelf: 'flex-start', marginTop: '0.5rem' }}>
+                En savoir plus
+              </Link>
+            </motion.div>
           </motion.div>
 
           <div className="text-center">
