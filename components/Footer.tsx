@@ -97,6 +97,9 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
                   fontFamily: 'Montserrat, sans-serif',
                   fontSize: '0.82rem',
                   fontWeight: 300,
@@ -107,6 +110,11 @@ export default function Footer() {
                 onMouseEnter={(e) => (e.currentTarget.style.color = '#C9A84C')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(245,240,232,0.82)')}
               >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                  <circle cx="12" cy="12" r="4"/>
+                  <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+                </svg>
                 Instagram
               </a>
               <a
@@ -114,6 +122,9 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
                   fontFamily: 'Montserrat, sans-serif',
                   fontSize: '0.82rem',
                   fontWeight: 300,
@@ -124,6 +135,9 @@ export default function Footer() {
                 onMouseEnter={(e) => (e.currentTarget.style.color = '#C9A84C')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(245,240,232,0.82)')}
               >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                </svg>
                 Facebook
               </a>
             </div>
