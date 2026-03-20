@@ -46,8 +46,8 @@ export default function Navbar() {
               width={44}
               height={44}
               style={{
-                filter: 'brightness(0) invert(1)',
-                opacity: 0.92,
+                filter: 'invert(1)',
+                mixBlendMode: 'screen',
               }}
             />
             <div className="flex flex-col">
@@ -136,7 +136,7 @@ export default function Navbar() {
           alt="LookaGraphy"
           width={60}
           height={60}
-          style={{ filter: 'brightness(0) invert(1)', opacity: 0.3, marginBottom: '2rem' }}
+          style={{ filter: 'invert(1)', mixBlendMode: 'screen', opacity: 0.4, marginBottom: '2rem' }}
         />
         <ul className="flex flex-col items-center gap-8">
           {links.map((l) => (
