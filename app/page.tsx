@@ -18,8 +18,15 @@ export default function Home() {
     <div style={{ background: '#F5F0E8' }}>
       {/* ── HERO VIDEO ── */}
       <section
-        className="relative flex items-center justify-center overflow-hidden"
-        style={{ height: '100svh', minHeight: 600 }}
+        style={{
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+          height: '100svh',
+          minHeight: 600,
+        }}
       >
         {/* Desktop video */}
         <video
@@ -29,6 +36,7 @@ export default function Home() {
           loop
           playsInline
           preload="auto"
+          style={{ zIndex: 0 }}
         >
           <source src="/videos/video-hero-wide.mp4" type="video/mp4" />
         </video>
@@ -40,27 +48,33 @@ export default function Home() {
           loop
           playsInline
           preload="auto"
+          style={{ zIndex: 0 }}
         >
           <source src="/videos/video-hero-vertical.mp4" type="video/mp4" />
         </video>
 
         {/* Fallback gradient when no video */}
         <div
-          className="absolute inset-0"
           style={{
-            background:
-              'linear-gradient(135deg, #1A1209 0%, #3D2B1F 40%, #2A2520 100%)',
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(135deg, #1A1209 0%, #3D2B1F 40%, #2A2520 100%)',
             zIndex: -1,
           }}
         />
 
         {/* Overlay */}
-        <div className="hero-overlay absolute inset-0" style={{ zIndex: 1 }} />
+        <div className="hero-overlay" style={{ position: 'absolute', inset: 0, zIndex: 1 }} />
 
         {/* Arabic watermark */}
         <div
-          className="absolute right-0 top-1/2 -translate-y-1/2 select-none pointer-events-none"
           style={{
+            position: 'absolute',
+            right: 0,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            userSelect: 'none',
+            pointerEvents: 'none',
             fontFamily: 'Cormorant Garamond, serif',
             fontSize: 'clamp(6rem, 20vw, 18rem)',
             color: '#C9A84C',
@@ -73,7 +87,7 @@ export default function Home() {
         </div>
 
         {/* Hero content */}
-        <div className="relative text-center px-6" style={{ zIndex: 3 }}>
+        <div style={{ position: 'relative', textAlign: 'center', padding: '0 1.5rem', zIndex: 3 }}>
           <div className="hero-ornament">
             <div
               className="ornament mb-8"
