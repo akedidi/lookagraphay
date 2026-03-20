@@ -75,23 +75,17 @@ export default function Home() {
 
         {/* Hero content */}
         <div className="relative text-center px-6" style={{ zIndex: 3 }}>
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, delay: 0.3 }}
-          >
+          <div className="hero-ornament">
             <div
               className="ornament mb-8"
               style={{ fontSize: '1.2rem', letterSpacing: '0.5em' }}
             >
               ﷽
             </div>
-          </motion.div>
+          </div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, delay: 0.6 }}
+          <h1
+            className="hero-title"
             style={{
               fontFamily: 'Cormorant Garamond, serif',
               fontWeight: 300,
@@ -103,12 +97,10 @@ export default function Home() {
             }}
           >
             Luca<span style={{ color: '#C9A84C' }}>Graphy</span>
-          </motion.h1>
+          </h1>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.2, delay: 1 }}
+          <p
+            className="hero-tagline"
             style={{
               fontFamily: 'Cormorant Garamond, serif',
               fontStyle: 'italic',
@@ -121,31 +113,23 @@ export default function Home() {
               margin: '0 auto 3rem',
             }}
           >
-            Quand l'encre trace le chemin de l'âme —<br />
+            Quand l&apos;encre trace le chemin de l&apos;âme —<br />
             la calligraphie arabe comme acte de présence.
-          </motion.p>
+          </p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 1.4 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
-          >
+          <div className="hero-cta flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/galerie" className="btn-gold">
               Découvrir les œuvres
             </Link>
             <Link href="/ateliers" className="btn-gold">
               Rejoindre un atelier
             </Link>
-          </motion.div>
+          </div>
         </div>
 
         {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2, duration: 1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        <div
+          className="hero-scroll absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
           style={{ zIndex: 3 }}
         >
           <span
@@ -166,7 +150,7 @@ export default function Home() {
               background: 'linear-gradient(to bottom, rgba(201,168,76,0.6), transparent)',
             }}
           />
-        </motion.div>
+        </div>
       </section>
 
       {/* ── INTRO PHRASE ── */}

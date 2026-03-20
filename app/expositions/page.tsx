@@ -19,7 +19,7 @@ export default function ExpositionsPage() {
         className="flex flex-col items-center justify-center text-center px-6 pt-40 pb-20"
         style={{ background: '#1A1209' }}
       >
-        <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+        <div className="page-header-anim">
           <span
             style={{
               fontFamily: 'Montserrat, sans-serif',
@@ -49,7 +49,7 @@ export default function ExpositionsPage() {
             className="block mx-auto mt-6"
             style={{ width: 60, height: 1, background: '#C9A84C' }}
           />
-        </motion.div>
+        </div>
       </section>
 
       {/* À venir */}

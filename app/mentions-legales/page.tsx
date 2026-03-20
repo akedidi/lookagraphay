@@ -14,7 +14,7 @@ export default function MentionsLegalesPage() {
         className="flex flex-col items-center justify-center text-center px-6 pt-40 pb-16"
         style={{ background: '#1A1209' }}
       >
-        <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+        <div className="page-header-anim">
           <h1
             style={{
               fontFamily: 'Cormorant Garamond, serif',
@@ -30,7 +30,7 @@ export default function MentionsLegalesPage() {
             className="block mx-auto mt-6"
             style={{ width: 60, height: 1, background: '#C9A84C' }}
           />
-        </motion.div>
+        </div>
       </section>
 
       <section className="py-20 px-6" style={{ background: '#F5F0E8' }}>

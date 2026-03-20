@@ -24,7 +24,7 @@ export default function StorePage() {
         className="flex flex-col items-center justify-center text-center px-6 pt-40 pb-20"
         style={{ background: '#3D2B1F' }}
       >
-        <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+        <div className="page-header-anim">
           <span
             style={{
               fontFamily: 'Montserrat, sans-serif',
@@ -67,7 +67,7 @@ export default function StorePage() {
           >
             Chaque pièce est unique, réalisée à la main. Acquérir une œuvre de Luca, c'est accueillir un fragment de présence.
           </p>
-        </motion.div>
+        </div>
       </section>
 
       {/* Filtres */}

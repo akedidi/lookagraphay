@@ -17,7 +17,7 @@ export default function AteliersPage() {
         className="flex flex-col items-center justify-center text-center px-6 pt-40 pb-20"
         style={{ background: '#2A2520' }}
       >
-        <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+        <div className="page-header-anim">
           <span
             style={{
               fontFamily: 'Montserrat, sans-serif',
@@ -61,7 +61,7 @@ export default function AteliersPage() {
           >
             Des cours semestriels en petits groupes pour entrer dans la pratique calligraphique avec profondeur, patience et présence.
           </p>
-        </motion.div>
+        </div>
       </section>
 
       {/* Intro */}

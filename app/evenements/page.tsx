@@ -26,7 +26,7 @@ export default function EvenementsPage() {
         className="flex flex-col items-center justify-center text-center px-6 pt-40 pb-20"
         style={{ background: '#3D2B1F' }}
       >
-        <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+        <div className="page-header-anim">
           <span
             style={{
               fontFamily: 'Montserrat, sans-serif',
@@ -56,7 +56,7 @@ export default function EvenementsPage() {
             className="block mx-auto mt-6"
             style={{ width: 60, height: 1, background: '#C9A84C' }}
           />
-        </motion.div>
+        </div>
       </section>
 
       {/* À venir */}
