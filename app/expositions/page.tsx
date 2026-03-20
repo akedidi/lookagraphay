@@ -23,7 +23,7 @@ export default function ExpositionsPage() {
           alignItems: 'center',
           justifyContent: 'center',
           textAlign: 'center',
-          padding: '10rem 1.5rem 5rem',
+          padding: '7rem 1.5rem 4rem',
         }}
       >
         <div className="page-header-anim">

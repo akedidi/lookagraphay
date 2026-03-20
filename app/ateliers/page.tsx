@@ -15,7 +15,7 @@ export default function AteliersPage() {
     <div style={{ background: '#F5F0E8' }}>
       {/* Header */}
       <section
-        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '10rem 1.5rem 6rem', background: '#2A2520' }}
+        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '7rem 1.5rem 5rem', background: '#2A2520' }}
       >
         <div className="page-header-anim">
           <span
