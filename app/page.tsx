@@ -366,7 +366,7 @@ export default function Home() {
               maxWidth: '48rem',
               marginLeft: 'auto',
               marginRight: 'auto',
-              marginBottom: '3.5rem',
+              marginBottom: '2rem',
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
               gap: '2.5rem',
@@ -737,7 +737,7 @@ export default function Home() {
       <section
         style={{
           background: '#3D2B1F',
-          padding: '8rem clamp(1.5rem, 5vw, 4rem)',
+          padding: '5rem clamp(1.5rem, 5vw, 4rem)',
           textAlign: 'center',
           position: 'relative',
           overflow: 'hidden',
