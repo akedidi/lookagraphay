@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
 import { artistData, ateliersData, expositionsData, evenementsData, galerieData } from '@/lib/data';
 
 const fadeUp = {
@@ -14,6 +15,26 @@ const stagger = {
 };
 
 export default function Home() {
+  const [muted, setMuted] = useState(true);
+  const videoDesktopRef = useRef<HTMLVideoElement>(null);
+  const videoMobileRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('hero-sound');
+    if (saved === 'on') setMuted(false);
+  }, []);
+
+  useEffect(() => {
+    if (videoDesktopRef.current) videoDesktopRef.current.muted = muted;
+    if (videoMobileRef.current) videoMobileRef.current.muted = muted;
+  }, [muted]);
+
+  function toggleSound() {
+    const next = !muted;
+    setMuted(next);
+    localStorage.setItem('hero-sound', next ? 'off' : 'on');
+  }
+
   return (
     <div style={{ background: '#F5F0E8' }}>
       {/* ── HERO VIDEO ── */}
@@ -30,6 +51,7 @@ export default function Home() {
       >
         {/* Desktop video */}
         <video
+          ref={videoDesktopRef}
           className="hero-video-desktop"
           autoPlay
           muted
@@ -43,6 +65,7 @@ export default function Home() {
         </video>
         {/* Mobile video */}
         <video
+          ref={videoMobileRef}
           className="hero-video-mobile"
           autoPlay
           muted
@@ -54,6 +77,52 @@ export default function Home() {
         >
           <source src="/videos/video-hero-vertical.mp4" type="video/mp4" />
         </video>
+
+        {/* Bouton son */}
+        <button
+          onClick={toggleSound}
+          title={muted ? 'Activer le son' : 'Couper le son'}
+          style={{
+            position: 'absolute',
+            top: '5.5rem',
+            right: '1.5rem',
+            zIndex: 10,
+            background: 'rgba(26,18,9,0.45)',
+            border: '1px solid rgba(201,168,76,0.3)',
+            borderRadius: '50%',
+            width: 40,
+            height: 40,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            color: '#F5F0E8',
+            backdropFilter: 'blur(6px)',
+            transition: 'background 0.3s, border-color 0.3s',
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(201,168,76,0.25)';
+            (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(201,168,76,0.7)';
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(26,18,9,0.45)';
+            (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(201,168,76,0.3)';
+          }}
+        >
+          {muted ? (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <line x1="23" y1="9" x2="17" y2="15"/>
+              <line x1="17" y1="9" x2="23" y2="15"/>
+            </svg>
+          ) : (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            </svg>
+          )}
+        </button>
 
         {/* Fallback gradient when no video */}
         <div
