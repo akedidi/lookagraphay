@@ -64,7 +64,7 @@ export default function ArtistePage() {
       {/* Bio + portrait */}
       <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-16 items-start" style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto' }}>
-          {/* Portrait placeholder */}
+          {/* Portrait */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -72,42 +72,39 @@ export default function ArtistePage() {
             transition={{ duration: 1 }}
             className="lg:col-span-2"
             style={{
-              aspectRatio: '3/4',
-              background: 'linear-gradient(135deg, #3D2B1F 0%, #1A1209 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
               position: 'relative',
+              overflow: 'hidden',
             }}
           >
-            <div
+            <img
+              src="/images/artiste-portrait-1.jpg"
+              alt="Looka — Calligraphe"
               style={{
-                fontFamily: 'Cormorant Garamond, serif',
-                fontSize: '8rem',
-                color: '#C9A84C',
-                opacity: 0.2,
-                lineHeight: 1,
-                userSelect: 'none',
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: 'top center',
+                display: 'block',
               }}
-            >
-              ل
-            </div>
+            />
             <div
               style={{
                 position: 'absolute',
-                bottom: '1.5rem',
-                left: '1.5rem',
-                right: '1.5rem',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                padding: '2rem 1.5rem 1.5rem',
+                background: 'linear-gradient(to top, rgba(26,18,9,0.7) 0%, transparent 100%)',
               }}
             >
-              <div style={{ width: 30, height: 1, background: '#C9A84C', marginBottom: '0.75rem', opacity: 0.5 }} />
+              <div style={{ width: 30, height: 1, background: '#C9A84C', marginBottom: '0.75rem', opacity: 0.7 }} />
               <p
                 style={{
                   fontFamily: 'Montserrat, sans-serif',
-                  fontSize: '0.85rem',
+                  fontSize: '0.75rem',
                   letterSpacing: '0.3em',
                   textTransform: 'uppercase',
-                  color: 'rgba(245,240,232,0.85)',
+                  color: 'rgba(245,240,232,0.9)',
                 }}
               >
                 Looka — Calligraphe
@@ -170,6 +167,38 @@ export default function ArtistePage() {
           </motion.div>
         </div>
       </section>
+
+      {/* Photo pleine largeur — en action */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 1.2 }}
+        style={{
+          position: 'relative',
+          height: 'clamp(320px, 50vw, 580px)',
+          overflow: 'hidden',
+        }}
+      >
+        <img
+          src="/images/artiste-portrait-2.jpg"
+          alt="Looka pratiquant la calligraphie"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center 30%',
+            display: 'block',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'rgba(26,18,9,0.35)',
+          }}
+        />
+      </motion.div>
 
       {/* Citation centrale */}
       <section className="py-24 section-pad text-center" style={{ background: '#2A2520' }}>
