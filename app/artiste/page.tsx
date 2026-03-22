@@ -176,7 +176,7 @@ export default function ArtistePage() {
         transition={{ duration: 1.2 }}
         style={{
           position: 'relative',
-          height: 'clamp(320px, 50vw, 580px)',
+          height: 'clamp(480px, 65vw, 720px)',
           overflow: 'hidden',
         }}
       >
@@ -187,7 +187,7 @@ export default function ArtistePage() {
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            objectPosition: 'center 15%',
+            objectPosition: 'center 45%',
             display: 'block',
           }}
         />
