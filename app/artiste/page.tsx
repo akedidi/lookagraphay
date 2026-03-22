@@ -241,7 +241,7 @@ export default function ArtistePage() {
 
       {/* Démarche */}
       <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16" style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto' }}>
+        <div style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '4rem' }}>
           <motion.div
             initial="hidden"
             whileInView="visible"
