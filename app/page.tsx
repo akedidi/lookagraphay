@@ -326,47 +326,39 @@ export default function Home() {
             className="img-zoom"
             style={{
               aspectRatio: '3/4',
-              background: 'linear-gradient(135deg, #3D2B1F, #1A1209)',
               position: 'relative',
               overflow: 'hidden',
             }}
           >
+            <img
+              src="/images/artiste-portrait-4.jpg"
+              alt="Looka — Calligraphe"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: 'top center',
+                display: 'block',
+              }}
+            />
             <div
               style={{
                 position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: 'column',
-                gap: '1rem',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                padding: '2rem 1.5rem 1.5rem',
+                background: 'linear-gradient(to top, rgba(26,18,9,0.65) 0%, transparent 100%)',
               }}
             >
-              <div
-                style={{
-                  fontFamily: 'Cormorant Garamond, serif',
-                  fontSize: '6rem',
-                  color: '#C9A84C',
-                  opacity: 0.3,
-                  lineHeight: 1,
-                }}
-              >
-                ل
-              </div>
-              <div
-                style={{
-                  width: 60,
-                  height: 1,
-                  background: 'rgba(201,168,76,0.4)',
-                }}
-              />
+              <div style={{ width: 30, height: 1, background: '#C9A84C', marginBottom: '0.6rem', opacity: 0.6 }} />
               <p
                 style={{
                   fontFamily: 'Montserrat, sans-serif',
-                  fontSize: '0.75rem',
+                  fontSize: '0.7rem',
                   letterSpacing: '0.3em',
                   textTransform: 'uppercase',
-                  color: 'rgba(245,240,232,0.84)',
+                  color: 'rgba(245,240,232,0.88)',
                 }}
               >
                 Portrait de l'artiste
