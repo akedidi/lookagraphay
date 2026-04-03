@@ -65,8 +65,8 @@ export default function Navbar() {
           padding: scrolled ? '1rem 0' : '1.5rem 0',
         }}
       >
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3" style={{ textDecoration: 'none' }}>
+        <div style={{ maxWidth: '90rem', margin: '0 auto', padding: '0 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
+          <Link href="/" className="flex items-center gap-3" style={{ textDecoration: 'none', flexShrink: 0, zIndex: 1 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={logoSrc} alt="LookaGraphy" width={44} height={44} style={{ display: 'block', flexShrink: 0 }} />
             <div className="flex flex-col">
@@ -98,10 +98,18 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Desktop nav */}
+          {/* Desktop nav — centré absolument */}
           <ul
             className="hidden lg:flex items-center"
-            style={{ gap: '0.25rem', listStyle: 'none', margin: 0, padding: 0 }}
+            style={{
+              position: 'absolute',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              gap: '0',
+              listStyle: 'none',
+              margin: 0,
+              padding: 0,
+            }}
           >
             {links.map((l) => (
               <li key={l.href}>
