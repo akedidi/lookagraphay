@@ -245,7 +245,7 @@ export default function AteliersPage() {
         {/* Deux panneaux vidéo côte à côte */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
           {[
-            { src: '/images/atelier-video.mp4', legende: 'Séance de calligraphie', sousTitre: 'Geste, méditation et création' },
+            { src: '/images/atelier-seance.mp4', legende: 'Séance de calligraphie', sousTitre: 'Geste, méditation et création' },
             { src: '/images/atelier-video-2.mp4', legende: 'Découverte de l\'art', sousTitre: 'Calligraphie arabe avec Looka' },
           ].map((video, i) => (
             <motion.div
