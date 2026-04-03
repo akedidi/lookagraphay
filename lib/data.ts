@@ -208,6 +208,23 @@ export const galerieData = [
       "Composition circulaire en style Koufi géométrique — la lettre 'Alif' répétée à l'infini.",
   },
   {
+    id: "oeuvre-mahabba",
+    titre: "Howa al-Mahabba — هو المحبة",
+    sousTitre: "L'amour dont on ne saisit l'essence qu'à travers la souffrance",
+    technique: "Acrylique sur toile de lin",
+    dimensions: "60 × 80 cm",
+    annee: "2015",
+    style: "Calligraphie contemporaine",
+    disponible: true,
+    prix: 300,
+    image: "/images/tableau-mahabba-1.jpg",
+    images: ["/images/tableau-mahabba-1.jpg", "/images/tableau-mahabba-2.jpg"],
+    extrait: "ابن حزم الأندلسي — Ṭawq al-Ḥamāma",
+    citation: "« C'est l'amour dont on ne saisit la véritable essence qu'à travers la souffrance. »",
+    description:
+      "Hommage à la vision de l'amour selon Ibn Hazm al-Andalousî, tirée de son œuvre Ṭawq al-Ḥamāma (Le Collier de la colombe). L'amour y est une force profonde et universelle, qui s'éprouve et s'apprécie pleinement à travers les épreuves de la vie. La composition circulaire en noir et blanc rayonne autour d'un cœur d'or — lumière intérieure que l'amour apporte malgré les difficultés, unifiant les cœurs et élevant l'âme.",
+  },
+  {
     id: "oeuvre-salam",
     titre: "Fîhâ liman sâlamoûna — وفيها لمن سالمونا",
     sousTitre: "La paix à ceux qui viennent en paix",
