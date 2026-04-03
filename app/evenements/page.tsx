@@ -129,7 +129,7 @@ export default function EvenementsPage() {
                   <div
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.8rem',
+                      fontSize: '0.95rem',
                       color: 'rgba(61,43,31,0.75)',
                       letterSpacing: '0.1em',
                     }}
@@ -170,7 +170,7 @@ export default function EvenementsPage() {
                   <p
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.8rem',
+                      fontSize: '0.95rem',
                       color: 'rgba(61,43,31,0.75)',
                       marginBottom: '0.25rem',
                     }}
@@ -180,7 +180,7 @@ export default function EvenementsPage() {
                   <p
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.8rem',
+                      fontSize: '0.95rem',
                       color: '#C9A84C',
                       marginBottom: '1rem',
                     }}
@@ -190,7 +190,7 @@ export default function EvenementsPage() {
                   <p
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.75rem',
+                      fontSize: '0.95rem',
                       fontWeight: 300,
                       lineHeight: 1.7,
                       color: '#3D2B1F',
@@ -261,7 +261,7 @@ export default function EvenementsPage() {
               <span
                 style={{
                   fontFamily: 'Montserrat, sans-serif',
-                  fontSize: '0.8rem',
+                  fontSize: '0.95rem',
                   color: 'rgba(245,240,232,0.82)',
                 }}
               >
@@ -271,7 +271,7 @@ export default function EvenementsPage() {
                 <h3
                   style={{
                     fontFamily: 'Cormorant Garamond, serif',
-                    fontSize: '1.2rem',
+                    fontSize: '1.3rem',
                     color: 'rgba(245,240,232,0.88)',
                     marginBottom: '0.25rem',
                   }}
@@ -281,7 +281,7 @@ export default function EvenementsPage() {
                 <p
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
-                    fontSize: '0.8rem',
+                    fontSize: '0.95rem',
                     color: 'rgba(201,168,76,0.8)',
                   }}
                 >
