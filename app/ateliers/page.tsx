@@ -200,55 +200,62 @@ export default function AteliersPage() {
         </div>
       </section>
 
-      {/* Vidéos atelier */}
-      <section style={{ background: '#2A2520', padding: '4rem 1.5rem' }}>
-        <div style={{ maxWidth: '72rem', margin: '0 auto' }}>
-          {/* Titre */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            style={{ textAlign: 'center', marginBottom: '2.5rem' }}
-          >
-            <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', letterSpacing: '0.42em', textTransform: 'uppercase', color: '#C9A84C', display: 'block', marginBottom: '1rem' }}>
-              En images
-            </span>
-            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', color: '#F5F0E8', letterSpacing: '0.05em' }}>
-              L'atelier en vidéo
-            </h2>
-            <span className="gold-line" />
-          </motion.div>
+      {/* Vidéos atelier — background */}
+      <section style={{ background: '#1A1209' }}>
+        {/* Titre */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          style={{ textAlign: 'center', padding: '4rem 1.5rem 2.5rem' }}
+        >
+          <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', letterSpacing: '0.42em', textTransform: 'uppercase', color: '#C9A84C', display: 'block', marginBottom: '1rem' }}>
+            En images
+          </span>
+          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', color: '#F5F0E8', letterSpacing: '0.05em' }}>
+            L'atelier en vidéo
+          </h2>
+          <span className="gold-line" />
+        </motion.div>
 
-          {/* Grille 2 vidéos */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
-            {[
-              { src: '/images/atelier-video.mp4', legende: 'Séance de calligraphie — geste, méditation et création' },
-              { src: '/images/atelier-video-2.mp4', legende: 'Découverte de la calligraphie arabe avec Looka' },
-            ].map((video, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.15, duration: 0.8 }}
-                style={{ background: '#1A1209', overflow: 'hidden' }}
-              >
-                <video
-                  src={video.src}
-                  controls
-                  playsInline
-                  style={{ width: '100%', display: 'block', aspectRatio: '16/9', objectFit: 'cover' }}
-                />
-                <div style={{ padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <span style={{ width: 24, height: 1, background: '#C9A84C', flexShrink: 0 }} />
-                  <p style={{ fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', fontSize: '0.88rem', color: 'rgba(245,240,232,0.65)', letterSpacing: '0.02em', margin: 0 }}>
-                    {video.legende}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+        {/* Deux panneaux vidéo côte à côte */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
+          {[
+            { src: '/images/atelier-video.mp4', legende: 'Séance de calligraphie', sousTitre: 'Geste, méditation et création' },
+            { src: '/images/atelier-video-2.mp4', legende: 'Découverte de l\'art', sousTitre: 'Calligraphie arabe avec Looka' },
+          ].map((video, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.2, duration: 1 }}
+              style={{ position: 'relative', aspectRatio: '16/9', overflow: 'hidden', minHeight: 280 }}
+            >
+              {/* Vidéo fond */}
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                src={video.src}
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+              {/* Overlay */}
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(26,18,9,0.82) 0%, rgba(26,18,9,0.2) 55%, transparent 100%)' }} />
+              {/* Légende bas */}
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '1.5rem 1.75rem' }}>
+                <span style={{ display: 'block', width: 28, height: 1, background: '#C9A84C', marginBottom: '0.75rem' }} />
+                <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', color: '#F5F0E8', margin: 0, lineHeight: 1.2 }}>
+                  {video.legende}
+                </p>
+                <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#C9A84C', margin: '0.35rem 0 0' }}>
+                  {video.sousTitre}
+                </p>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </section>
 
