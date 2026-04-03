@@ -618,19 +618,17 @@ export default function Home() {
                     flexDirection: 'column',
                     justifyContent: 'flex-end',
                     padding: '1rem',
-                    background: 'linear-gradient(to top, rgba(26,18,9,0.92) 0%, transparent 65%)',
-                    opacity: 0,
-                    transition: 'opacity 0.4s',
+                    background: 'linear-gradient(to top, rgba(26,18,9,0.88) 0%, rgba(26,18,9,0.2) 55%, transparent 100%)',
                   }}
-                  onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.opacity = '1')}
-                  onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.opacity = '0')}
                 >
                   <p
                     style={{
                       fontFamily: 'Cormorant Garamond, serif',
-                      fontSize: '1rem',
+                      fontSize: '0.95rem',
                       color: '#F5F0E8',
-                      letterSpacing: '0.05em',
+                      letterSpacing: '0.04em',
+                      margin: 0,
+                      lineHeight: 1.3,
                     }}
                   >
                     {oeuvre.titre}
@@ -638,12 +636,14 @@ export default function Home() {
                   <p
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.75rem',
+                      fontSize: '0.6rem',
                       color: '#C9A84C',
-                      letterSpacing: '0.2em',
+                      letterSpacing: '0.18em',
+                      textTransform: 'uppercase',
+                      margin: '0.25rem 0 0',
                     }}
                   >
-                    {oeuvre.style}
+                    {oeuvre.annee}
                   </p>
                 </div>
               </motion.div>
