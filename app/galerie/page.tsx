@@ -162,42 +162,38 @@ export default function GaleriePage() {
                   />
                 )}
 
-                {/* Overlay au hover */}
+                {/* Gradient permanent + infos toujours visibles */}
                 <div
-                  className="galerie-overlay"
                   style={{
                     position: 'absolute',
                     inset: 0,
-                    background: 'linear-gradient(to top, rgba(26,18,9,0.92) 0%, rgba(26,18,9,0.1) 60%, transparent 100%)',
+                    background: 'linear-gradient(to top, rgba(26,18,9,0.88) 0%, rgba(26,18,9,0.2) 45%, transparent 70%)',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'flex-end',
-                    padding: '1.5rem',
-                    opacity: 0,
-                    transition: 'opacity 0.4s',
+                    padding: '1.25rem',
                   }}
-                  onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.opacity = '1')}
-                  onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.opacity = '0')}
                 >
                   <h3
                     style={{
                       fontFamily: 'Cormorant Garamond, serif',
-                      fontSize: '1.1rem',
+                      fontSize: '1rem',
                       color: '#F5F0E8',
-                      marginBottom: '0.2rem',
+                      marginBottom: '0.15rem',
+                      lineHeight: 1.25,
                     }}
                   >
                     {oeuvre.titre}
                   </h3>
                   {(oeuvre as Oeuvre).sousTitre && (
-                    <p style={{ fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', fontSize: '0.9rem', color: 'rgba(245,240,232,0.7)', marginBottom: '0.4rem' }}>
+                    <p style={{ fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', fontSize: '0.82rem', color: 'rgba(245,240,232,0.7)', marginBottom: '0.3rem' }}>
                       {(oeuvre as Oeuvre).sousTitre}
                     </p>
                   )}
                   <p
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.72rem',
+                      fontSize: '0.65rem',
                       letterSpacing: '0.2em',
                       color: '#C9A84C',
                       textTransform: 'uppercase',
