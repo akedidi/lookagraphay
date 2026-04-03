@@ -207,6 +207,23 @@ export const galerieData = [
     description:
       "Composition circulaire en style Koufi géométrique — la lettre 'Alif' répétée à l'infini.",
   },
+  {
+    id: "oeuvre-da-al-hayat",
+    titre: "Da' al-Hayat — دع الحياة",
+    sousTitre: "Laisse la vie vivre en toi",
+    technique: "Toile de coton, feuille d'or, acrylique et encre japonaise",
+    dimensions: "Toile originale",
+    annee: "2005",
+    style: "Calligraphie contemporaine",
+    disponible: true,
+    prix: 400,
+    image: "/images/tableau-laisse-vie-2.jpg",
+    images: ["/images/tableau-laisse-vie-2.jpg", "/images/tableau-laisse-vie-1.jpg"],
+    extrait: "جالل الدين الرومي",
+    citation: "« Ne cherche pas à résister aux changements qui se dressent sur ton chemin. Laisse la vie vivre en toi. »",
+    description:
+      "Extrait de Rumi : le mot « vivre » (taïch en arabe) sort du cadre doré, qui symbolise notre cage d'or, notre zone de confort. Cette représentation montre que sortir de cette cage est la seule voie pour retrouver la paix intérieure — symbolisée par la couleur blanche du reste du tableau. La calligraphie respire comme une vague, un mouvement continu qui incarne la transformation, la liberté et la régénération intérieure.",
+  },
 ];
 
 export const storeData = [

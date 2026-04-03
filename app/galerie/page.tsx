@@ -5,6 +5,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { galerieData } from '@/lib/data';
 
+type Oeuvre = typeof galerieData[0] & {
+  sousTitre?: string;
+  citation?: string;
+  images?: string[];
+};
+
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: 'easeOut' as const } },
@@ -13,12 +19,20 @@ const fadeUp = {
 const arabicLetters = ['ب', 'ل', 'ن', 'م', 'ح', 'ع'];
 
 export default function GaleriePage() {
-  const [selected, setSelected] = useState<typeof galerieData[0] | null>(null);
+  const [selected, setSelected] = useState<Oeuvre | null>(null);
   const [filter, setFilter] = useState('Tous');
+  const [modalImg, setModalImg] = useState(0);
   const styles = ['Tous', ...Array.from(new Set(galerieData.map((o) => o.style)))];
 
   const filtered =
     filter === 'Tous' ? galerieData : galerieData.filter((o) => o.style === filter);
+
+  function openOeuvre(oeuvre: Oeuvre) {
+    setSelected(oeuvre);
+    setModalImg(0);
+  }
+
+  const modalImages = selected?.images ?? (selected?.image ? [selected.image] : []);
 
   return (
     <div style={{ background: '#F5F0E8' }}>
@@ -60,8 +74,8 @@ export default function GaleriePage() {
       </section>
 
       {/* Filtres */}
-      <section className="py-10 section-pad" style={{ background: '#FAF7F2', borderBottom: '1px solid rgba(61,43,31,0.08)' }}>
-        <div className="max-w-6xl mx-auto flex flex-wrap gap-3 justify-center">
+      <section style={{ padding: '2.5rem 1.5rem', background: '#FAF7F2', borderBottom: '1px solid rgba(61,43,31,0.08)' }}>
+        <div style={{ maxWidth: '72rem', margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: '0.75rem', justifyContent: 'center' }}>
           {styles.map((style) => (
             <button
               key={style}
@@ -86,142 +100,136 @@ export default function GaleriePage() {
       </section>
 
       {/* Grille */}
-      <section className="py-16 section-pad pb-32" style={{ background: '#F5F0E8' }}>
-        <div style={{ maxWidth: "72rem", marginLeft: "auto", marginRight: "auto" }}>
-          <motion.div
-            layout
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            <AnimatePresence>
-              {filtered.map((oeuvre, i) => (
-                <motion.div
-                  key={oeuvre.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.97 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.97 }}
-                  transition={{ duration: 0.4 }}
-                  onClick={() => setSelected(oeuvre)}
-                  className="img-zoom"
+      <section style={{ padding: '4rem 1.5rem 8rem', background: '#F5F0E8' }}>
+        <div style={{ maxWidth: '72rem', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+          <AnimatePresence>
+            {(filtered as Oeuvre[]).map((oeuvre, i) => (
+              <motion.div
+                key={oeuvre.id}
+                layout
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.97 }}
+                transition={{ duration: 0.4 }}
+                onClick={() => openOeuvre(oeuvre)}
+                style={{
+                  cursor: 'pointer',
+                  background: 'linear-gradient(135deg, #3D2B1F, #1A1209)',
+                  aspectRatio: i % 4 === 1 ? '2/3' : '4/5',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+                whileHover={{ y: -4 }}
+              >
+                {/* Lettre arabe décorative (fond, toujours visible) */}
+                <div
                   style={{
-                    cursor: 'pointer',
-                    background: 'linear-gradient(135deg, #3D2B1F, #1A1209)',
-                    aspectRatio: i % 4 === 1 ? '2/3' : '1/1',
-                    position: 'relative',
-                    overflow: 'hidden',
+                    position: 'absolute',
+                    inset: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
-                  whileHover={{ y: -4 }}
                 >
-                  {/* Placeholder visuel */}
                   <div
                     style={{
-                      position: 'absolute',
-                      inset: 0,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
+                      fontFamily: 'Cormorant Garamond, serif',
+                      fontSize: 'clamp(3rem, 6vw, 5rem)',
+                      color: '#C9A84C',
+                      opacity: 0.3,
                     }}
                   >
-                    <div
-                      style={{
-                        fontFamily: 'Cormorant Garamond, serif',
-                        fontSize: 'clamp(3rem, 6vw, 5rem)',
-                        color: '#C9A84C',
-                        opacity: 0.3,
-                      }}
-                    >
-                      {arabicLetters[i % arabicLetters.length]}
-                    </div>
+                    {arabicLetters[i % arabicLetters.length]}
                   </div>
+                </div>
 
-                  {/* Overlay info */}
-                  <div
+                {/* Image réelle par-dessus (masquée si 404) */}
+                {oeuvre.image && (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={oeuvre.image}
+                    alt={oeuvre.titre}
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                     style={{
                       position: 'absolute',
                       inset: 0,
-                      background: 'linear-gradient(to top, rgba(26,18,9,0.92) 0%, transparent 50%)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'flex-end',
-                      padding: '1.5rem',
-                      opacity: 0,
-                      transition: 'opacity 0.4s',
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      objectPosition: 'center top',
+                      transition: 'transform 0.6s ease',
                     }}
-                    onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.opacity = '1')}
-                    onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.opacity = '0')}
+                  />
+                )}
+
+                {/* Overlay au hover */}
+                <div
+                  className="galerie-overlay"
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'linear-gradient(to top, rgba(26,18,9,0.92) 0%, rgba(26,18,9,0.1) 60%, transparent 100%)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-end',
+                    padding: '1.5rem',
+                    opacity: 0,
+                    transition: 'opacity 0.4s',
+                  }}
+                  onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.opacity = '1')}
+                  onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.opacity = '0')}
+                >
+                  <h3
+                    style={{
+                      fontFamily: 'Cormorant Garamond, serif',
+                      fontSize: '1.1rem',
+                      color: '#F5F0E8',
+                      marginBottom: '0.2rem',
+                    }}
                   >
-                    <h3
-                      style={{
-                        fontFamily: 'Cormorant Garamond, serif',
-                        fontSize: '1.1rem',
-                        color: '#F5F0E8',
-                        marginBottom: '0.25rem',
-                      }}
-                    >
-                      {oeuvre.titre}
-                    </h3>
-                    <p
-                      style={{
-                        fontFamily: 'Montserrat, sans-serif',
-                        fontSize: '0.85rem',
-                        letterSpacing: '0.2em',
-                        color: '#C9A84C',
-                        textTransform: 'uppercase',
-                        marginBottom: '0.5rem',
-                      }}
-                    >
-                      {oeuvre.style}
+                    {oeuvre.titre}
+                  </h3>
+                  {(oeuvre as Oeuvre).sousTitre && (
+                    <p style={{ fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', fontSize: '0.9rem', color: 'rgba(245,240,232,0.7)', marginBottom: '0.4rem' }}>
+                      {(oeuvre as Oeuvre).sousTitre}
                     </p>
-                    <div className="flex justify-between items-center">
-                      <span
-                        style={{
-                          fontFamily: 'Montserrat, sans-serif',
-                          fontSize: '0.8rem',
-                          color: 'rgba(245,240,232,0.82)',
-                        }}
-                      >
-                        {oeuvre.dimensions}
-                      </span>
-                      {oeuvre.disponible && (
-                        <span
-                          style={{
-                            fontFamily: 'Montserrat, sans-serif',
-                            fontSize: '0.85rem',
-                            color: '#C9A84C',
-                            letterSpacing: '0.15em',
-                            textTransform: 'uppercase',
-                          }}
-                        >
-                          Disponible
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Badge disponible */}
-                  {oeuvre.disponible && (
-                    <span
-                      style={{
-                        position: 'absolute',
-                        top: '0.75rem',
-                        right: '0.75rem',
-                        fontFamily: 'Montserrat, sans-serif',
-                        fontSize: '0.62rem',
-                        letterSpacing: '0.2em',
-                        textTransform: 'uppercase',
-                        color: '#C9A84C',
-                        background: 'rgba(26,18,9,0.75)',
-                        padding: '0.25rem 0.5rem',
-                        border: '1px solid rgba(201,168,76,0.4)',
-                      }}
-                    >
-                      Dispo
-                    </span>
                   )}
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </motion.div>
+                  <p
+                    style={{
+                      fontFamily: 'Montserrat, sans-serif',
+                      fontSize: '0.72rem',
+                      letterSpacing: '0.2em',
+                      color: '#C9A84C',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {oeuvre.style} · {oeuvre.annee}
+                  </p>
+                </div>
+
+                {/* Badge disponible */}
+                {oeuvre.disponible && (
+                  <span
+                    style={{
+                      position: 'absolute',
+                      top: '0.75rem',
+                      right: '0.75rem',
+                      fontFamily: 'Montserrat, sans-serif',
+                      fontSize: '0.62rem',
+                      letterSpacing: '0.2em',
+                      textTransform: 'uppercase',
+                      color: '#C9A84C',
+                      background: 'rgba(26,18,9,0.75)',
+                      padding: '0.25rem 0.5rem',
+                      border: '1px solid rgba(201,168,76,0.4)',
+                    }}
+                  >
+                    Dispo
+                  </span>
+                )}
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       </section>
 
@@ -241,7 +249,7 @@ export default function GaleriePage() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '2rem',
+              padding: '1.5rem',
             }}
           >
             <motion.div
@@ -251,49 +259,110 @@ export default function GaleriePage() {
               onClick={(e) => e.stopPropagation()}
               style={{
                 background: '#FAF7F2',
-                maxWidth: 800,
+                maxWidth: 860,
                 width: '100%',
-                maxHeight: '90vh',
+                maxHeight: '92vh',
                 overflow: 'auto',
                 display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
+                gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
               }}
             >
-              {/* Visuel */}
-              <div
-                style={{
-                  background: 'linear-gradient(135deg, #3D2B1F, #1A1209)',
-                  minHeight: 400,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <div
-                  style={{
-                    fontFamily: 'Cormorant Garamond, serif',
-                    fontSize: '6rem',
-                    color: '#C9A84C',
-                    opacity: 0.3,
-                  }}
-                >
-                  ل
-                </div>
+              {/* Visuel gauche */}
+              <div style={{ position: 'relative', background: '#1A1209', minHeight: 420 }}>
+                {modalImages.length > 0 ? (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      key={modalImg}
+                      src={modalImages[modalImg]}
+                      alt={selected.titre}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center top',
+                        display: 'block',
+                        minHeight: 420,
+                      }}
+                    />
+                    {/* Navigation photos si plusieurs */}
+                    {modalImages.length > 1 && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          bottom: '1rem',
+                          left: 0,
+                          right: 0,
+                          display: 'flex',
+                          justifyContent: 'center',
+                          gap: '0.5rem',
+                        }}
+                      >
+                        {modalImages.map((_, idx) => (
+                          <button
+                            key={idx}
+                            onClick={(e) => { e.stopPropagation(); setModalImg(idx); }}
+                            style={{
+                              width: idx === modalImg ? 24 : 8,
+                              height: 8,
+                              background: idx === modalImg ? '#C9A84C' : 'rgba(201,168,76,0.4)',
+                              border: 'none',
+                              cursor: 'pointer',
+                              transition: 'all 0.3s',
+                              padding: 0,
+                            }}
+                          />
+                        ))}
+                      </div>
+                    )}
+                    {/* Flèches navigation */}
+                    {modalImages.length > 1 && (
+                      <>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setModalImg((modalImg - 1 + modalImages.length) % modalImages.length); }}
+                          style={{
+                            position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)',
+                            background: 'rgba(26,18,9,0.7)', border: '1px solid rgba(201,168,76,0.3)',
+                            color: '#C9A84C', width: 36, height: 36, cursor: 'pointer',
+                            fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          }}
+                        >
+                          ‹
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setModalImg((modalImg + 1) % modalImages.length); }}
+                          style={{
+                            position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)',
+                            background: 'rgba(26,18,9,0.7)', border: '1px solid rgba(201,168,76,0.3)',
+                            color: '#C9A84C', width: 36, height: 36, cursor: 'pointer',
+                            fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          }}
+                        >
+                          ›
+                        </button>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                    <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '6rem', color: '#C9A84C', opacity: 0.3 }}>ل</div>
+                  </div>
+                )}
               </div>
 
-              {/* Info */}
-              <div style={{ padding: '3rem' }}>
+              {/* Info droite */}
+              <div style={{ padding: '2.5rem 2rem', overflowY: 'auto' }}>
                 <button
                   onClick={() => setSelected(null)}
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
-                    fontSize: '0.75rem',
+                    fontSize: '0.72rem',
                     letterSpacing: '0.25em',
                     color: '#C9A84C',
                     background: 'none',
                     border: 'none',
                     cursor: 'pointer',
-                    marginBottom: '2rem',
+                    marginBottom: '1.5rem',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.5rem',
@@ -306,46 +375,79 @@ export default function GaleriePage() {
                 <span
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
-                    fontSize: '0.85rem',
+                    fontSize: '0.72rem',
                     letterSpacing: '0.3em',
                     textTransform: 'uppercase',
                     color: '#C9A84C',
                     display: 'block',
-                    marginBottom: '0.75rem',
+                    marginBottom: '0.6rem',
                   }}
                 >
                   {selected.style} · {selected.annee}
                 </span>
+
                 <h2
                   style={{
                     fontFamily: 'Cormorant Garamond, serif',
                     fontWeight: 400,
-                    fontSize: '1.8rem',
+                    fontSize: '1.6rem',
                     color: '#1A1209',
                     letterSpacing: '0.03em',
-                    marginBottom: '1.5rem',
+                    marginBottom: '0.3rem',
                     lineHeight: 1.2,
                   }}
                 >
                   {selected.titre}
                 </h2>
-                <span
-                  style={{ display: 'block', width: 40, height: 1, background: '#C9A84C', marginBottom: '1.5rem' }}
-                />
+
+                {(selected as Oeuvre).sousTitre && (
+                  <p
+                    style={{
+                      fontFamily: 'Cormorant Garamond, serif',
+                      fontStyle: 'italic',
+                      fontSize: '1.05rem',
+                      color: '#3D2B1F',
+                      marginBottom: '1rem',
+                    }}
+                  >
+                    {(selected as Oeuvre).sousTitre}
+                  </p>
+                )}
+
+                <span style={{ display: 'block', width: 40, height: 1, background: '#C9A84C', marginBottom: '1.25rem' }} />
+
+                {/* Citation si disponible */}
+                {(selected as Oeuvre).citation && (
+                  <blockquote
+                    style={{
+                      fontFamily: 'Cormorant Garamond, serif',
+                      fontStyle: 'italic',
+                      fontSize: '0.95rem',
+                      lineHeight: 1.7,
+                      color: '#3D2B1F',
+                      borderLeft: '2px solid #C9A84C',
+                      paddingLeft: '1rem',
+                      marginBottom: '1.25rem',
+                    }}
+                  >
+                    {(selected as Oeuvre).citation}
+                  </blockquote>
+                )}
+
                 <p
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
-                    fontSize: '0.75rem',
+                    fontSize: '0.76rem',
                     fontWeight: 300,
                     lineHeight: 1.9,
                     color: '#3D2B1F',
-                    marginBottom: '2rem',
+                    marginBottom: '1.5rem',
                   }}
                 >
                   {selected.description}
                 </p>
 
-                <div className="flex flex-col gap-2 mb-6">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
                   {[
                     { label: 'Technique', value: selected.technique },
                     { label: 'Dimensions', value: selected.dimensions },
@@ -354,10 +456,12 @@ export default function GaleriePage() {
                       <span
                         style={{
                           fontFamily: 'Montserrat, sans-serif',
-                          fontSize: '0.85rem',
+                          fontSize: '0.68rem',
                           letterSpacing: '0.25em',
                           textTransform: 'uppercase',
                           color: '#C9A84C',
+                          display: 'block',
+                          marginBottom: '0.1rem',
                         }}
                       >
                         {info.label}
@@ -365,7 +469,7 @@ export default function GaleriePage() {
                       <p
                         style={{
                           fontFamily: 'Montserrat, sans-serif',
-                          fontSize: '0.85rem',
+                          fontSize: '0.8rem',
                           fontWeight: 300,
                           color: '#3D2B1F',
                         }}
@@ -376,7 +480,7 @@ export default function GaleriePage() {
                   ))}
                 </div>
 
-                <div className="flex items-end justify-between mb-6">
+                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
                   <div
                     style={{
                       fontFamily: 'Cormorant Garamond, serif',
@@ -390,7 +494,7 @@ export default function GaleriePage() {
                   <span
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.85rem',
+                      fontSize: '0.72rem',
                       color: selected.disponible ? '#C9A84C' : 'rgba(61,43,31,0.4)',
                       textTransform: 'uppercase',
                       letterSpacing: '0.15em',
@@ -401,7 +505,7 @@ export default function GaleriePage() {
                 </div>
 
                 {selected.disponible && (
-                  <Link href="/store" className="btn-gold btn-gold-solid" style={{ width: '100%', textAlign: 'center' }}>
+                  <Link href="/contact" className="btn-gold btn-gold-solid" style={{ display: 'block', textAlign: 'center' }}>
                     Acquérir cette œuvre
                   </Link>
                 )}
