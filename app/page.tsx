@@ -589,7 +589,7 @@ export default function Home() {
                 className="img-zoom"
                 style={{
                   aspectRatio: i % 3 === 1 ? '3/4' : '1/1',
-                  background: `linear-gradient(${135 + i * 20}deg, #3D2B1F, #1A1209)`,
+                  background: '#1A1209',
                   position: 'relative',
                   overflow: 'hidden',
                   cursor: 'pointer',
@@ -597,28 +597,19 @@ export default function Home() {
                 whileHover={{ scale: 1.01 }}
                 transition={{ duration: 0.4 }}
               >
-                <div
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={oeuvre.image}
+                  alt={oeuvre.titre}
                   style={{
                     position: 'absolute',
                     inset: 0,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: 'rgba(0,0,0,0.1)',
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'center',
                   }}
-                >
-                  <div
-                    style={{
-                      fontFamily: 'Cormorant Garamond, serif',
-                      fontSize: 'clamp(2rem, 5vw, 4rem)',
-                      color: '#C9A84C',
-                      opacity: 0.4,
-                    }}
-                  >
-                    {['ب', 'ل', 'ن', 'م', 'ح', 'ع'][i]}
-                  </div>
-                </div>
+                />
                 <div
                   style={{
                     position: 'absolute',
@@ -627,7 +618,7 @@ export default function Home() {
                     flexDirection: 'column',
                     justifyContent: 'flex-end',
                     padding: '1rem',
-                    background: 'linear-gradient(to top, rgba(26,18,9,0.9) 0%, transparent 60%)',
+                    background: 'linear-gradient(to top, rgba(26,18,9,0.92) 0%, transparent 65%)',
                     opacity: 0,
                     transition: 'opacity 0.4s',
                   }}
