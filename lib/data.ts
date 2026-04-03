@@ -208,6 +208,23 @@ export const galerieData = [
       "Composition circulaire en style Koufi géométrique — la lettre 'Alif' répétée à l'infini.",
   },
   {
+    id: "oeuvre-haq",
+    titre: "Haq — حق",
+    sousTitre: "Vérité & Justice",
+    technique: "Acrylique sur toile",
+    dimensions: "Toile originale",
+    annee: "2015",
+    style: "Calligraphie contemporaine",
+    disponible: true,
+    prix: 350,
+    image: "/images/tableau-haq-1.jpg",
+    images: ["/images/tableau-haq-1.jpg", "/images/tableau-haq-2.jpg"],
+    extrait: "Looka",
+    citation: "« Peu importe nos efforts pour estomper, cacher ou faire taire la vérité, elle finit toujours par apparaître au grand jour. »",
+    description:
+      "J'ai choisi ce mot, Haq, parce qu'il fait partie des mots qui font la magie de la langue arabe : peu d'autres langues possèdent un terme qui désigne à la fois justice et droit, en un seul mot. Au centre du tableau, ce mot est calligraphié avec une partie estompée et l'autre manifeste — symbolisant que, peu importe nos efforts pour cacher ou faire taire la vérité, elle finit toujours par apparaître au grand jour.",
+  },
+  {
     id: "oeuvre-mahabba",
     titre: "Howa al-Mahabba — هو المحبة",
     sousTitre: "L'amour dont on ne saisit l'essence qu'à travers la souffrance",
