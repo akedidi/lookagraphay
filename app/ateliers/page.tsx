@@ -335,11 +335,11 @@ export default function AteliersPage() {
                 <div
                   style={{
                     fontFamily: 'Cormorant Garamond, serif',
-                    fontSize: '2rem',
+                    fontSize: '2.4rem',
                     color: '#C9A84C',
-                    opacity: 0.25,
+                    opacity: 0.3,
                     lineHeight: 1,
-                    marginBottom: '1rem',
+                    marginBottom: '1.2rem',
                     fontWeight: 300,
                   }}
                 >
@@ -348,10 +348,10 @@ export default function AteliersPage() {
                 <p
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
-                    fontSize: '0.75rem',
+                    fontSize: '0.95rem',
                     fontWeight: 300,
-                    color: 'rgba(245,240,232,0.87)',
-                    lineHeight: 1.7,
+                    color: 'rgba(245,240,232,0.9)',
+                    lineHeight: 1.8,
                   }}
                 >
                   {item}
