@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' as const } },
 };
 
 const pillars = [
@@ -259,7 +259,7 @@ export default function AssociationPage() {
               viewport={{ once: true, margin: '-40px' }}
               variants={{
                 hidden: { opacity: 0, y: 24 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.7, delay: (i % 3) * 0.1, ease: [0.22, 1, 0.36, 1] } },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.7, delay: (i % 3) * 0.1, ease: 'easeOut' as const } },
               }}
               style={{
                 background: '#1A1209',

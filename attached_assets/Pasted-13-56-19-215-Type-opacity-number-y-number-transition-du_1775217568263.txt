@@ -1,0 +1,43 @@
+13:56:19.215 
+    Type '{ opacity: number; y: number; transition: { duration: number; ease: number[]; }; }' is not assignable to type 'Variant'.
+13:56:19.215 
+      Type '{ opacity: number; y: number; transition: { duration: number; ease: number[]; }; }' is not assignable to type 'TargetAndTransition'.
+13:56:19.215 
+        Type '{ opacity: number; y: number; transition: { duration: number; ease: number[]; }; }' is not assignable to type '{ transition?: Transition<any> | undefined; transitionEnd?: ResolvedValues$1 | undefined; }'.
+13:56:19.215 
+          Types of property 'transition' are incompatible.
+13:56:19.215 
+            Type '{ duration: number; ease: number[]; }' is not assignable to type 'Transition<any> | undefined'.
+13:56:19.216 
+              Type '{ duration: number; ease: number[]; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+13:56:19.216 
+                Type '{ duration: number; ease: number[]; }' is not assignable to type 'ValueAnimationTransition<any>'.
+13:56:19.216 
+                  Types of property 'ease' are incompatible.
+13:56:19.217 
+                    Type 'number[]' is not assignable to type 'Easing | Easing[] | undefined'.
+13:56:19.217 
+                      Type 'number[]' is not assignable to type 'EasingFunction | Easing[]'.
+13:56:19.217 
+                        Type 'number[]' is not assignable to type 'Easing[]'.
+13:56:19.217 
+                          Type 'number' is not assignable to type 'Easing'.
+13:56:19.218 
+13:56:19.218 
+  82 |         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg, transparent, #C9A84C, transparent)' }} />
+13:56:19.218 
+  83 |
+13:56:19.218 
+> 84 |         <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+13:56:19.219 
+     |                                                        ^
+13:56:19.219 
+  85 |           {/* Gold ornament */}
+13:56:19.219 
+  86 |           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1.5rem', marginBottom: '2.5rem' }}>
+13:56:19.220 
+  87 |             <div style={{ width: 60, height: 1, background: 'linear-gradient(to right, transparent, #C9A84C)' }} />
+13:56:19.247 
+Next.js build worker exited with code: 1 and signal: null
+13:56:19.291 
+Error: Command "npm run build" exited with 1
