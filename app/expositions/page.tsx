@@ -35,10 +35,12 @@ export default function ExpositionsPage() {
           loop
           playsInline
           style={{
+            display: 'block',
             position: 'absolute',
-            inset: 0,
+            top: 0,
+            left: 0,
             width: '100%',
-            height: '100%',
+            height: 'calc(100% + 4px)',
             objectFit: 'cover',
             objectPosition: 'center',
           }}
@@ -48,8 +50,11 @@ export default function ExpositionsPage() {
         <div
           style={{
             position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(to bottom, rgba(26,18,9,0.72) 0%, rgba(26,18,9,0.55) 60%, rgba(26,18,9,0.8) 100%)',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: '-2px',
+            background: 'linear-gradient(to bottom, rgba(26,18,9,0.72) 0%, rgba(26,18,9,0.55) 60%, rgba(26,18,9,0.92) 100%)',
           }}
         />
         {/* Contenu */}
