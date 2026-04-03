@@ -242,15 +242,15 @@ export default function AteliersPage() {
                 src={video.src}
                 style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
               />
-              {/* Overlay */}
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(26,18,9,0.82) 0%, rgba(26,18,9,0.2) 55%, transparent 100%)' }} />
-              {/* Légende bas */}
-              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '1.5rem 1.75rem' }}>
-                <span style={{ display: 'block', width: 28, height: 1, background: '#C9A84C', marginBottom: '0.75rem' }} />
-                <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', color: '#F5F0E8', margin: 0, lineHeight: 1.2 }}>
+              {/* Overlay dégradé */}
+              <div style={{ position: 'absolute', inset: 0, background: 'rgba(26,18,9,0.45)' }} />
+              {/* Texte centré */}
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', textAlign: 'center' }}>
+                <p style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 'clamp(1.4rem, 2.5vw, 2rem)', color: '#F5F0E8', margin: 0, lineHeight: 1.3, letterSpacing: '0.04em' }}>
                   {video.legende}
                 </p>
-                <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#C9A84C', margin: '0.35rem 0 0' }}>
+                <span style={{ display: 'block', width: 36, height: 1, background: '#C9A84C', margin: '1rem auto' }} />
+                <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#C9A84C', margin: 0 }}>
                   {video.sousTitre}
                 </p>
               </div>
