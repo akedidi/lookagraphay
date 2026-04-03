@@ -14,19 +14,46 @@ export default function ExpositionsPage() {
 
   return (
     <div style={{ background: '#F5F0E8' }}>
-      {/* Header */}
+      {/* Header — vidéo background */}
       <section
         style={{
-          background: '#1A1209',
+          position: 'relative',
+          minHeight: '60vh',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           textAlign: 'center',
-          padding: '7rem 1.5rem 4rem',
+          padding: '7rem 1.5rem 5rem',
+          overflow: 'hidden',
         }}
       >
-        <div className="page-header-anim">
+        {/* Vidéo fond */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center',
+          }}
+          src="/images/vernissage.mp4"
+        />
+        {/* Overlay sombre */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(to bottom, rgba(26,18,9,0.72) 0%, rgba(26,18,9,0.55) 60%, rgba(26,18,9,0.8) 100%)',
+          }}
+        />
+        {/* Contenu */}
+        <div className="page-header-anim" style={{ position: 'relative', zIndex: 1 }}>
           <span
             style={{
               fontFamily: 'Montserrat, sans-serif',
