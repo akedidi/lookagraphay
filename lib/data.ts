@@ -53,6 +53,7 @@ export const ateliersData = [
       "Exploration du style fusion arabo-japonais de Looka",
       "Composition de mots et de textes calligraphiés",
       "Création de ses propres œuvres artistiques",
+      "Regard critique, partage et mise en valeur des créations",
     ],
     contact: "looka.graphy@gmail.com",
   },
