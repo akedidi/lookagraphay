@@ -6,6 +6,7 @@ import Link from 'next/link';
 const links = [
   { href: '/', label: 'Accueil' },
   { href: '/artiste', label: "L'Artiste" },
+  { href: '/association', label: 'Association' },
   { href: '/ateliers', label: 'Ateliers' },
   { href: '/expositions', label: 'Expositions' },
   { href: '/evenements', label: 'Événements' },
