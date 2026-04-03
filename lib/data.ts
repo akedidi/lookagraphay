@@ -208,6 +208,23 @@ export const galerieData = [
       "Composition circulaire en style Koufi géométrique — la lettre 'Alif' répétée à l'infini.",
   },
   {
+    id: "oeuvre-salam",
+    titre: "Fîhâ liman sâlamoûna — وفيها لمن سالمونا",
+    sousTitre: "La paix à ceux qui viennent en paix",
+    technique: "Acrylique sur toile de lin",
+    dimensions: "60 × 80 cm",
+    annee: "2024",
+    style: "Calligraphie contemporaine",
+    disponible: true,
+    prix: 450,
+    image: "/images/tableau-salam-1.jpg",
+    images: ["/images/tableau-salam-1.jpg", "/images/tableau-salam-2.jpg"],
+    extrait: "مصطفى صادق الرافعي",
+    citation: "« Trouvera la paix celui qui nous approche avec un cœur de paix. »",
+    description:
+      "Cette œuvre maîtresse rend hommage à la fraternité et à l'hospitalité. La calligraphie ample et lumineuse célèbre la paix offerte à ceux qui nous approchent avec de bonnes intentions, et invite à la réciprocité et à l'union entre les êtres. Le losange d'or suspendu, point d'ancrage de la composition, symbolise la préciosité du lien humain.",
+  },
+  {
     id: "oeuvre-amour-croyance",
     titre: "Adînu bi-dîn al-hubb — أدين بدين الحب",
     sousTitre: "L'amour est ma croyance",
