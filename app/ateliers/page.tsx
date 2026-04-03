@@ -444,11 +444,11 @@ export default function AteliersPage() {
                   <span
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.72rem',
+                      fontSize: '0.78rem',
                       letterSpacing: '0.3em',
                       textTransform: 'uppercase',
                       color: '#C9A84C',
-                      minWidth: 90,
+                      minWidth: 100,
                       paddingTop: '0.15rem',
                     }}
                   >
@@ -457,10 +457,10 @@ export default function AteliersPage() {
                   <span
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.75rem',
+                      fontSize: '0.95rem',
                       fontWeight: 300,
                       color: '#3D2B1F',
-                      lineHeight: 1.5,
+                      lineHeight: 1.6,
                     }}
                   >
                     {info.value}
@@ -473,7 +473,7 @@ export default function AteliersPage() {
                 <span
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
-                    fontSize: '0.72rem',
+                    fontSize: '0.78rem',
                     letterSpacing: '0.3em',
                     textTransform: 'uppercase',
                     color: '#C9A84C',
@@ -488,7 +488,7 @@ export default function AteliersPage() {
                     key={i}
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.85rem',
+                      fontSize: '0.95rem',
                       fontWeight: 300,
                       color: '#3D2B1F',
                       lineHeight: 1.7,
@@ -534,9 +534,9 @@ export default function AteliersPage() {
                 <p
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
-                    fontSize: '0.75rem',
+                    fontSize: '0.95rem',
                     fontWeight: 300,
-                    color: 'rgba(245,240,232,0.82)',
+                    color: 'rgba(245,240,232,0.88)',
                     lineHeight: 1.8,
                     marginBottom: '2rem',
                   }}
