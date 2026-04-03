@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ateliersData } from '@/lib/data';
 
@@ -10,14 +11,42 @@ const fadeUp = {
 
 export default function AteliersPage() {
   const cours = ateliersData[0];
+  const heroVideoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (heroVideoRef.current) {
+      heroVideoRef.current.playbackRate = 0.65;
+    }
+  }, []);
 
   return (
     <div style={{ background: '#F5F0E8' }}>
-      {/* Header */}
+      {/* Header — vidéo background ralentie */}
       <section
-        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '7rem 1.5rem 5rem', background: '#2A2520' }}
+        style={{
+          position: 'relative',
+          minHeight: '65vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          padding: '7rem 1.5rem 5rem',
+          overflow: 'hidden',
+        }}
       >
-        <div className="page-header-anim">
+        <video
+          ref={heroVideoRef}
+          autoPlay
+          muted
+          loop
+          playsInline
+          src="/images/atelier-video.mp4"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+        />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(26,18,9,0.68) 0%, rgba(26,18,9,0.5) 60%, rgba(26,18,9,0.78) 100%)' }} />
+
+        <div className="page-header-anim" style={{ position: 'relative', zIndex: 1 }}>
           <span
             style={{
               fontFamily: 'Montserrat, sans-serif',
