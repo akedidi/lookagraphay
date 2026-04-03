@@ -208,6 +208,23 @@ export const galerieData = [
       "Composition circulaire en style Koufi géométrique — la lettre 'Alif' répétée à l'infini.",
   },
   {
+    id: "oeuvre-amour-croyance",
+    titre: "Adînu bi-dîn al-hubb — أدين بدين الحب",
+    sousTitre: "L'amour est ma croyance",
+    technique: "Acrylique sur toile de lin",
+    dimensions: "60 × 90 cm",
+    annee: "2024",
+    style: "Calligraphie contemporaine",
+    disponible: true,
+    prix: 300,
+    image: "/images/tableau-amour-3.jpg",
+    images: ["/images/tableau-amour-3.jpg", "/images/tableau-amour-1.jpg", "/images/tableau-amour-2.jpg"],
+    extrait: "محيي الدين بن عربي",
+    citation: "« L'amour est ma croyance et m'incline devant ses enseignements. Mon cœur serait ouvert à toute forme : un pré pour les gazelles, un monastère pour les moines… L'amour est ma foi, l'amour est ma croyance. »",
+    description:
+      "Ibn al-Arabi exprime une vision universelle et inclusive de la spiritualité, où le cœur s'ouvre à toutes les traditions. Dans cette calligraphie, le texte est composé en cercle — symbole de la planète Terre. Les différentes couleurs représentent la diversité des peuples et des cultures, unis par l'amour. L'œuvre a été exposée lors de la Arab Week at UNESCO.",
+  },
+  {
     id: "oeuvre-da-al-hayat",
     titre: "Da' al-Hayat — دع الحياة",
     sousTitre: "Laisse la vie vivre en toi",
