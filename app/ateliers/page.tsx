@@ -41,7 +41,7 @@ export default function AteliersPage() {
           muted
           loop
           playsInline
-          src="/images/atelier-video.mp4"
+          src="/images/atelier-hero.mp4"
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
         />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(26,18,9,0.68) 0%, rgba(26,18,9,0.5) 60%, rgba(26,18,9,0.78) 100%)' }} />
