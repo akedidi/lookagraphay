@@ -208,6 +208,23 @@ export const galerieData = [
       "Composition circulaire en style Koufi géométrique — la lettre 'Alif' répétée à l'infini.",
   },
   {
+    id: "oeuvre-chawq-al-hayat",
+    titre: "Chawq al-Hayat — شوق الحياة",
+    sousTitre: "Désir ardent de la vie",
+    technique: "Acrylique sur toile de lin",
+    dimensions: "60 × 90 cm",
+    annee: "2024",
+    style: "Calligraphie contemporaine",
+    disponible: true,
+    prix: 500,
+    image: "/images/tableau-chawq-2.jpg",
+    images: ["/images/tableau-chawq-2.jpg", "/images/tableau-chawq-1.jpg"],
+    extrait: "أبو القاسم الشابي",
+    citation: "« Celui que le désir ardent de la vie n'enlace pas, se dissipera dans son ciel et disparaîtra en poussière. »",
+    description:
+      "Ce vers du poète tunisien Abou el-Kassem el-Chebbi exprime la force vitale sans laquelle l'existence se fane. La couleur bleue, omniprésente, évoque les sources de la vie — le ciel et la mer, symboles de liberté et d'infini. Les points dorés qui ponctuent la toile sont autant de lumières vers lesquelles notre esprit peut tendre, éclats atteignables pour qui laisse le désir de vivre animer chaque geste et chaque instant.",
+  },
+  {
     id: "oeuvre-haq",
     titre: "Haq — حق",
     sousTitre: "Vérité & Justice",
