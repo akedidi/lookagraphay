@@ -9,7 +9,7 @@ const fadeUp = {
 
 const pillars = [
   {
-    num: '1',
+    num: '١',
     title: 'Éducation & Transmission',
     items: [
       'Ateliers réguliers de calligraphie pour tous niveaux — enfants, adultes, professionnels',
@@ -18,7 +18,7 @@ const pillars = [
     ],
   },
   {
-    num: '2',
+    num: '٢',
     title: 'Événements & Expositions',
     items: [
       'Expositions de calligraphie contemporaine et traditionnelle',
@@ -27,7 +27,7 @@ const pillars = [
     ],
   },
   {
-    num: '3',
+    num: '٣',
     title: 'Création Interdisciplinaire',
     items: [
       'Projets artistiques hybrides : calligraphie et musique live, peinture et théâtre',
@@ -36,7 +36,7 @@ const pillars = [
     ],
   },
   {
-    num: '4',
+    num: '٤',
     title: 'Patrimoine & Interculturalité',
     items: [
       'Sensibilisation au patrimoine de la calligraphie arabe et des traditions du monde',
@@ -45,7 +45,7 @@ const pillars = [
     ],
   },
   {
-    num: '5',
+    num: '٥',
     title: 'Innovation & Numérique',
     items: [
       'Projets numériques et interactifs : réalité augmentée, projections',
@@ -54,7 +54,7 @@ const pillars = [
     ],
   },
   {
-    num: '6',
+    num: '٦',
     title: 'Engagement Social & Inclusion',
     items: [
       'Ateliers pour personnes en situation de handicap et quartiers prioritaires',
