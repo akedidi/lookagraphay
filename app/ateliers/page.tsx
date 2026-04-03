@@ -200,6 +200,53 @@ export default function AteliersPage() {
         </div>
       </section>
 
+      {/* Vidéo atelier */}
+      <section style={{ background: '#2A2520', padding: '0' }}>
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1 }}
+          style={{ position: 'relative', maxWidth: '72rem', margin: '0 auto' }}
+        >
+          <video
+            src="/images/atelier-video.mp4"
+            controls
+            playsInline
+            style={{
+              width: '100%',
+              display: 'block',
+              maxHeight: '75vh',
+              objectFit: 'cover',
+              background: '#1A1209',
+            }}
+          />
+          {/* Légende */}
+          <div
+            style={{
+              padding: '1.25rem 2rem',
+              background: '#2A2520',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem',
+            }}
+          >
+            <span style={{ width: 32, height: 1, background: '#C9A84C', flexShrink: 0 }} />
+            <p
+              style={{
+                fontFamily: 'Cormorant Garamond, serif',
+                fontStyle: 'italic',
+                fontSize: '0.95rem',
+                color: 'rgba(245,240,232,0.7)',
+                letterSpacing: '0.03em',
+              }}
+            >
+              Un aperçu de l'atelier de calligraphie — entre geste, méditation et création
+            </p>
+          </div>
+        </motion.div>
+      </section>
+
       {/* Contenu du cours */}
       <section className="py-24 section-pad" style={{ background: '#1A1209' }}>
         <div style={{ maxWidth: "56rem", marginLeft: "auto", marginRight: "auto" }}>
