@@ -618,9 +618,9 @@ export default function AteliersPage() {
               <p
                 style={{
                   fontFamily: 'Montserrat, sans-serif',
-                  fontSize: '0.75rem',
+                  fontSize: '0.95rem',
                   fontWeight: 300,
-                  color: 'rgba(245,240,232,0.82)',
+                  color: 'rgba(245,240,232,0.88)',
                   lineHeight: 1.8,
                 }}
               >
