@@ -198,33 +198,27 @@ export default function AteliersPage() {
             </p>
           </motion.div>
 
-          {/* Ornement calligraphique */}
+          {/* Vidéo bloc droit */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.92 }}
+            initial={{ opacity: 0, scale: 0.96 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 1.2 }}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              position: 'relative',
               aspectRatio: '1',
-              background: 'linear-gradient(135deg, #2A2520 0%, #1A1209 100%)',
+              overflow: 'hidden',
             }}
           >
-            <div
-              style={{
-                fontFamily: 'Cormorant Garamond, serif',
-                fontSize: 'clamp(5rem, 12vw, 10rem)',
-                color: '#C9A84C',
-                opacity: 0.25,
-                lineHeight: 1,
-                userSelect: 'none',
-                direction: 'rtl',
-              }}
-            >
-              خط
-            </div>
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              src="/images/atelier-video-3.mp4"
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+            />
+            <div style={{ position: 'absolute', inset: 0, background: 'rgba(26,18,9,0.25)' }} />
           </motion.div>
         </div>
       </section>
