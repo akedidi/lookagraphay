@@ -217,3 +217,14 @@ h1, h2, h3, h4, h5, h6 {
   background: #A07830;
   color: #F5F0E8;
 }
+
+.video-grid-2col {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 640px) {
+  .video-grid-2col {
+    grid-template-columns: 1fr;
+  }
+}

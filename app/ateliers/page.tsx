@@ -243,7 +243,7 @@ export default function AteliersPage() {
         </motion.div>
 
         {/* Deux panneaux vidéo côte à côte */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', overflowX: 'hidden' }}>
+        <div className="video-grid-2col" style={{ overflow: 'hidden' }}>
           {[
             { src: '/images/atelier-seance.mp4', legende: 'Séance de calligraphie', sousTitre: 'Geste, méditation et création' },
             { src: '/images/atelier-video-2.mp4', legende: 'Découverte de l\'art', sousTitre: 'Calligraphie arabe avec Looka' },
