@@ -243,7 +243,7 @@ export default function AteliersPage() {
         </motion.div>
 
         {/* Deux panneaux vidéo côte à côte */}
-        <div className="video-grid-2col" style={{ overflow: 'hidden' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', overflow: 'hidden' }}>
           {[
             { src: '/images/atelier-seance.mp4', legende: 'Séance de calligraphie', sousTitre: 'Geste, méditation et création' },
             { src: '/images/atelier-video-2.mp4', legende: 'Découverte de l\'art', sousTitre: 'Calligraphie arabe avec Looka' },
@@ -254,7 +254,7 @@ export default function AteliersPage() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.2, duration: 1 }}
-              style={{ position: 'relative', aspectRatio: '16/9', overflow: 'hidden', minHeight: 280 }}
+              style={{ flex: '1 1 300px', minWidth: 0, position: 'relative', aspectRatio: '16/9', overflow: 'hidden', minHeight: 280 }}
             >
               {/* Vidéo fond */}
               <video
