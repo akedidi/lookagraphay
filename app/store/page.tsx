@@ -163,10 +163,10 @@ export default function StorePage() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              style={{ background: '#FAF7F2', maxWidth: 860, width: '100%', maxHeight: '92vh', overflow: 'auto', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)' }}
+              style={{ background: '#FAF7F2', maxWidth: 860, width: '100%', maxHeight: '92vh', overflow: 'auto', display: 'flex', flexWrap: 'wrap' }}
             >
               {/* Visuel gauche */}
-              <div style={{ position: 'relative', background: '#1A1209', minHeight: 420 }}>
+              <div style={{ position: 'relative', background: '#1A1209', flex: '1 1 300px', minWidth: 0, minHeight: 320 }}>
                 {modalImages.length > 0 ? (
                   <>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -174,7 +174,7 @@ export default function StorePage() {
                       key={modalImg}
                       src={modalImages[modalImg]}
                       alt={selected.titre}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block', minHeight: 420 }}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block', position: 'absolute', inset: 0 }}
                     />
                     {modalImages.length > 1 && (
                       <div style={{ position: 'absolute', bottom: '1rem', left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: '0.5rem' }}>
@@ -208,7 +208,7 @@ export default function StorePage() {
               </div>
 
               {/* Info droite */}
-              <div style={{ padding: '2.5rem 2rem', overflowY: 'auto' }}>
+              <div style={{ flex: '1 1 300px', minWidth: 0, padding: '2.5rem 2rem', overflowY: 'auto' }}>
                 <button
                   onClick={() => setSelected(null)}
                   style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', letterSpacing: '0.25em', color: '#C9A84C', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', textTransform: 'uppercase' }}
