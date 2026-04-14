@@ -224,7 +224,7 @@ export default function AteliersPage() {
       </section>
 
       {/* Vidéos atelier — background */}
-      <section style={{ background: '#1A1209' }}>
+      <section style={{ background: '#1A1209', overflow: 'hidden' }}>
         {/* Titre */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -243,7 +243,7 @@ export default function AteliersPage() {
         </motion.div>
 
         {/* Deux panneaux vidéo côte à côte */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', overflowX: 'hidden' }}>
           {[
             { src: '/images/atelier-seance.mp4', legende: 'Séance de calligraphie', sousTitre: 'Geste, méditation et création' },
             { src: '/images/atelier-video-2.mp4', legende: 'Découverte de l\'art', sousTitre: 'Calligraphie arabe avec Looka' },
