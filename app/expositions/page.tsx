@@ -26,6 +26,7 @@ export default function ExpositionsPage() {
           textAlign: 'center',
           padding: '7rem 1.5rem 5rem',
           overflow: 'hidden',
+          background: '#1A1209',
         }}
       >
         {/* Vidéo fond */}
@@ -40,7 +41,7 @@ export default function ExpositionsPage() {
             top: 0,
             left: 0,
             width: '100%',
-            height: 'calc(100% + 4px)',
+            height: '100%',
             objectFit: 'cover',
             objectPosition: 'center',
           }}
@@ -50,13 +51,12 @@ export default function ExpositionsPage() {
         <div
           style={{
             position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: '-2px',
-            background: 'linear-gradient(to bottom, rgba(26,18,9,0.72) 0%, rgba(26,18,9,0.55) 60%, rgba(26,18,9,0.92) 100%)',
+            inset: 0,
+            background: 'linear-gradient(to bottom, rgba(26,18,9,0.72) 0%, rgba(26,18,9,0.55) 55%, rgba(26,18,9,1) 100%)',
           }}
         />
+        {/* Bande solide anti-artefact */}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 6, background: '#1A1209', zIndex: 2 }} />
         {/* Contenu */}
         <div className="page-header-anim" style={{ position: 'relative', zIndex: 1 }}>
           <span
