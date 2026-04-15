@@ -6,6 +6,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
+    const folder = (formData.get('folder') as string) || 'articles';
 
     if (!file) {
       return NextResponse.json({ error: 'Aucun fichier reçu' }, { status: 400 });
@@ -20,9 +21,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Fichier trop lourd (max 10 Mo)' }, { status: 400 });
     }
 
+    const validFolders = ['articles', 'expos', 'events'];
+    const safeFolder = validFolders.includes(folder) ? folder : 'articles';
+
     const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
     const safeName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-    const dir = path.join(process.cwd(), 'public', 'images', 'bijoux');
+    const dir = path.join(process.cwd(), 'public', 'images', safeFolder);
 
     await mkdir(dir, { recursive: true });
 
@@ -30,7 +34,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
     await writeFile(path.join(dir, safeName), buffer);
 
-    return NextResponse.json({ path: `/images/bijoux/${safeName}` });
+    return NextResponse.json({ path: `/images/${safeFolder}/${safeName}` });
   } catch (err: any) {
     console.error('Upload error:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });
