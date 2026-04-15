@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 const ADMIN_USER = 'admin';
 const ADMIN_PASS = 'mayyacine31';
@@ -137,19 +137,53 @@ function Toggle({ label, value, onChange }: any) {
 
 function ImagesField({ label, value, onChange }: any) {
   const [newUrl, setNewUrl] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const fileRef = React.useRef<HTMLInputElement>(null);
   const imgs: string[] = Array.isArray(value) ? value : [];
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (data.path) {
+        onChange([...imgs, data.path]);
+      } else {
+        alert('Erreur upload: ' + (data.error || 'inconnu'));
+      }
+    } catch {
+      alert('Erreur lors de l\'upload');
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = '';
+    }
+  };
+
   return (
     <div style={{ marginBottom: '1rem' }}>
       <label style={labelStyle}>{label}</label>
       {imgs.map((url, i) => (
         <div key={i} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.4rem', alignItems: 'center' }}>
+          {url && <img src={url} alt="" style={{ width: 44, height: 44, objectFit: 'cover', flexShrink: 0, border: '1px solid rgba(201,168,76,0.3)' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />}
           <input value={url} onChange={e => { const a = [...imgs]; a[i] = e.target.value; onChange(a); }} style={{ ...inputStyle, flex: 1 }} />
           <button onClick={() => onChange(imgs.filter((_, j) => j !== i))} style={{ ...btnDanger, padding: '0.3rem 0.6rem', fontSize: '0.7rem' }}>✕</button>
         </div>
       ))}
-      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.4rem' }}>
-        <input value={newUrl} onChange={e => setNewUrl(e.target.value)} placeholder="/images/..." style={{ ...inputStyle, flex: 1 }} />
-        <button onClick={() => { if (newUrl.trim()) { onChange([...imgs, newUrl.trim()]); setNewUrl(''); } }} style={{ ...btnOutline, whiteSpace: 'nowrap' }}>+ Ajouter</button>
+      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.4rem', flexWrap: 'wrap' }}>
+        <input value={newUrl} onChange={e => setNewUrl(e.target.value)} placeholder="/images/..." style={{ ...inputStyle, flex: 1, minWidth: 120 }} />
+        <button onClick={() => { if (newUrl.trim()) { onChange([...imgs, newUrl.trim()]); setNewUrl(''); } }} style={{ ...btnOutline, whiteSpace: 'nowrap' }}>+ URL</button>
+        <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleUpload} />
+        <button
+          onClick={() => fileRef.current?.click()}
+          disabled={uploading}
+          style={{ ...btnGold, whiteSpace: 'nowrap', opacity: uploading ? 0.6 : 1 }}
+        >
+          {uploading ? 'Upload…' : '📤 Uploader'}
+        </button>
       </div>
     </div>
   );
@@ -354,7 +388,7 @@ export default function AdminPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1.5rem' }}>
                   <Field label="Titre" value={editStore.titre} onChange={(v: string) => setEditStore({ ...editStore, titre: v })} />
                   <Field label="Sous-titre" value={editStore.sous_titre} onChange={(v: string) => setEditStore({ ...editStore, sous_titre: v })} />
-                  <Select label="Catégorie" value={editStore.categorie} onChange={(v: string) => setEditStore({ ...editStore, categorie: v })} options={['Tableau', 'Bijoux']} />
+                  <Select label="Catégorie" value={editStore.categorie} onChange={(v: string) => setEditStore({ ...editStore, categorie: v })} options={['Tableau', 'Bague', "Boucles d'oreilles", 'Pendentif']} />
                   <Field label="Année" value={editStore.annee} onChange={(v: string) => setEditStore({ ...editStore, annee: v })} />
                   <Field label="Technique" value={editStore.technique} onChange={(v: string) => setEditStore({ ...editStore, technique: v })} />
                   <Field label="Dimensions" value={editStore.dimensions} onChange={(v: string) => setEditStore({ ...editStore, dimensions: v })} />
