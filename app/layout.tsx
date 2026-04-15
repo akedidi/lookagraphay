@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { Cormorant_Garamond, Montserrat } from 'next/font/google';
 import './globals.css';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import SiteShell from '@/components/SiteShell';
 import { siteConfig } from '@/lib/data';
 
 const cormorant = Cormorant_Garamond({
@@ -49,9 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr" className={`${cormorant.variable} ${montserrat.variable}`}>
       <body>
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
+        <SiteShell>{children}</SiteShell>
       </body>
     </html>
   );

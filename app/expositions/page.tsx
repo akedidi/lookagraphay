@@ -1,7 +1,18 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { expositionsData } from '@/lib/data';
+
+type Exposition = {
+  id: number;
+  titre: string;
+  lieu?: string;
+  dates?: string;
+  statut: string;
+  description?: string;
+  image?: string;
+  images?: string[];
+};
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -9,8 +20,16 @@ const fadeUp = {
 };
 
 export default function ExpositionsPage() {
-  const aVenir = expositionsData.filter((e) => e.statut === 'à venir');
-  const passes = expositionsData.filter((e) => e.statut === 'passé');
+  const [expositions, setExpositions] = useState<Exposition[]>([]);
+
+  useEffect(() => {
+    fetch('/api/expositions')
+      .then(r => r.json())
+      .then(data => { if (Array.isArray(data)) setExpositions(data); });
+  }, []);
+
+  const aVenir = expositions.filter((e) => e.statut === 'à venir');
+  const passes = expositions.filter((e) => e.statut === 'passé');
 
   return (
     <div style={{ background: '#F5F0E8' }}>
@@ -29,7 +48,6 @@ export default function ExpositionsPage() {
           background: '#1A1209',
         }}
       >
-        {/* Vidéo fond */}
         <video
           autoPlay
           muted
@@ -47,7 +65,6 @@ export default function ExpositionsPage() {
           }}
           src="/images/vernissage.mp4"
         />
-        {/* Overlay sombre */}
         <div
           style={{
             position: 'absolute',
@@ -55,9 +72,7 @@ export default function ExpositionsPage() {
             background: 'linear-gradient(to bottom, rgba(26,18,9,0.72) 0%, rgba(26,18,9,0.55) 55%, rgba(26,18,9,1) 100%)',
           }}
         />
-        {/* Bande solide anti-artefact */}
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 6, background: '#1A1209', zIndex: 2 }} />
-        {/* Contenu */}
         <div className="page-header-anim" style={{ position: 'relative', zIndex: 1 }}>
           <span
             style={{
@@ -144,15 +159,7 @@ export default function ExpositionsPage() {
               >
                 Expositions à venir
               </h2>
-              <span
-                style={{
-                  display: 'block',
-                  width: 40,
-                  height: 1,
-                  background: '#C9A84C',
-                  marginTop: '1.5rem',
-                }}
-              />
+              <span style={{ display: 'block', width: 40, height: 1, background: '#C9A84C', marginTop: '1.5rem' }} />
             </motion.div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
@@ -178,18 +185,18 @@ export default function ExpositionsPage() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      overflow: 'hidden',
+                      position: 'relative',
                     }}
                   >
-                    <div
-                      style={{
-                        fontFamily: 'Cormorant Garamond, serif',
-                        fontSize: '5rem',
-                        color: '#C9A84C',
-                        opacity: 0.25,
-                      }}
-                    >
-                      {['ص', 'ن'][i]}
-                    </div>
+                    {expo.image ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={expo.image} alt={expo.titre} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+                    ) : (
+                      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '5rem', color: '#C9A84C', opacity: 0.25 }}>
+                        {['ص', 'ن'][i % 2]}
+                      </div>
+                    )}
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -222,38 +229,14 @@ export default function ExpositionsPage() {
                     >
                       {expo.titre}
                     </h2>
-                    <p
-                      style={{
-                        fontFamily: 'Montserrat, sans-serif',
-                        fontSize: '0.82rem',
-                        color: '#C9A84C',
-                        letterSpacing: '0.15em',
-                        marginBottom: '0.5rem',
-                      }}
-                    >
+                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.82rem', color: '#C9A84C', letterSpacing: '0.15em', marginBottom: '0.5rem' }}>
                       {expo.lieu}
                     </p>
-                    <p
-                      style={{
-                        fontFamily: 'Montserrat, sans-serif',
-                        fontSize: '0.82rem',
-                        color: 'rgba(61,43,31,0.75)',
-                        letterSpacing: '0.1em',
-                        marginBottom: '1.5rem',
-                      }}
-                    >
+                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.82rem', color: 'rgba(61,43,31,0.75)', letterSpacing: '0.1em', marginBottom: '1.5rem' }}>
                       {expo.dates}
                     </p>
-                    <span
-                      style={{
-                        display: 'block',
-                        width: 40,
-                        height: 1,
-                        background: 'rgba(61,43,31,0.2)',
-                        marginBottom: '1.5rem',
-                      }}
-                    />
-                    {expo.description.split('\n\n').map((para, pi) => (
+                    <span style={{ display: 'block', width: 40, height: 1, background: 'rgba(61,43,31,0.2)', marginBottom: '1.5rem' }} />
+                    {(expo.description || '').split('\n\n').map((para, pi) => (
                       <p
                         key={pi}
                         style={{
@@ -262,7 +245,7 @@ export default function ExpositionsPage() {
                           fontSize: '0.875rem',
                           lineHeight: 1.9,
                           color: '#3D2B1F',
-                          marginBottom: pi < expo.description.split('\n\n').length - 1 ? '1rem' : 0,
+                          marginBottom: pi < (expo.description || '').split('\n\n').length - 1 ? '1rem' : 0,
                         }}
                       >
                         {para}
@@ -310,15 +293,7 @@ export default function ExpositionsPage() {
             >
               Expositions passées
             </h2>
-            <span
-              style={{
-                display: 'block',
-                width: 40,
-                height: 1,
-                background: '#C9A84C',
-                marginTop: '1.5rem',
-              }}
-            />
+            <span style={{ display: 'block', width: 40, height: 1, background: '#C9A84C', marginTop: '1.5rem' }} />
           </motion.div>
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -334,7 +309,6 @@ export default function ExpositionsPage() {
                   padding: '3.5rem 0',
                 }}
               >
-                {/* En-tête expo */}
                 <div
                   style={{
                     display: 'grid',
@@ -383,7 +357,7 @@ export default function ExpositionsPage() {
                     >
                       « {expo.titre} »
                     </h3>
-                    {expo.description.split('\n\n').map((para, pi) => (
+                    {(expo.description || '').split('\n\n').map((para, pi) => (
                       <p
                         key={pi}
                         style={{
@@ -392,7 +366,7 @@ export default function ExpositionsPage() {
                           fontWeight: 300,
                           lineHeight: 1.9,
                           color: 'rgba(245,240,232,0.85)',
-                          marginBottom: pi < expo.description.split('\n\n').length - 1 ? '1rem' : 0,
+                          marginBottom: pi < (expo.description || '').split('\n\n').length - 1 ? '1rem' : 0,
                         }}
                       >
                         {para}

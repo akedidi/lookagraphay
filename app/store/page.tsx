@@ -1,16 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { storeData } from '@/lib/data';
 
-type StoreItem = typeof storeData[0] & {
-  sousTitre?: string;
+type StoreItem = {
+  id: number;
+  titre: string;
+  sous_titre?: string;
+  categorie: string;
+  description?: string;
   citation?: string;
-  images?: string[];
   technique?: string;
   dimensions?: string;
   annee?: string;
+  prix: number;
+  images?: string[];
+  disponible: boolean;
+  paypal_link?: string;
+  ordre?: number;
 };
 
 const fadeUp = {
@@ -19,21 +26,30 @@ const fadeUp = {
 };
 
 const arabicLetters = ['ب', 'ل', 'ن', 'م', 'ح', 'ع'];
-const categories = ['Tous', ...Array.from(new Set(storeData.map((s) => s.categorie)))];
 
 export default function StorePage() {
+  const [items, setItems] = useState<StoreItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('Tous');
   const [selected, setSelected] = useState<StoreItem | null>(null);
   const [modalImg, setModalImg] = useState(0);
 
-  const filtered = filter === 'Tous' ? storeData : storeData.filter((s) => s.categorie === filter);
+  useEffect(() => {
+    fetch('/api/store')
+      .then(r => r.json())
+      .then(data => { if (Array.isArray(data)) setItems(data); })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const categories = ['Tous', ...Array.from(new Set(items.map(s => s.categorie)))];
+  const filtered = filter === 'Tous' ? items : items.filter(s => s.categorie === filter);
 
   function openItem(item: StoreItem) {
     setSelected(item);
     setModalImg(0);
   }
 
-  const modalImages = selected?.images ?? (selected?.image ? [selected.image] : []);
+  const modalImages = selected?.images ?? [];
 
   return (
     <div style={{ background: '#F5F0E8' }}>
@@ -79,8 +95,13 @@ export default function StorePage() {
       {/* Grille */}
       <section style={{ padding: '4rem 1.5rem 8rem', background: '#F5F0E8' }}>
         <div style={{ maxWidth: '72rem', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+          {loading && (
+            <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '4rem', fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', color: 'rgba(61,43,31,0.4)' }}>
+              Chargement…
+            </div>
+          )}
           <AnimatePresence>
-            {(filtered as StoreItem[]).map((item, i) => (
+            {filtered.map((item, i) => (
               <motion.div
                 key={item.id}
                 layout
@@ -106,10 +127,10 @@ export default function StorePage() {
                 </div>
 
                 {/* Image réelle */}
-                {item.image && (
+                {item.images?.[0] && (
                   /* eslint-disable-next-line @next/next/no-img-element */
                   <img
-                    src={item.image}
+                    src={item.images[0]}
                     alt={item.titre}
                     onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                     style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', transition: 'transform 0.6s ease' }}
@@ -121,9 +142,9 @@ export default function StorePage() {
                   <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', color: '#F5F0E8', marginBottom: '0.15rem', lineHeight: 1.25 }}>
                     {item.titre}
                   </h3>
-                  {(item as StoreItem).sousTitre && (
+                  {item.sous_titre && (
                     <p style={{ fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', fontSize: '0.82rem', color: 'rgba(245,240,232,0.7)', marginBottom: '0.3rem' }}>
-                      {(item as StoreItem).sousTitre}
+                      {item.sous_titre}
                     </p>
                   )}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -217,24 +238,24 @@ export default function StorePage() {
                 </button>
 
                 <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#C9A84C', display: 'block', marginBottom: '0.6rem' }}>
-                  {selected.categorie}{(selected as StoreItem).annee ? ` · ${(selected as StoreItem).annee}` : ''}
+                  {selected.categorie}{selected.annee ? ` · ${selected.annee}` : ''}
                 </span>
 
                 <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 400, fontSize: '1.6rem', color: '#1A1209', letterSpacing: '0.03em', marginBottom: '0.3rem', lineHeight: 1.2 }}>
                   {selected.titre}
                 </h2>
 
-                {(selected as StoreItem).sousTitre && (
+                {selected.sous_titre && (
                   <p style={{ fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', fontSize: '1.05rem', color: '#3D2B1F', marginBottom: '1rem' }}>
-                    {(selected as StoreItem).sousTitre}
+                    {selected.sous_titre}
                   </p>
                 )}
 
                 <span style={{ display: 'block', width: 40, height: 1, background: '#C9A84C', marginBottom: '1.25rem' }} />
 
-                {(selected as StoreItem).citation && (
+                {selected.citation && (
                   <blockquote style={{ fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', fontSize: '0.95rem', lineHeight: 1.7, color: '#3D2B1F', borderLeft: '2px solid #C9A84C', paddingLeft: '1rem', marginBottom: '1.25rem' }}>
-                    {(selected as StoreItem).citation}
+                    {selected.citation}
                   </blockquote>
                 )}
 
@@ -242,11 +263,11 @@ export default function StorePage() {
                   {selected.description}
                 </p>
 
-                {((selected as StoreItem).technique || (selected as StoreItem).dimensions) && (
+                {(selected.technique || selected.dimensions) && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
                     {[
-                      { label: 'Technique', value: (selected as StoreItem).technique },
-                      { label: 'Dimensions', value: (selected as StoreItem).dimensions },
+                      { label: 'Technique', value: selected.technique },
+                      { label: 'Dimensions', value: selected.dimensions },
                     ].filter(i => i.value).map((info) => (
                       <div key={info.label}>
                         <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', letterSpacing: '0.25em', textTransform: 'uppercase', color: '#C9A84C', display: 'block', marginBottom: '0.1rem' }}>
@@ -269,9 +290,9 @@ export default function StorePage() {
                   </span>
                 </div>
 
-                {selected.disponible && (
+                {selected.disponible && selected.paypal_link && (
                   <a
-                    href={selected.paypalLink}
+                    href={selected.paypal_link}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn-gold"

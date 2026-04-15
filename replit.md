@@ -9,28 +9,42 @@ Site vitrine premium pour **LookaGraphy**, calligraphe Looka (Paris). Identité 
 - **Tailwind CSS v4** (avec `@tailwindcss/postcss`)
 - **Framer Motion v12** (animations légères)
 - **TypeScript**
+- **MySQL2** (connexion à la DB Hostinger)
 
 ## Structure du projet
 ```
 app/
-  layout.tsx          — Layout global (Navbar + Footer)
+  layout.tsx          — Layout global (utilise SiteShell pour isoler /admin)
   globals.css         — Styles globaux, variables CSS, animations
   page.tsx            — Accueil (hero vidéo, sections)
   artiste/page.tsx    — L'Artiste (biographie, démarche, inspirations)
   ateliers/page.tsx   — Ateliers semestriels avec paiement PayPal
-  expositions/page.tsx — Expositions (à venir + passées)
-  evenements/page.tsx  — Événements (agenda + archives)
+  expositions/page.tsx — Expositions (dynamique, fetch /api/expositions)
+  evenements/page.tsx  — Événements (dynamique, fetch /api/evenements)
   galerie/page.tsx    — Galerie d'œuvres avec filtre + modal
-  store/page.tsx      — Store avec achat via PayPal
+  store/page.tsx      — Store (dynamique, fetch /api/store)
   contact/page.tsx    — Formulaire de contact
   mentions-legales/page.tsx — Mentions légales
+  admin/
+    layout.tsx        — Layout isolé sans Navbar/Footer
+    page.tsx          — Backoffice admin (login admin/mayyacine31, localStorage)
+  api/
+    store/route.ts          — GET/POST articles store
+    store/[id]/route.ts     — PUT/DELETE article
+    expositions/route.ts    — GET/POST expositions
+    expositions/[id]/route.ts — PUT/DELETE exposition
+    evenements/route.ts     — GET/POST événements
+    evenements/[id]/route.ts  — PUT/DELETE événement
+    admin/init/route.ts     — POST : init tables + seed données existantes
 
 components/
   Navbar.tsx          — Navigation fixe avec transparence/scroll
   Footer.tsx          — Pied de page avec navigation + contact
+  SiteShell.tsx       — Wrapper conditionnel (masque Navbar/Footer sur /admin)
 
 lib/
-  data.ts             — Toutes les données mock en français
+  data.ts             — Données statiques (non utilisées pour store/expos/evts)
+  db.ts               — Pool de connexion MySQL2 (Hostinger)
 
 public/
   videos/             — Vidéos hero (video-hero-wide.mp4, video-hero-vertical.mp4)
