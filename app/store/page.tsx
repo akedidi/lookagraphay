@@ -92,6 +92,35 @@ export default function StorePage() {
         </div>
       </section>
 
+      {/* Bandeau collection Lettres d'Âme */}
+      {['Bague', "Boucles d'oreilles", 'Pendentif'].includes(filter) && (
+        <section style={{ background: '#1A1209', padding: '3rem 1.5rem', borderBottom: '1px solid rgba(201,168,76,0.15)' }}>
+          <div style={{ maxWidth: '52rem', margin: '0 auto', textAlign: 'center' }}>
+            <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.35em', color: '#C9A84C', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
+              Collection
+            </p>
+            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', color: '#F5F0E8', letterSpacing: '0.05em', marginBottom: '1.25rem' }}>
+              Lettres d'Âme
+            </h2>
+            <p style={{ fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', fontSize: '1.05rem', color: 'rgba(245,240,232,0.75)', lineHeight: 1.75, marginBottom: '1.75rem' }}>
+              Chaque pièce raconte une histoire calligraphiée avec émotion et façonnée avec passion. Chaque lettre s'entrelace dans des designs subtils et délicats, donnant naissance à des bijoux qui capturent l'essence de l'amour, de la liberté et de l'expression personnelle.
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center' }}>
+              {[
+                { label: 'Bagues', detail: 'Argent 80 € · Or 90 €' },
+                { label: 'Pendentifs', detail: 'Argent 70 € · Or 80 €' },
+                { label: 'Boucles d\'oreilles', detail: 'Paire argent 120 € · Or 130 €' },
+              ].map(({ label, detail }) => (
+                <div key={label} style={{ border: '1px solid rgba(201,168,76,0.25)', padding: '0.75rem 1.5rem', textAlign: 'center' }}>
+                  <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.6rem', letterSpacing: '0.25em', textTransform: 'uppercase', color: '#C9A84C', marginBottom: '0.3rem' }}>{label}</div>
+                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '0.9rem', color: 'rgba(245,240,232,0.7)' }}>{detail}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Grille */}
       <section style={{ padding: '4rem 1.5rem 8rem', background: '#F5F0E8' }}>
         <div style={{ maxWidth: '72rem', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
