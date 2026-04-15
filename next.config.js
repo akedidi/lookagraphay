@@ -3,6 +3,7 @@ const replitDomain = process.env.REPLIT_DEV_DOMAIN;
 
 const nextConfig = {
   reactStrictMode: true,
+  output: 'standalone',
   images: {
     unoptimized: true,
   },
