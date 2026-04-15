@@ -44,3 +44,10 @@ outputType = "webview"
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[userenv]
+
+[userenv.shared]
+DB_HOST = "srv2073.hstgr.io"
+DB_NAME = "u376353647_lookagraphy"
+DB_USER = "u376353647_root"
