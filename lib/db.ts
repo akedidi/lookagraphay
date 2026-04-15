@@ -1,14 +1,27 @@
 import mysql from 'mysql2/promise';
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'srv2073.hstgr.io',
-  user: process.env.DB_USER || 'u376353647_root',
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME || 'u376353647_lookagraphy',
-  waitForConnections: true,
-  connectionLimit: 5,
-  queueLimit: 0,
-  timezone: '+00:00',
-});
+declare global {
+  // eslint-disable-next-line no-var
+  var _mysqlPool: mysql.Pool | undefined;
+}
 
-export default pool;
+function getPool(): mysql.Pool {
+  if (!global._mysqlPool) {
+    global._mysqlPool = mysql.createPool({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      waitForConnections: true,
+      connectionLimit: 3,
+      queueLimit: 0,
+      connectTimeout: 10000,
+      timezone: '+00:00',
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 0,
+    });
+  }
+  return global._mysqlPool;
+}
+
+export default getPool();
