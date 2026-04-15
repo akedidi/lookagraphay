@@ -1,7 +1,19 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { evenementsData } from '@/lib/data';
+
+type Evenement = {
+  id: number;
+  titre: string;
+  date?: string;
+  heure?: string;
+  lieu?: string;
+  type: string;
+  statut: string;
+  description?: string;
+  images?: string[];
+};
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -13,11 +25,21 @@ const typeColors: Record<string, string> = {
   Performance: '#A07830',
   'Portes ouvertes': '#C9A84C',
   Conférence: '#A07830',
+  Atelier: '#C9A84C',
+  Autre: '#A07830',
 };
 
 export default function EvenementsPage() {
-  const aVenir = evenementsData.filter((e) => e.statut === 'à venir');
-  const passes = evenementsData.filter((e) => e.statut === 'passé');
+  const [evenements, setEvenements] = useState<Evenement[]>([]);
+
+  useEffect(() => {
+    fetch('/api/evenements')
+      .then(r => r.json())
+      .then(data => { if (Array.isArray(data)) setEvenements(data); });
+  }, []);
+
+  const aVenir = evenements.filter((e) => e.statut === 'à venir');
+  const passes = evenements.filter((e) => e.statut === 'passé');
 
   return (
     <div style={{ background: '#F5F0E8' }}>
@@ -60,7 +82,7 @@ export default function EvenementsPage() {
 
       {/* À venir */}
       <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
-        <div style={{ maxWidth: "56rem", marginLeft: "auto", marginRight: "auto" }}>
+        <div style={{ maxWidth: '56rem', marginLeft: 'auto', marginRight: 'auto' }}>
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -96,7 +118,7 @@ export default function EvenementsPage() {
           </motion.div>
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {aVenir.map((evt, i) => (
+            {aVenir.map((evt) => (
               <motion.article
                 key={evt.id}
                 initial="hidden"
@@ -124,7 +146,7 @@ export default function EvenementsPage() {
                       marginBottom: '0.25rem',
                     }}
                   >
-                    {evt.date.split(' ')[0]}
+                    {(evt.date || '').split(' ')[0]}
                   </div>
                   <div
                     style={{
@@ -134,7 +156,7 @@ export default function EvenementsPage() {
                       letterSpacing: '0.1em',
                     }}
                   >
-                    {evt.date.replace(/^\d+\s/, '')}
+                    {(evt.date || '').replace(/^\d+\s/, '')}
                   </div>
                 </div>
 
@@ -201,13 +223,18 @@ export default function EvenementsPage() {
                 </div>
               </motion.article>
             ))}
+            {aVenir.length === 0 && (
+              <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.85rem', color: 'rgba(61,43,31,0.5)', padding: '2rem 0' }}>
+                Aucun événement à venir pour le moment.
+              </p>
+            )}
           </div>
         </div>
       </section>
 
       {/* Passés */}
       <section className="py-20 section-pad" style={{ background: '#2A2520' }}>
-        <div style={{ maxWidth: "56rem", marginLeft: "auto", marginRight: "auto" }}>
+        <div style={{ maxWidth: '56rem', marginLeft: 'auto', marginRight: 'auto' }}>
           <motion.div
             initial="hidden"
             whileInView="visible"
