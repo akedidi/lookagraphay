@@ -20,6 +20,91 @@ type StoreItem = {
   ordre?: number;
 };
 
+type Matiere = 'argent' | 'or';
+type Quantite = 'unite' | 'paire';
+
+const TARIFS: Record<string, (m: Matiere, q?: Quantite) => number> = {
+  'Pendentif': (m) => m === 'argent' ? 70 : 80,
+  'Bague': (m) => m === 'argent' ? 80 : 90,
+  "Boucles d'oreilles": (m, q) => {
+    if (m === 'argent') return q === 'paire' ? 120 : 75;
+    return q === 'paire' ? 130 : 85;
+  },
+};
+
+function isBijou(cat: string) {
+  return ['Pendentif', 'Bague', "Boucles d'oreilles"].includes(cat);
+}
+
+function PrixSelector({ categorie, onChange }: { categorie: string; onChange: (prix: number, matiere: string, quantite?: string) => void }) {
+  const [matiere, setMatiere] = useState<Matiere>('argent');
+  const [quantite, setQuantite] = useState<Quantite>('paire');
+  const isBoucle = categorie === "Boucles d'oreilles";
+  const fn = TARIFS[categorie];
+  const prix = fn ? fn(matiere, quantite) : 0;
+
+  useEffect(() => {
+    const mLabel = matiere === 'argent' ? 'Argent' : 'Argent trempé dans l\'or';
+    const qLabel = isBoucle ? (quantite === 'paire' ? 'la paire' : 'à l\'unité') : undefined;
+    onChange(prix, mLabel, qLabel);
+  }, [matiere, quantite, prix]);
+
+  const optBtn = (label: string, active: boolean, onClick: () => void) => (
+    <button
+      onClick={onClick}
+      style={{
+        fontFamily: 'Montserrat, sans-serif',
+        fontSize: '0.75rem',
+        letterSpacing: '0.12em',
+        padding: '0.55rem 1rem',
+        border: `1.5px solid ${active ? '#C9A84C' : 'rgba(61,43,31,0.2)'}`,
+        background: active ? 'rgba(201,168,76,0.1)' : 'transparent',
+        color: active ? '#1A1209' : 'rgba(61,43,31,0.55)',
+        cursor: 'pointer',
+        transition: 'all 0.2s',
+        fontWeight: active ? 600 : 300,
+      }}
+    >
+      {label}
+    </button>
+  );
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '1.5rem' }}>
+      <div>
+        <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#C9A84C', display: 'block', marginBottom: '0.6rem' }}>
+          Matière
+        </span>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          {optBtn('Argent', matiere === 'argent', () => setMatiere('argent'))}
+          {optBtn("Argent trempé dans l'or", matiere === 'or', () => setMatiere('or'))}
+        </div>
+      </div>
+
+      {isBoucle && (
+        <div>
+          <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#C9A84C', display: 'block', marginBottom: '0.6rem' }}>
+            Quantité
+          </span>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            {optBtn("À l'unité", quantite === 'unite', () => setQuantite('unite'))}
+            {optBtn('La paire', quantite === 'paire', () => setQuantite('paire'))}
+          </div>
+        </div>
+      )}
+
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
+        <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2.2rem', fontWeight: 300, color: '#C9A84C', letterSpacing: '0.02em' }}>
+          {prix} €
+        </span>
+        <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(61,43,31,0.45)', letterSpacing: '0.1em' }}>
+          TVA incluse
+        </span>
+      </div>
+    </div>
+  );
+}
+
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: 'easeOut' as const } },
@@ -33,6 +118,9 @@ export default function StorePage() {
   const [filter, setFilter] = useState('Tous');
   const [selected, setSelected] = useState<StoreItem | null>(null);
   const [modalImg, setModalImg] = useState(0);
+  const [selectedPrix, setSelectedPrix] = useState(0);
+  const [selectedMatiere, setSelectedMatiere] = useState('');
+  const [selectedQuantite, setSelectedQuantite] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     fetch('/api/store')
@@ -47,6 +135,23 @@ export default function StorePage() {
   function openItem(item: StoreItem) {
     setSelected(item);
     setModalImg(0);
+    if (isBijou(item.categorie)) {
+      const fn = TARIFS[item.categorie];
+      const defaultQ: Quantite = "Boucles d'oreilles" === item.categorie ? 'paire' : 'paire';
+      const defaultPrix = fn ? fn('argent', defaultQ) : item.prix;
+      setSelectedPrix(defaultPrix);
+      setSelectedMatiere('Argent');
+      setSelectedQuantite(item.categorie === "Boucles d'oreilles" ? 'la paire' : undefined);
+    } else {
+      setSelectedPrix(item.prix);
+      setSelectedMatiere('');
+      setSelectedQuantite(undefined);
+    }
+  }
+
+  function buildPaypalLink(baseLink: string | undefined, prix: number) {
+    if (!baseLink) return undefined;
+    return `https://paypal.me/lookagraphy/${prix}`;
   }
 
   const modalImages = selected?.images ?? [];
@@ -102,21 +207,9 @@ export default function StorePage() {
             <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', color: '#F5F0E8', letterSpacing: '0.05em', marginBottom: '1.25rem' }}>
               Lettres d'Âme
             </h2>
-            <p style={{ fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', fontSize: '1.05rem', color: 'rgba(245,240,232,0.75)', lineHeight: 1.75, marginBottom: '1.75rem' }}>
+            <p style={{ fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', fontSize: '1.05rem', color: 'rgba(245,240,232,0.75)', lineHeight: 1.75 }}>
               Chaque pièce raconte une histoire calligraphiée avec émotion et façonnée avec passion. Chaque lettre s'entrelace dans des designs subtils et délicats, donnant naissance à des bijoux qui capturent l'essence de l'amour, de la liberté et de l'expression personnelle.
             </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center' }}>
-              {[
-                { label: 'Bagues', detail: 'Argent 80 € · Or 90 €' },
-                { label: 'Pendentifs', detail: 'Argent 70 € · Or 80 €' },
-                { label: 'Boucles d\'oreilles', detail: 'Paire argent 120 € · Or 130 €' },
-              ].map(({ label, detail }) => (
-                <div key={label} style={{ border: '1px solid rgba(201,168,76,0.25)', padding: '0.75rem 1.5rem', textAlign: 'center' }}>
-                  <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.6rem', letterSpacing: '0.25em', textTransform: 'uppercase', color: '#C9A84C', marginBottom: '0.3rem' }}>{label}</div>
-                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '0.9rem', color: 'rgba(245,240,232,0.7)' }}>{detail}</div>
-                </div>
-              ))}
-            </div>
           </div>
         </section>
       )}
@@ -148,7 +241,7 @@ export default function StorePage() {
                 }}
                 whileHover={{ y: -4 }}
               >
-                {/* Lettre arabe décorative (fallback) */}
+                {/* Lettre arabe décorative */}
                 <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(3rem, 6vw, 5rem)', color: '#C9A84C', opacity: 0.3 }}>
                     {arabicLetters[i % arabicLetters.length]}
@@ -166,7 +259,7 @@ export default function StorePage() {
                   />
                 )}
 
-                {/* Gradient + infos permanents */}
+                {/* Gradient + infos (sans prix) */}
                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(26,18,9,0.88) 0%, rgba(26,18,9,0.2) 45%, transparent 70%)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '1.25rem' }}>
                   <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', color: '#F5F0E8', marginBottom: '0.15rem', lineHeight: 1.25 }}>
                     {item.titre}
@@ -176,14 +269,9 @@ export default function StorePage() {
                       {item.sous_titre}
                     </p>
                   )}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.2em', color: '#C9A84C', textTransform: 'uppercase' }}>
-                      {item.categorie}{item.annee ? ` · ${item.annee}` : ''}
-                    </p>
-                    <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', fontWeight: 300, color: '#C9A84C' }}>
-                      {item.prix} €
-                    </span>
-                  </div>
+                  <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.2em', color: '#C9A84C', textTransform: 'uppercase' }}>
+                    {item.categorie}{item.annee ? ` · ${item.annee}` : ''}
+                  </p>
                 </div>
 
                 {/* Badge disponible */}
@@ -198,7 +286,7 @@ export default function StorePage() {
         </div>
       </section>
 
-      {/* Modal */}
+      {/* Modal détail */}
       <AnimatePresence>
         {selected && (
           <motion.div
@@ -213,10 +301,10 @@ export default function StorePage() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              style={{ background: '#FAF7F2', maxWidth: 860, width: '100%', maxHeight: '92vh', overflow: 'auto', display: 'flex', flexWrap: 'wrap' }}
+              style={{ background: '#FAF7F2', maxWidth: 900, width: '100%', maxHeight: '92vh', overflow: 'auto', display: 'flex', flexWrap: 'wrap' }}
             >
               {/* Visuel gauche */}
-              <div style={{ position: 'relative', background: '#1A1209', flex: '1 1 300px', minWidth: 0, minHeight: 320 }}>
+              <div style={{ position: 'relative', background: '#1A1209', flex: '1 1 320px', minWidth: 0, minHeight: 360 }}>
                 {modalImages.length > 0 ? (
                   <>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -258,7 +346,7 @@ export default function StorePage() {
               </div>
 
               {/* Info droite */}
-              <div style={{ flex: '1 1 300px', minWidth: 0, padding: '2.5rem 2rem', overflowY: 'auto' }}>
+              <div style={{ flex: '1 1 320px', minWidth: 0, padding: '2.5rem 2rem', overflowY: 'auto' }}>
                 <button
                   onClick={() => setSelected(null)}
                   style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', letterSpacing: '0.25em', color: '#C9A84C', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', textTransform: 'uppercase' }}
@@ -310,24 +398,44 @@ export default function StorePage() {
                   </div>
                 )}
 
-                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem', fontWeight: 300, color: '#C9A84C' }}>
-                    {selected.prix} €
-                  </div>
-                  <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: selected.disponible ? '#C9A84C' : 'rgba(61,43,31,0.4)', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
-                    {selected.disponible ? 'Disponible' : 'Indisponible'}
-                  </span>
-                </div>
+                {/* Séparateur avant tarif */}
+                <div style={{ height: 1, background: 'rgba(61,43,31,0.1)', marginBottom: '1.5rem' }} />
 
-                {selected.disponible && selected.paypal_link && (
+                {/* Sélecteur prix pour bijoux */}
+                {isBijou(selected.categorie) ? (
+                  <PrixSelector
+                    categorie={selected.categorie}
+                    onChange={(prix, matiere, quantite) => {
+                      setSelectedPrix(prix);
+                      setSelectedMatiere(matiere);
+                      setSelectedQuantite(quantite);
+                    }}
+                  />
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+                    <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem', fontWeight: 300, color: '#C9A84C' }}>
+                      {selected.prix} €
+                    </div>
+                    <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: selected.disponible ? '#C9A84C' : 'rgba(61,43,31,0.4)', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
+                      {selected.disponible ? 'Disponible' : 'Indisponible'}
+                    </span>
+                  </div>
+                )}
+
+                {selected.disponible && (
                   <a
-                    href={selected.paypal_link}
+                    href={`https://paypal.me/lookagraphy/${selectedPrix || selected.prix}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn-gold"
                     style={{ display: 'block', textAlign: 'center' }}
                   >
-                    Acheter via PayPal
+                    Commander via PayPal
+                    {isBijou(selected.categorie) && selectedMatiere && (
+                      <span style={{ display: 'block', fontSize: '0.65rem', letterSpacing: '0.15em', marginTop: '0.2rem', opacity: 0.8, fontWeight: 300 }}>
+                        {selectedMatiere}{selectedQuantite ? ` · ${selectedQuantite}` : ''} — {selectedPrix} €
+                      </span>
+                    )}
                   </a>
                 )}
               </div>
