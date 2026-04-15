@@ -276,16 +276,17 @@ export default function AdminPage() {
             <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem', color: light, fontWeight: 300, letterSpacing: '0.05em' }}>LookaGraphy</div>
             <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', letterSpacing: '0.3em', color: gold, textTransform: 'uppercase', marginTop: '0.3rem' }}>Backoffice</div>
           </div>
-          <Field label="Identifiant" value={loginUser} onChange={setLoginUser} placeholder="admin" />
-          <Field label="Mot de passe" value={loginPass} onChange={setLoginPass} type="password" placeholder="••••••••" />
-          {loginError && <p style={{ color: '#e05555', fontFamily: 'Montserrat, sans-serif', fontSize: '0.8rem', marginBottom: '1rem' }}>{loginError}</p>}
-          <button
-            onClick={login}
-            onKeyDown={e => e.key === 'Enter' && login()}
-            style={{ ...btnGold, width: '100%', padding: '0.8rem' }}
-          >
-            Connexion
-          </button>
+          <form onSubmit={e => { e.preventDefault(); login(); }}>
+            <Field label="Identifiant" value={loginUser} onChange={setLoginUser} placeholder="admin" />
+            <Field label="Mot de passe" value={loginPass} onChange={setLoginPass} type="password" placeholder="••••••••" />
+            {loginError && <p style={{ color: '#e05555', fontFamily: 'Montserrat, sans-serif', fontSize: '0.8rem', marginBottom: '1rem' }}>{loginError}</p>}
+            <button
+              type="submit"
+              style={{ ...btnGold, width: '100%', padding: '0.8rem' }}
+            >
+              Connexion
+            </button>
+          </form>
         </div>
       </div>
     );
