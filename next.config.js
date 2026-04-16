@@ -18,7 +18,7 @@ const nextConfig = {
   }),
   async headers() {
     return [
-      // Pages HTML — no-cache pour éviter le cache navigateur, PAS de nosniff (c'est HTML)
+      // Pages HTML — no-cache pour éviter le cache navigateur et LiteSpeed
       {
         source: '/((?!_next|api|images|videos).*)',
         headers: [
@@ -26,6 +26,9 @@ const nextConfig = {
           { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
           { key: 'Pragma', value: 'no-cache' },
           { key: 'Expires', value: '0' },
+          { key: 'Surrogate-Control', value: 'no-store' },
+          { key: 'X-LiteSpeed-Cache-Control', value: 'no-cache' },
+          { key: 'Vary', value: 'Accept-Encoding' },
         ],
       },
       // Fichiers JS/CSS statiques Next.js — Content-Type correct, immutable car hash dans le nom
