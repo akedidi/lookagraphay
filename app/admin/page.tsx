@@ -214,15 +214,17 @@ export default function AdminPage() {
   const [msg, setMsg] = useState('');
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const s = localStorage.getItem(SESSION_KEY);
-      if (s === 'true') setLoggedIn(true);
-    }
+    try {
+      if (typeof window !== 'undefined') {
+        const s = localStorage.getItem(SESSION_KEY);
+        if (s === 'true') setLoggedIn(true);
+      }
+    } catch (_) {}
   }, []);
 
   const login = () => {
     if (loginUser === ADMIN_USER && loginPass === ADMIN_PASS) {
-      localStorage.setItem(SESSION_KEY, 'true');
+      try { localStorage.setItem(SESSION_KEY, 'true'); } catch (_) {}
       setLoggedIn(true);
       setLoginError('');
     } else {
@@ -231,7 +233,7 @@ export default function AdminPage() {
   };
 
   const logout = () => {
-    localStorage.removeItem(SESSION_KEY);
+    try { localStorage.removeItem(SESSION_KEY); } catch (_) {}
     setLoggedIn(false);
   };
 
