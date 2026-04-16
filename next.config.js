@@ -11,7 +11,6 @@ const securityHeaders = [
 
 const nextConfig = {
   reactStrictMode: false,
-  output: 'standalone',
   images: {
     unoptimized: true,
   },
