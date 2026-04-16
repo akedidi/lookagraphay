@@ -20,8 +20,10 @@ export default function Home() {
   const videoMobileRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('hero-sound');
-    if (saved === 'on') setMuted(false);
+    try {
+      const saved = localStorage.getItem('hero-sound');
+      if (saved === 'on') setMuted(false);
+    } catch (_) {}
   }, []);
 
   useEffect(() => {
@@ -32,7 +34,9 @@ export default function Home() {
   function toggleSound() {
     const next = !muted;
     setMuted(next);
-    localStorage.setItem('hero-sound', next ? 'off' : 'on');
+    try {
+      localStorage.setItem('hero-sound', next ? 'off' : 'on');
+    } catch (_) {}
   }
 
   return (
