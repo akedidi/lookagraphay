@@ -45,7 +45,7 @@ export default function Home() {
           alignItems: 'center',
           justifyContent: 'center',
           overflow: 'hidden',
-          height: '100svh',
+          height: '100vh',
           minHeight: 600,
         }}
       >
