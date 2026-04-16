@@ -36,18 +36,36 @@ function isBijou(cat: string) {
   return ['Pendentif', 'Bague', "Boucles d'oreilles"].includes(cat);
 }
 
+function calcPrix(cat: string, m: Matiere, q: Quantite): number {
+  const fn = TARIFS[cat];
+  return fn ? fn(m, q) : 0;
+}
+
+function matiereLabel(m: Matiere): string {
+  return m === 'argent' ? 'Argent' : "Argent trempé dans l'or";
+}
+
+function quantiteLabel(q: Quantite): string {
+  return q === 'paire' ? 'la paire' : "à l'unité";
+}
+
 function PrixSelector({ categorie, onChange }: { categorie: string; onChange: (prix: number, matiere: string, quantite?: string) => void }) {
   const [matiere, setMatiere] = useState<Matiere>('argent');
   const [quantite, setQuantite] = useState<Quantite>('paire');
   const isBoucle = categorie === "Boucles d'oreilles";
-  const fn = TARIFS[categorie];
-  const prix = fn ? fn(matiere, quantite) : 0;
+  const prix = calcPrix(categorie, matiere, quantite);
 
-  useEffect(() => {
-    const mLabel = matiere === 'argent' ? 'Argent' : 'Argent trempé dans l\'or';
-    const qLabel = isBoucle ? (quantite === 'paire' ? 'la paire' : 'à l\'unité') : undefined;
-    onChange(prix, mLabel, qLabel);
-  }, [matiere, quantite, prix]);
+  function handleMatiere(m: Matiere) {
+    setMatiere(m);
+    const p = calcPrix(categorie, m, quantite);
+    onChange(p, matiereLabel(m), isBoucle ? quantiteLabel(quantite) : undefined);
+  }
+
+  function handleQuantite(q: Quantite) {
+    setQuantite(q);
+    const p = calcPrix(categorie, matiere, q);
+    onChange(p, matiereLabel(matiere), quantiteLabel(q));
+  }
 
   const optBtn = (label: string, active: boolean, onClick: () => void) => (
     <button
@@ -76,8 +94,8 @@ function PrixSelector({ categorie, onChange }: { categorie: string; onChange: (p
           Matière
         </span>
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          {optBtn('Argent', matiere === 'argent', () => setMatiere('argent'))}
-          {optBtn("Argent trempé dans l'or", matiere === 'or', () => setMatiere('or'))}
+          {optBtn('Argent', matiere === 'argent', () => handleMatiere('argent'))}
+          {optBtn("Argent trempé dans l'or", matiere === 'or', () => handleMatiere('or'))}
         </div>
       </div>
 
@@ -87,8 +105,8 @@ function PrixSelector({ categorie, onChange }: { categorie: string; onChange: (p
             Quantité
           </span>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
-            {optBtn("À l'unité", quantite === 'unite', () => setQuantite('unite'))}
-            {optBtn('La paire', quantite === 'paire', () => setQuantite('paire'))}
+            {optBtn("À l'unité", quantite === 'unite', () => handleQuantite('unite'))}
+            {optBtn('La paire', quantite === 'paire', () => handleQuantite('paire'))}
           </div>
         </div>
       )}
