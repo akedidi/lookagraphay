@@ -1,0 +1,240 @@
+
+added 84 packages, and audited 85 packages in 6s
+
+2
+
+
+3
+
+21 packages are looking for funding
+
+4
+
+run `npm fund` for details
+
+5
+
+
+6
+
+1 high severity vulnerability
+
+7
+
+
+8
+
+To address all issues (including breaking changes), run:
+
+9
+
+npm audit fix --force
+
+10
+
+
+11
+
+Run `npm audit` for details.
+
+12
+
+
+13
+
+> lucagraphy@1.0.0 build
+
+14
+
+> next build && node scripts/postbuild.js
+
+15
+
+
+16
+
+▲ Next.js 14.2.35
+
+17
+
+
+18
+
+Creating an optimized production build ...
+
+19
+
+✓ Compiled successfully
+
+20
+
+Linting and checking validity of types ...
+
+21
+
+Collecting page data ...
+
+22
+
+Generating static pages (0/20) ...
+
+23
+
+Generating static pages (5/20)
+
+24
+
+Generating static pages (10/20)
+
+25
+
+Generating static pages (15/20)
+
+26
+
+✓ Generating static pages (20/20)
+
+27
+
+Finalizing page optimization ...
+
+28
+
+Collecting build traces ...
+
+29
+
+
+30
+
+Route (app) Size First Load JS
+
+31
+
+┌ ○ / 3.97 kB 144 kB
+
+32
+
+├ ○ /_not-found 875 B 88.2 kB
+
+33
+
+├ ○ /admin 4.61 kB 91.9 kB
+
+34
+
+├ ƒ /api/admin/init 0 B 0 B
+
+35
+
+├ ƒ /api/admin/upload 0 B 0 B
+
+36
+
+├ ƒ /api/evenements 0 B 0 B
+
+37
+
+├ ƒ /api/evenements/[id] 0 B 0 B
+
+38
+
+├ ƒ /api/expositions 0 B 0 B
+
+39
+
+├ ƒ /api/expositions/[id] 0 B 0 B
+
+40
+
+├ ○ /api/health 0 B 0 B
+
+41
+
+├ ƒ /api/store 0 B 0 B
+
+42
+
+├ ƒ /api/store/[id] 0 B 0 B
+
+43
+
+├ ○ /artiste 2.12 kB 143 kB
+
+44
+
+├ ○ /association 2.86 kB 130 kB
+
+45
+
+├ ○ /ateliers 3.12 kB 135 kB
+
+46
+
+├ ○ /contact 2.21 kB 134 kB
+
+47
+
+├ ○ /evenements 1.61 kB 129 kB
+
+48
+
+├ ○ /expositions 2.05 kB 130 kB
+
+49
+
+├ ○ /galerie 4.39 kB 145 kB
+
+50
+
+├ ○ /mentions-legales 1.64 kB 129 kB
+
+51
+
+└ ○ /store 5.87 kB 133 kB
+
+52
+
++ First Load JS shared by all 87.3 kB
+
+53
+
+├ chunks/117-bdb895d1249d295d.js 31.7 kB
+
+54
+
+├ chunks/fd9d1056-b11b2651f33aae7f.js 53.7 kB
+
+55
+
+└ other shared chunks (total) 1.94 kB
+
+56
+
+
+57
+
+
+58
+
+○ (Static) prerendered as static content
+
+59
+
+ƒ (Dynamic) server-rendered on demand
+
+60
+
+
+61
+
+[postbuild] Copying public/ → .next/standalone/public/
+
+62
+
+[postbuild] Copying .next/static/ → .next/standalone/.next/static/
+
+63
+
+[postbuild] Done. Static assets are ready for standalone server.
+
