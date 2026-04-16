@@ -22,7 +22,12 @@ const nextConfig = {
     return [
       {
         source: '/(.*)',
-        headers: securityHeaders,
+        headers: [
+          ...securityHeaders,
+          { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
+          { key: 'Pragma', value: 'no-cache' },
+          { key: 'Expires', value: '0' },
+        ],
       },
       {
         source: '/api/(.*)',
