@@ -655,8 +655,8 @@ export default function Home() {
           </motion.div>
 
           <div className="text-center">
-            <Link href="/galerie" className="btn-gold">
-              Voir toute la galerie
+            <Link href="/store" className="btn-gold">
+              Accéder au Store
             </Link>
           </div>
         </div>
