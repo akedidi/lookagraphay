@@ -12,10 +12,11 @@ export const artistData = {
   name: "Looka",
   fullName: "Looka — Calligraphe",
   bio: [
-    "Looka est une passionnée de calligraphie, distinguée par une identité créative unique.",
-    "Honorant sa double culture arabo-musulmane et française, Looka a été captivée par les subtilités des arts islamiques. Lors de ses séjours au Japon, elle s'est émerveillée devant l'écriture japonaise, lue de droite à gauche, rappelant les particularités de l'écriture arabe. Dans un audacieux défi artistique, Looka intègre ces deux sphères calligraphiques dans ses œuvres, présentant les lettres arabes de haut en bas, à la manière des caractères japonais.",
-    "Son style s'enrichit encore par l'incorporation de lettres issues de différents styles de calligraphie, mêlant des formes classiques à ses propres créations de lettres originales, créant ainsi un style distinctif et personnel.",
-    "Son travail révèle une approche libérée et personnelle, une ode à la vie, à la beauté et à l'universalité humaine. Inspirée par la poésie arabe révolutionnaire, la littérature soufie, et les anciens poèmes porteurs de messages puissants, Looka aspire à célébrer les valeurs universelles fondamentales à travers son art.",
+    "Looka est une calligraphe contemporaine dont l'univers artistique explore la rencontre entre héritage, poésie et universalité. Profondément ancrée dans la culture arabe, elle s'inspire des arts islamiques ainsi que de la poésie ancienne, soufie et révolutionnaire, qu'elle transforme en une écriture sensible, porteuse de vie et de spiritualité.",
+    "Lors de ses séjours au Japon, elle découvre une approche de l'écriture verticale et fluide, en résonance avec la calligraphie arabe. Son parcours en Europe lui fait également rencontrer la richesse de la calligraphie latine. De ces trois univers naît une fusion artistique unique, où elle réinvente la lettre arabe dans des compositions souvent verticales, créant une identité visuelle entre ces mondes culturels.",
+    "Son œuvre s'inscrit dans une démarche profondément humaniste et inclusive. Forte de son expérience auprès de personnes en situation de handicap, elle défend un accès égal à l'art et à l'apprentissage, afin que chacun puisse créer et s'exprimer librement, quelles que soient ses capacités.",
+    "Docteure en écologie, elle intègre aussi une conscience environnementale forte à sa pratique, en utilisant des matériaux durables et des encres naturelles.",
+    "Son travail porte enfin une dimension engagée autour de l'empowerment des femmes dans l'art et de l'égalité des genres, affirmant une voix libre, forte et universelle dans le paysage artistique contemporain.",
   ],
   quote:
     "J'écris l'arabe comme le japonais — de haut en bas — pour rappeler que la beauté n'a pas de frontières.",
