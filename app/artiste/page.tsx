@@ -162,7 +162,9 @@ export default function ArtistePage() {
                   textAlign: 'justify',
                 }}
               >
-                {para}
+                {para.split(/\*\*(.+?)\*\*/).map((part, j) =>
+                  j % 2 === 1 ? <strong key={j} style={{ fontWeight: 700 }}>{part}</strong> : part
+                )}
               </p>
             ))}
           </motion.div>

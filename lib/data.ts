@@ -16,7 +16,7 @@ export const artistData = {
     "Lors de ses séjours au Japon, elle découvre une approche de l'écriture verticale et fluide, en résonance avec la calligraphie arabe. Son parcours en Europe lui fait également rencontrer la richesse de la calligraphie latine. De ces trois univers naît une fusion artistique unique, où elle réinvente la lettre arabe dans des compositions souvent verticales, créant une identité visuelle entre ces mondes culturels.",
     "Son œuvre s'inscrit dans une démarche profondément humaniste et inclusive. Forte de son expérience auprès de personnes en situation de handicap, elle défend un accès égal à l'art et à l'apprentissage, afin que chacun puisse créer et s'exprimer librement, quelles que soient ses capacités.",
     "Docteure en écologie, elle intègre aussi une conscience environnementale forte à sa pratique, en utilisant des matériaux durables et des encres naturelles.",
-    "Son travail porte enfin une dimension engagée autour de l'empowerment des femmes dans l'art et de l'égalité des genres, affirmant une voix libre, forte et universelle dans le paysage artistique contemporain.",
+    "Son travail porte enfin une dimension engagée autour de l'**empowerment des femmes dans l'art** et de l'égalité des genres, affirmant une voix libre, forte et universelle dans le paysage artistique contemporain.",
   ],
   quote:
     "J'écris l'arabe comme le japonais — de haut en bas — pour rappeler que la beauté n'a pas de frontières.",
