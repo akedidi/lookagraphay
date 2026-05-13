@@ -23,6 +23,14 @@ export default function Footer() {
         >
           {/* Brand */}
           <div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/logo.png"
+              alt="LookaGraphy"
+              width={64}
+              height={64}
+              style={{ display: 'block', marginBottom: '0.85rem', filter: 'brightness(0) invert(1) sepia(0.15)', opacity: 0.9 }}
+            />
             <div
               style={{
                 fontFamily: 'Cormorant Garamond, serif',

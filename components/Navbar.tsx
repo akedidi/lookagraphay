@@ -30,7 +30,7 @@ function useTransparentLogo(src: string): string {
       for (let i = 0; i < d.length; i += 4) {
         const brightness = (d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114);
         d[i] = 245; d[i + 1] = 240; d[i + 2] = 232;
-        d[i + 3] = brightness;
+        d[i + 3] = 255 - brightness;
       }
       ctx.putImageData(imageData, 0, 0);
       setDataUrl(canvas.toDataURL('image/png'));
