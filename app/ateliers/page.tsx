@@ -515,7 +515,6 @@ export default function AteliersPage() {
                 gap: '2rem',
               }}
             >
-              <div className="ornament" style={{ fontSize: '2rem', opacity: 0.3 }}>خ</div>
               <div>
                 <h3
                   style={{

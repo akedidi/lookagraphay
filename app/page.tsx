@@ -516,7 +516,6 @@ export default function Home() {
                 gap: '1rem',
               }}
             >
-              <div className="ornament" style={{ fontSize: '1.8rem', opacity: 0.25 }}>خ</div>
               <p
                 style={{
                   fontFamily: 'Cormorant Garamond, serif',
