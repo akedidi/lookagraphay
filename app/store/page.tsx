@@ -233,8 +233,8 @@ export default function StorePage() {
       )}
 
       {/* Grille */}
-      <section style={{ padding: '4rem 1.5rem 8rem', background: '#F5F0E8' }}>
-        <div style={{ maxWidth: '72rem', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+      <section style={{ padding: '4rem 1rem 8rem', background: '#F5F0E8' }}>
+        <div style={{ maxWidth: '72rem', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '1rem' }}>
           {loading && (
             <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '4rem', fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', color: 'rgba(61,43,31,0.4)' }}>
               Chargement…
@@ -253,7 +253,7 @@ export default function StorePage() {
                 style={{
                   cursor: 'pointer',
                   background: 'linear-gradient(135deg, #3D2B1F, #1A1209)',
-                  aspectRatio: i % 4 === 1 ? '2/3' : '4/5',
+                  aspectRatio: '3/4',
                   position: 'relative',
                   overflow: 'hidden',
                 }}
@@ -291,8 +291,8 @@ export default function StorePage() {
                     {item.categorie}
                   </p>
                   {item.prix ? (
-                    <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.15rem', fontWeight: 400, color: '#F5F0E8', lineHeight: 1, letterSpacing: '0.02em' }}>
-                      {item.prix} <span style={{ fontSize: '0.8rem', fontWeight: 300, color: '#E4C97A' }}>€</span>
+                    <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.15rem', fontWeight: 400, color: '#E4C97A', lineHeight: 1, letterSpacing: '0.02em' }}>
+                      {item.prix} <span style={{ fontSize: '0.8rem', fontWeight: 300 }}>€</span>
                     </p>
                   ) : null}
                 </div>
