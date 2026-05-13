@@ -193,7 +193,7 @@ export default function ContactPage() {
                     color: '#3D2B1F',
                   }}
                 >
-                  Paris, 11e arrondissement
+                  Paris, 14e arrondissement
                 </span>
               </div>
             </div>
