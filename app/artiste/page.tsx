@@ -159,6 +159,7 @@ export default function ArtistePage() {
                   lineHeight: 1.9,
                   color: '#3D2B1F',
                   marginBottom: '1.5rem',
+                  textAlign: 'justify',
                 }}
               >
                 {para}
