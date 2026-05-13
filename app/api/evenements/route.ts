@@ -3,7 +3,7 @@ import pool from '@/lib/db';
 
 export async function GET() {
   try {
-    const [rows] = await pool.execute('SELECT * FROM evenements ORDER BY id DESC') as any;
+    const [rows] = await pool.execute('SELECT * FROM evenements ORDER BY id ASC') as any;
     const items = rows.map((r: any) => ({
       ...r,
       images: typeof r.images === 'string' ? JSON.parse(r.images) : (r.images || []),
