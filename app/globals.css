@@ -301,8 +301,12 @@ h1, h2, h3, h4, h5, h6 {
     align-items: flex-start !important;
   }
   .admin-section-head button {
-    width: 100%;
-    text-align: center;
+    min-width: 2.4rem;
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
+  .admin-btn-text {
+    display: none;
   }
   .admin-item-row {
     flex-direction: column !important;

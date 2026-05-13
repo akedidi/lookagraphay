@@ -381,7 +381,7 @@ export default function AdminPage() {
           <div>
             <div className="admin-section-head">
               {sectionTitle('Articles du Store')}
-              <button onClick={() => { setEditStore({ ...emptyStore }); setIsNew(true); }} style={btnGold}>+ Nouvel article</button>
+              <button onClick={() => { setEditStore({ ...emptyStore }); setIsNew(true); }} style={btnGold}>+<span className="admin-btn-text"> Nouvel article</span></button>
             </div>
 
             {editStore && (
@@ -439,7 +439,7 @@ export default function AdminPage() {
           <div>
             <div className="admin-section-head">
               {sectionTitle('Expositions')}
-              <button onClick={() => { setEditExpo({ ...emptyExpo }); setIsNew(true); }} style={btnGold}>+ Nouvelle exposition</button>
+              <button onClick={() => { setEditExpo({ ...emptyExpo }); setIsNew(true); }} style={btnGold}>+<span className="admin-btn-text"> Nouvelle exposition</span></button>
             </div>
 
             {editExpo && (
@@ -491,7 +491,7 @@ export default function AdminPage() {
           <div>
             <div className="admin-section-head">
               {sectionTitle('Événements')}
-              <button onClick={() => { setEditEvt({ ...emptyEvt }); setIsNew(true); }} style={btnGold}>+ Nouvel événement</button>
+              <button onClick={() => { setEditEvt({ ...emptyEvt }); setIsNew(true); }} style={btnGold}>+<span className="admin-btn-text"> Nouvel événement</span></button>
             </div>
 
             {editEvt && (
