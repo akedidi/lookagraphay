@@ -19,7 +19,7 @@ export const artistData = {
     "Son travail porte enfin une dimension engagée autour de l'**empowerment des femmes dans l'art** et de l'égalité des genres, affirmant une voix libre, forte et universelle dans le paysage artistique contemporain.",
   ],
   quote:
-    "J'écris l'arabe comme le japonais — de haut en bas — pour rappeler que la beauté n'a pas de frontières.",
+    "Ma calligraphie ne cherche pas seulement à être belle : elle cherche à toucher, faire réfléchir et ouvrir les esprits.",
   inspirations: [
     "La poésie arabe révolutionnaire",
     "La littérature soufie et ses messages universels",
