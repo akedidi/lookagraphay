@@ -627,18 +627,6 @@ export default function Home() {
                   >
                     {oeuvre.titre}
                   </p>
-                  <p
-                    style={{
-                      fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.6rem',
-                      color: '#C9A84C',
-                      letterSpacing: '0.18em',
-                      textTransform: 'uppercase',
-                      margin: '0.25rem 0 0',
-                    }}
-                  >
-                    {oeuvre.annee}
-                  </p>
                 </div>
               </motion.div>
             ))}
