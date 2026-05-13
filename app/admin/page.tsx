@@ -420,8 +420,8 @@ export default function AdminPage() {
                     <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: gold }}>{item.categorie} · {item.prix}€ · {item.disponible ? 'DISPO' : 'Indisponible'}</div>
                   </div>
                   <div className="admin-item-actions">
-                    <button onClick={() => { setEditStore({ ...item }); setIsNew(false); }} style={btnOutline}>Modifier</button>
-                    <button onClick={() => deleteStore(item.id)} style={btnDanger}>Supprimer</button>
+                    <button onClick={() => { setEditStore({ ...item }); setIsNew(false); }} style={btnOutline}><span className="admin-btn-text">Modifier</span><span className="admin-icon">✎</span></button>
+                    <button onClick={() => deleteStore(item.id)} style={btnDanger}><span className="admin-btn-text">Supprimer</span><span className="admin-icon">✕</span></button>
                   </div>
                 </div>
               ))}
@@ -472,8 +472,8 @@ export default function AdminPage() {
                     <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: gold }}>{expo.lieu} · {expo.statut}</div>
                   </div>
                   <div className="admin-item-actions">
-                    <button onClick={() => { setEditExpo({ ...expo, images: expo.images || [] }); setIsNew(false); }} style={btnOutline}>Modifier</button>
-                    <button onClick={() => deleteExpo(expo.id)} style={btnDanger}>Supprimer</button>
+                    <button onClick={() => { setEditExpo({ ...expo, images: expo.images || [] }); setIsNew(false); }} style={btnOutline}><span className="admin-btn-text">Modifier</span><span className="admin-icon">✎</span></button>
+                    <button onClick={() => deleteExpo(expo.id)} style={btnDanger}><span className="admin-btn-text">Supprimer</span><span className="admin-icon">✕</span></button>
                   </div>
                 </div>
               ))}
@@ -522,8 +522,8 @@ export default function AdminPage() {
                     <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: gold }}>{evt.type} · {evt.date} · {evt.statut}</div>
                   </div>
                   <div className="admin-item-actions">
-                    <button onClick={() => { setEditEvt({ ...evt, images: evt.images || [] }); setIsNew(false); }} style={btnOutline}>Modifier</button>
-                    <button onClick={() => deleteEvt(evt.id)} style={btnDanger}>Supprimer</button>
+                    <button onClick={() => { setEditEvt({ ...evt, images: evt.images || [] }); setIsNew(false); }} style={btnOutline}><span className="admin-btn-text">Modifier</span><span className="admin-icon">✎</span></button>
+                    <button onClick={() => deleteEvt(evt.id)} style={btnDanger}><span className="admin-btn-text">Supprimer</span><span className="admin-icon">✕</span></button>
                   </div>
                 </div>
               ))}
