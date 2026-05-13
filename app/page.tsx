@@ -1,11 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-
+import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { artistData, ateliersData, expositionsData, evenementsData, galerieData } from '@/lib/data';
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 32 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: 'easeOut' as const } },
+};
 
+const stagger = {
+  visible: { transition: { staggerChildren: 0.15 } },
+};
 
 export default function Home() {
   const [muted, setMuted] = useState(true);
@@ -185,8 +192,8 @@ export default function Home() {
               margin: '0 auto 3rem',
             }}
           >
-            Une calligraphie métissée, portant la liberté et l&apos;humanité dans ses traits,<br />
-            ouverte au monde, inclusive et respectueuse de la planète.
+            Quand l&apos;encre trace le chemin de l&apos;âme —<br />
+            la calligraphie arabe comme acte de présence.
           </p>
 
           <div className="hero-cta" style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', justifyContent: 'center' }}>
@@ -227,7 +234,11 @@ export default function Home() {
 
       {/* ── INTRO PHRASE ── */}
       <section className="py-24 section-pad text-center" style={{ background: '#1A1209' }}>
-        <div
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-100px' }}
+          variants={fadeUp}
         >
           <div className="ornament mb-6" style={{ fontSize: '1.5rem' }}>
             ـ ـ ـ
@@ -253,13 +264,17 @@ export default function Home() {
           <div className="mt-8" style={{ color: 'rgba(245,240,232,0.84)', fontSize: '0.8rem', letterSpacing: '0.25em', fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase' }}>
             — Looka
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* ── L'ARTISTE ── */}
       <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center" style={{ maxWidth: '72rem', marginLeft: 'auto', marginRight: 'auto' }}>
-          <div
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-80px' }}
+            variants={fadeUp}
             className="max-w-xl mx-auto lg:max-w-none lg:mx-0"
           >
             <span
@@ -305,9 +320,13 @@ export default function Home() {
             <Link href="/artiste" className="btn-gold">
               Découvrir son univers
             </Link>
-          </div>
+          </motion.div>
 
-          <div
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 1, ease: 'easeOut' as const }}
             className="img-zoom"
             style={{
               aspectRatio: '3/4',
@@ -349,14 +368,18 @@ export default function Home() {
                 Portrait de l'artiste
               </p>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ── ATELIERS ── */}
       <section className="py-24 section-pad" style={{ background: '#2A2520' }}>
         <div style={{ maxWidth: "72rem", marginLeft: "auto", marginRight: "auto" }}>
-          <div
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-80px' }}
+            variants={fadeUp}
             className="text-center mb-16"
           >
             <span
@@ -397,9 +420,13 @@ export default function Home() {
             >
               Des cours semestriels en petits groupes, pour entrer dans la pratique avec profondeur et patience.
             </p>
-          </div>
+          </motion.div>
 
-          <div
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-60px' }}
+            variants={stagger}
             style={{
               maxWidth: '48rem',
               marginLeft: 'auto',
@@ -411,14 +438,16 @@ export default function Home() {
             }}
           >
             {ateliersData.map((atelier) => (
-              <div
+              <motion.div
                 key={atelier.id}
+                variants={fadeUp}
                 style={{
                   border: '1px solid rgba(201,168,76,0.2)',
                   padding: '2.5rem 2rem',
                   position: 'relative',
                   transition: 'border-color 0.3s',
                 }}
+                whileHover={{ borderColor: 'rgba(201,168,76,0.5)' }}
               >
                 <span
                   style={{
@@ -472,10 +501,11 @@ export default function Home() {
                 >
                   {atelier.dates}
                 </span>
-              </div>
+              </motion.div>
             ))}
             {/* Carte contact */}
-            <div
+            <motion.div
+              variants={fadeUp}
               style={{
                 border: '1px solid rgba(201,168,76,0.1)',
                 padding: '2.5rem 2rem',
@@ -486,6 +516,7 @@ export default function Home() {
                 gap: '1rem',
               }}
             >
+              <div className="ornament" style={{ fontSize: '1.8rem', opacity: 0.25 }}>خ</div>
               <p
                 style={{
                   fontFamily: 'Cormorant Garamond, serif',
@@ -500,8 +531,8 @@ export default function Home() {
               <Link href="/ateliers" className="btn-gold" style={{ alignSelf: 'flex-start', marginTop: '0.5rem' }}>
                 En savoir plus
               </Link>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           <div style={{ textAlign: 'center' }}>
             <Link href="/ateliers" className="btn-gold">
@@ -514,7 +545,11 @@ export default function Home() {
       {/* ── GALERIE PREVIEW ── */}
       <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
         <div style={{ maxWidth: "72rem", marginLeft: "auto", marginRight: "auto" }}>
-          <div
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-80px' }}
+            variants={fadeUp}
             className="text-center mb-16"
           >
             <span
@@ -542,20 +577,29 @@ export default function Home() {
               Œuvres récentes
             </h2>
             <span className="gold-line" />
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-12">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-60px' }}
+            variants={stagger}
+            className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-12"
+          >
             {galerieData.slice(0, 6).map((oeuvre, i) => (
-              <div
+              <motion.div
                 key={oeuvre.id}
+                variants={fadeUp}
+                className="img-zoom"
                 style={{
                   aspectRatio: i % 3 === 1 ? '3/4' : '1/1',
                   background: '#1A1209',
                   position: 'relative',
                   overflow: 'hidden',
                   cursor: 'pointer',
-                  transition: 'transform 0.4s ease',
                 }}
+                whileHover={{ scale: 1.01 }}
+                transition={{ duration: 0.4 }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -606,9 +650,9 @@ export default function Home() {
                     {oeuvre.annee}
                   </p>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           <div className="text-center">
             <Link href="/store" className="btn-gold">
@@ -621,7 +665,11 @@ export default function Home() {
       {/* ── EXPOSITIONS ── */}
       <section className="py-24 section-pad" style={{ background: '#1A1209' }}>
         <div style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto' }}>
-          <div
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-80px' }}
+            variants={fadeUp}
             className="text-center mb-16"
           >
             <span
@@ -649,14 +697,17 @@ export default function Home() {
               Prochainement
             </h2>
             <span className="gold-line" />
-          </div>
+          </motion.div>
 
           {expositionsData
             .filter((e) => e.statut === 'à venir')
             .map((expo, i) => (
-              <div
+              <motion.div
                 key={expo.id}
-                
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
                 style={{
                   borderTop: '1px solid rgba(201,168,76,0.15)',
                   padding: '2.5rem 0',
@@ -727,7 +778,7 @@ export default function Home() {
                     {expo.description}
                   </p>
                 </div>
-              </div>
+              </motion.div>
             ))}
 
           <div className="text-center mt-12">
@@ -771,7 +822,11 @@ export default function Home() {
             لـ
           </div>
         </div>
-        <div
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+          variants={fadeUp}
           style={{ zIndex: 1, position: 'relative' }}
         >
           <h2
@@ -809,7 +864,7 @@ export default function Home() {
               Nous écrire
             </Link>
           </div>
-        </div>
+        </motion.div>
       </section>
     </div>
   );

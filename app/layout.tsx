@@ -47,7 +47,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr" className={`${cormorant.variable} ${montserrat.variable}`}>
-      <body suppressHydrationWarning>
+      <body>
         <SiteShell>{children}</SiteShell>
       </body>
     </html>

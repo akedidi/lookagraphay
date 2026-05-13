@@ -1,8 +1,13 @@
 'use client';
 
 import { useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { ateliersData } from '@/lib/data';
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: 'easeOut' as const } },
+};
 
 export default function AteliersPage() {
   const cours = ateliersData[0];
@@ -96,9 +101,12 @@ export default function AteliersPage() {
             { label: 'Lieu', value: 'Montparnasse', desc: 'Paris' },
             { label: 'Niveau', value: 'Tous', desc: 'niveaux acceptés' },
           ].map((item, i) => (
-            <div
+            <motion.div
               key={i}
-              
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.12, duration: 0.7 }}
             >
               <div
                 style={{
@@ -134,7 +142,7 @@ export default function AteliersPage() {
               >
                 {item.desc}
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>
@@ -142,8 +150,11 @@ export default function AteliersPage() {
       {/* Philosophie du cours */}
       <section className="py-28 section-pad" style={{ background: '#F5F0E8' }}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center" style={{ maxWidth: '56rem', marginLeft: 'auto', marginRight: 'auto' }}>
-          <div
-            
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
             className="max-w-xl mx-auto lg:max-w-none lg:mx-0"
           >
             <span
@@ -185,11 +196,14 @@ export default function AteliersPage() {
             >
               {cours.philosophie}
             </p>
-          </div>
+          </motion.div>
 
           {/* Vidéo bloc droit */}
-          <div
-            
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.2 }}
             style={{
               position: 'relative',
               aspectRatio: '1',
@@ -205,15 +219,18 @@ export default function AteliersPage() {
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
             />
             <div style={{ position: 'absolute', inset: 0, background: 'rgba(26,18,9,0.25)' }} />
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Vidéos atelier — background */}
       <section style={{ background: '#1A1209', overflow: 'hidden' }}>
         {/* Titre */}
-        <div
-          
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
           style={{ textAlign: 'center', padding: '4rem 1.5rem 2.5rem' }}
         >
           <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', letterSpacing: '0.42em', textTransform: 'uppercase', color: '#C9A84C', display: 'block', marginBottom: '1rem' }}>
@@ -223,7 +240,7 @@ export default function AteliersPage() {
             L'atelier en vidéo
           </h2>
           <span className="gold-line" />
-        </div>
+        </motion.div>
 
         {/* Deux panneaux vidéo côte à côte */}
         <div style={{ display: 'flex', flexWrap: 'wrap', overflow: 'hidden' }}>
@@ -231,9 +248,12 @@ export default function AteliersPage() {
             { src: '/images/atelier-seance.mp4', legende: 'Séance de calligraphie', sousTitre: 'Geste, méditation et création' },
             { src: '/images/atelier-video-2.mp4', legende: 'Découverte de l\'art', sousTitre: 'Calligraphie arabe avec Looka' },
           ].map((video, i) => (
-            <div
+            <motion.div
               key={i}
-              
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.2, duration: 1 }}
               style={{ flex: '1 1 300px', minWidth: 0, position: 'relative', aspectRatio: '16/9', overflow: 'hidden', minHeight: 280 }}
             >
               {/* Vidéo fond */}
@@ -257,7 +277,7 @@ export default function AteliersPage() {
                   {video.sousTitre}
                 </p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>
@@ -265,8 +285,11 @@ export default function AteliersPage() {
       {/* Contenu du cours */}
       <section className="py-24 section-pad" style={{ background: '#1A1209' }}>
         <div style={{ maxWidth: "56rem", marginLeft: "auto", marginRight: "auto" }}>
-          <div
-            
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
             className="text-center mb-16"
           >
             <span
@@ -294,13 +317,16 @@ export default function AteliersPage() {
               Contenu du cours
             </h2>
             <span className="gold-line" />
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px" style={{ background: 'rgba(201,168,76,0.1)' }}>
             {cours.programme.map((item, i) => (
-              <div
+              <motion.div
                 key={i}
-                
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.6 }}
                 style={{
                   background: '#1A1209',
                   padding: '2.5rem 2rem',
@@ -330,7 +356,7 @@ export default function AteliersPage() {
                 >
                   {item}
                 </p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -339,8 +365,11 @@ export default function AteliersPage() {
       {/* Infos & Inscription */}
       <section className="py-28 section-pad" style={{ background: '#FAF7F2' }}>
         <div style={{ maxWidth: "56rem", marginLeft: "auto", marginRight: "auto" }}>
-          <div
-            
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
             className="text-center mb-16"
           >
             <span
@@ -368,12 +397,15 @@ export default function AteliersPage() {
               Infos & Inscription
             </h2>
             <span style={{ display: 'block', width: 50, height: 1, background: '#C9A84C', margin: '1.5rem auto 0' }} />
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Infos pratiques */}
-            <div
-              
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUp}
               style={{
                 border: '1px solid rgba(61,43,31,0.12)',
                 padding: '2.5rem',
@@ -466,11 +498,14 @@ export default function AteliersPage() {
                   </p>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
             {/* Contact */}
-            <div
-              
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUp}
               style={{
                 background: '#1A1209',
                 padding: '2.5rem',
@@ -480,6 +515,7 @@ export default function AteliersPage() {
                 gap: '2rem',
               }}
             >
+              <div className="ornament" style={{ fontSize: '2rem', opacity: 0.3 }}>خ</div>
               <div>
                 <h3
                   style={{
@@ -515,7 +551,7 @@ export default function AteliersPage() {
                   {cours.contact}
                 </a>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -523,8 +559,11 @@ export default function AteliersPage() {
       {/* FAQ */}
       <section className="py-20 section-pad" style={{ background: '#2A2520' }}>
         <div style={{ maxWidth: '48rem', marginLeft: 'auto', marginRight: 'auto' }}>
-          <div
-            
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
             style={{ textAlign: 'center', marginBottom: '3.5rem' }}
           >
             <h2
@@ -539,7 +578,7 @@ export default function AteliersPage() {
               Questions pratiques
             </h2>
             <span className="gold-line" />
-          </div>
+          </motion.div>
           {[
             {
               q: 'Faut-il des connaissances en arabe ?',
@@ -554,9 +593,12 @@ export default function AteliersPage() {
               r: `Écrivez à Looka par email à ${cours.contact} pour vous inscrire ou obtenir toutes les informations sur le cours (tarifs, dates, matériel).`,
             },
           ].map((faq, i) => (
-            <div
+            <motion.div
               key={i}
-              
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
               style={{
                 borderTop: '1px solid rgba(201,168,76,0.12)',
                 padding: '1.75rem 0',
@@ -584,7 +626,7 @@ export default function AteliersPage() {
               >
                 {faq.r}
               </p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>

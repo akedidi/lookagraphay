@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 type Exposition = {
   id: number;
@@ -13,6 +14,10 @@ type Exposition = {
   images?: string[];
 };
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: 'easeOut' as const } },
+};
 
 export default function ExpositionsPage() {
   const [expositions, setExpositions] = useState<Exposition[]>([]);
@@ -123,8 +128,11 @@ export default function ExpositionsPage() {
       {aVenir.length > 0 && (
         <section style={{ background: '#F5F0E8', padding: '6rem 1.5rem' }}>
           <div style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto' }}>
-            <div
-              
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUp}
               style={{ marginBottom: '3.5rem' }}
             >
               <span
@@ -152,13 +160,16 @@ export default function ExpositionsPage() {
                 Expositions à venir
               </h2>
               <span style={{ display: 'block', width: 40, height: 1, background: '#C9A84C', marginTop: '1.5rem' }} />
-            </div>
+            </motion.div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
               {aVenir.map((expo, i) => (
-                <article
+                <motion.article
                   key={expo.id}
-                  
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeUp}
                   style={{
                     display: 'grid',
                     gridTemplateColumns: '1fr 2fr',
@@ -241,7 +252,7 @@ export default function ExpositionsPage() {
                       </p>
                     ))}
                   </div>
-                </article>
+                </motion.article>
               ))}
             </div>
           </div>
@@ -251,8 +262,11 @@ export default function ExpositionsPage() {
       {/* Passées */}
       <section style={{ background: '#2A2520', padding: '6rem 1.5rem' }}>
         <div style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto' }}>
-          <div
-            
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
             style={{ marginBottom: '3.5rem' }}
           >
             <span
@@ -280,13 +294,16 @@ export default function ExpositionsPage() {
               Expositions passées
             </h2>
             <span style={{ display: 'block', width: 40, height: 1, background: '#C9A84C', marginTop: '1.5rem' }} />
-          </div>
+          </motion.div>
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {passes.map((expo, i) => (
-              <article
+              <motion.article
                 key={expo.id}
-                
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15, duration: 0.8 }}
                 style={{
                   borderTop: '1px solid rgba(201,168,76,0.15)',
                   padding: '3.5rem 0',
@@ -357,7 +374,7 @@ export default function ExpositionsPage() {
                     ))}
                   </div>
                 </div>
-              </article>
+              </motion.article>
             ))}
           </div>
         </div>

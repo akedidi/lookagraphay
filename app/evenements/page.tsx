@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 type Evenement = {
   id: number;
@@ -14,6 +15,10 @@ type Evenement = {
   images?: string[];
 };
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: 'easeOut' as const } },
+};
 
 const typeColors: Record<string, string> = {
   Vernissage: '#C9A84C',
@@ -78,8 +83,11 @@ export default function EvenementsPage() {
       {/* À venir */}
       <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
         <div style={{ maxWidth: '56rem', marginLeft: 'auto', marginRight: 'auto' }}>
-          <div
-            
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
             className="mb-14"
           >
             <span
@@ -107,13 +115,16 @@ export default function EvenementsPage() {
               Prochains événements
             </h2>
             <span style={{ display: 'block', width: 40, height: 1, background: '#C9A84C', marginTop: '1.5rem' }} />
-          </div>
+          </motion.div>
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {aVenir.map((evt) => (
-              <article
+              <motion.article
                 key={evt.id}
-                
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
                 style={{
                   borderTop: '1px solid rgba(61,43,31,0.12)',
                   padding: '2.5rem 0',
@@ -210,7 +221,7 @@ export default function EvenementsPage() {
                     {evt.description}
                   </p>
                 </div>
-              </article>
+              </motion.article>
             ))}
             {aVenir.length === 0 && (
               <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.85rem', color: 'rgba(61,43,31,0.5)', padding: '2rem 0' }}>
@@ -224,8 +235,11 @@ export default function EvenementsPage() {
       {/* Passés */}
       <section className="py-20 section-pad" style={{ background: '#2A2520' }}>
         <div style={{ maxWidth: '56rem', marginLeft: 'auto', marginRight: 'auto' }}>
-          <div
-            
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
             className="mb-14"
           >
             <span
@@ -253,12 +267,15 @@ export default function EvenementsPage() {
               Événements passés
             </h2>
             <span style={{ display: 'block', width: 40, height: 1, background: '#C9A84C', marginTop: '1.5rem' }} />
-          </div>
+          </motion.div>
 
           {passes.map((evt, i) => (
-            <div
+            <motion.div
               key={evt.id}
-              
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
               style={{
                 borderTop: '1px solid rgba(201,168,76,0.1)',
                 padding: '1.5rem 0',
@@ -298,7 +315,7 @@ export default function EvenementsPage() {
                   {evt.lieu}
                 </p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>

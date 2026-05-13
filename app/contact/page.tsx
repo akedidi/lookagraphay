@@ -1,8 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { siteConfig } from '@/lib/data';
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: 'easeOut' as const } },
+};
 
 const motifs = [
   { value: 'atelier', label: 'Inscription à un atelier' },
@@ -95,8 +100,11 @@ export default function ContactPage() {
       <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-16" style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto' }}>
           {/* Sidebar */}
-          <div
-            
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
             className="lg:col-span-2 max-w-lg mx-auto lg:max-w-none lg:mx-0"
           >
             <span
@@ -204,11 +212,14 @@ export default function ContactPage() {
             >
               ح
             </div>
-          </div>
+          </motion.div>
 
           {/* Formulaire */}
-          <div
-            
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
             className="lg:col-span-3"
           >
             {sent ? (
@@ -313,7 +324,7 @@ export default function ContactPage() {
                 </button>
               </form>
             )}
-          </div>
+          </motion.div>
         </div>
       </section>
     </div>

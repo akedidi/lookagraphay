@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 type StoreItem = {
   id: number;
@@ -122,6 +123,10 @@ function PrixSelector({ categorie, onChange }: { categorie: string; onChange: (p
   );
 }
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: 'easeOut' as const } },
+};
 
 const arabicLetters = ['ب', 'ل', 'ن', 'م', 'ح', 'ع'];
 
@@ -235,10 +240,15 @@ export default function StorePage() {
               Chargement…
             </div>
           )}
-          <>
+          <AnimatePresence>
             {filtered.map((item, i) => (
-              <div
+              <motion.div
                 key={item.id}
+                layout
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.97 }}
+                transition={{ duration: 0.4 }}
                 onClick={() => openItem(item)}
                 style={{
                   cursor: 'pointer',
@@ -246,8 +256,8 @@ export default function StorePage() {
                   aspectRatio: i % 4 === 1 ? '2/3' : '4/5',
                   position: 'relative',
                   overflow: 'hidden',
-                  transition: 'transform 0.3s ease',
                 }}
+                whileHover={{ y: -4 }}
               >
                 {/* Lettre arabe décorative */}
                 <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -288,20 +298,26 @@ export default function StorePage() {
                     Dispo
                   </span>
                 )}
-              </div>
+              </motion.div>
             ))}
-          </>
+          </AnimatePresence>
         </div>
       </section>
 
       {/* Modal détail */}
-      <>
+      <AnimatePresence>
         {selected && (
-          <div
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={() => setSelected(null)}
             style={{ position: 'fixed', inset: 0, background: 'rgba(26,18,9,0.92)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}
           >
-            <div
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
               style={{ background: '#FAF7F2', maxWidth: 900, width: '100%', maxHeight: '92vh', overflow: 'auto', display: 'flex', flexWrap: 'wrap' }}
             >
@@ -441,14 +457,14 @@ export default function StorePage() {
                   </a>
                 )}
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
-      </>
+      </AnimatePresence>
 
       {/* Note commande sur mesure */}
       <section style={{ padding: '5rem 1.5rem', textAlign: 'center', background: '#1A1209' }}>
-        <div style={{ maxWidth: 560, margin: '0 auto' }}>
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} style={{ maxWidth: 560, margin: '0 auto' }}>
           <div className="ornament mb-6" style={{ fontSize: '1rem' }}>◆</div>
           <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: '1.6rem', color: '#F5F0E8', marginBottom: '1rem' }}>
             Commande sur mesure
@@ -459,7 +475,7 @@ export default function StorePage() {
           <a href="/contact" className="btn-gold">
             Demander une création sur mesure
           </a>
-        </div>
+        </motion.div>
       </section>
     </div>
   );
