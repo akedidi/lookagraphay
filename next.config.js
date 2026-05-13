@@ -70,7 +70,8 @@ const nextConfig = {
     if (dev) {
       config.watchOptions = {
         ...config.watchOptions,
-        aggregateTimeout: 300,
+        aggregateTimeout: 500,
+        poll: false,
         ignored: [
           '**/node_modules/**',
           '**/.next/**',
@@ -79,6 +80,8 @@ const nextConfig = {
           '**/.cache/**',
           '**/.upm/**',
           '**/.agents/**',
+          '**/.replit/**',
+          '**/replit_zip_error_log.txt',
         ],
       };
     }
