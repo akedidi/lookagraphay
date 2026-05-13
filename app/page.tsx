@@ -16,10 +16,12 @@ const stagger = {
 
 export default function Home() {
   const [muted, setMuted] = useState(true);
+  const [tagline, setTagline] = useState('');
   const videoDesktopRef = useRef<HTMLVideoElement>(null);
   const videoMobileRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
+    setTagline("Une calligraphie métissée, portant la liberté et l\u2019humanité dans ses traits, ouverte au monde, inclusive et respectueuse de la planète.");
     try {
       const saved = localStorage.getItem('hero-sound');
       if (saved === 'on') setMuted(false);
@@ -180,7 +182,6 @@ export default function Home() {
 
           <p
             className="hero-tagline"
-            suppressHydrationWarning
             style={{
               fontFamily: 'Cormorant Garamond, serif',
               fontStyle: 'italic',
@@ -191,9 +192,10 @@ export default function Home() {
               marginBottom: '3rem',
               maxWidth: 600,
               margin: '0 auto 3rem',
+              minHeight: '2em',
             }}
           >
-            Une calligraphie métissée, portant la liberté et l&apos;humanité dans ses traits, ouverte au monde, inclusive et respectueuse de la planète.
+            {tagline}
           </p>
 
           <div className="hero-cta" style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', justifyContent: 'center' }}>
