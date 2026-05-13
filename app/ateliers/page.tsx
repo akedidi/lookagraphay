@@ -533,22 +533,56 @@ export default function AteliersPage() {
                 <p
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
-                    fontSize: '0.95rem',
+                    fontSize: '0.82rem',
                     fontWeight: 300,
-                    color: 'rgba(245,240,232,0.88)',
+                    color: 'rgba(245,240,232,0.75)',
                     lineHeight: 1.8,
                     marginBottom: '2rem',
                   }}
                 >
-                  Pour vous inscrire ou obtenir plus d'informations, écrivez directement à Looka. Elle répond personnellement à chaque message.
+                  Écrivez directement à Looka ou remplissez le formulaire d'inscription correspondant à votre type de cours.
                 </p>
+
+                {/* Email */}
                 <a
                   href={`mailto:${cours.contact}`}
                   className="btn-gold btn-gold-solid"
-                  style={{ display: 'inline-block' }}
+                  style={{ display: 'inline-block', marginBottom: '2rem' }}
                 >
                   {cours.contact}
                 </a>
+
+                {/* Deux formulaires */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <div>
+                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: '#C9A84C', marginBottom: '0.6rem' }}>
+                      Atelier d'initiation · Cours à l'unité
+                    </p>
+                    <a
+                      href="https://forms.gle/yJ7FgXfKRSsjA1V27"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-gold"
+                      style={{ display: 'inline-block' }}
+                    >
+                      Formulaire d'inscription
+                    </a>
+                  </div>
+                  <div>
+                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: '#C9A84C', marginBottom: '0.6rem' }}>
+                      Cours semestriel
+                    </p>
+                    <a
+                      href="https://forms.gle/yJ7FgXfKRSsjA1V27"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-gold"
+                      style={{ display: 'inline-block' }}
+                    >
+                      Formulaire d'inscription
+                    </a>
+                  </div>
+                </div>
               </div>
             </motion.div>
           </div>
@@ -589,7 +623,7 @@ export default function AteliersPage() {
             },
             {
               q: "Comment s'inscrire ?",
-              r: `Écrivez à Looka par email à ${cours.contact} pour vous inscrire ou obtenir toutes les informations sur le cours (tarifs, dates, matériel).`,
+              r: `Écrivez à Looka par email à ${cours.contact}, ou remplissez directement le formulaire d'inscription en ligne — un formulaire pour l'atelier d'initiation / cours à l'unité, un autre pour le cours semestriel.`,
             },
           ].map((faq, i) => (
             <motion.div
