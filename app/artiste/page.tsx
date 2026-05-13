@@ -288,7 +288,7 @@ export default function ArtistePage() {
                 color: '#3D2B1F',
               }}
             >
-              Dans un audacieux défi artistique, Looka présente les lettres arabes de haut en bas, à la manière des caractères japonais. Elle mêle des formes classiques à ses propres créations de lettres originales, forgiant un langage calligraphique qui célèbre la rencontre entre les civilisations — une ode à l'universalité humaine.
+              Looka est une calligraphe passionnée au style unique, inspiré par ses racines arabes, l&apos;art islamique et la calligraphie japonaise et latine. À travers ses œuvres, elle fusionne les lettres arabes et l&apos;esthétique verticale japonaise pour créer une calligraphie libre et personnelle. Elle mêle des formes classiques à ses propres créations de lettres originales, forgiant un langage calligraphique qui célèbre la rencontre entre les civilisations - une ode à l&apos;universalité humaine.<br /><br />Docteure en écologie, elle intègre également une démarche écoresponsable à son art en utilisant des matériaux durables et des encres naturelles.
             </p>
           </motion.div>
 
