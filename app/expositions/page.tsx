@@ -355,7 +355,7 @@ export default function ExpositionsPage() {
                         letterSpacing: '0.03em',
                       }}
                     >
-                      « {expo.titre} »
+                      {expo.titre}
                     </h3>
                     {(expo.description || '').split('\n\n').map((para, pi) => (
                       <p
