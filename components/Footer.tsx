@@ -29,7 +29,7 @@ export default function Footer() {
               alt="LookaGraphy"
               width={64}
               height={64}
-              style={{ display: 'block', marginBottom: '0.85rem', filter: 'brightness(0) invert(1) sepia(0.15)', opacity: 0.9 }}
+              style={{ display: 'block', marginBottom: '0.85rem' }}
             />
             <div
               style={{

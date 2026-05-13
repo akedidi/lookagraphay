@@ -14,36 +14,9 @@ const links = [
   { href: '/contact', label: 'Contact' },
 ];
 
-function useTransparentLogo(src: string): string {
-  const [dataUrl, setDataUrl] = useState(src);
-  useEffect(() => {
-    const img = new window.Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-      ctx.drawImage(img, 0, 0);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const d = imageData.data;
-      for (let i = 0; i < d.length; i += 4) {
-        const brightness = (d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114);
-        d[i] = 245; d[i + 1] = 240; d[i + 2] = 232;
-        d[i + 3] = 255 - brightness;
-      }
-      ctx.putImageData(imageData, 0, 0);
-      setDataUrl(canvas.toDataURL('image/png'));
-    };
-    img.src = src;
-  }, [src]);
-  return dataUrl;
-}
-
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const logoSrc = useTransparentLogo('/images/logo.png');
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -67,7 +40,7 @@ export default function Navbar() {
         <div style={{ maxWidth: '90rem', margin: '0 auto', padding: '0 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
           <Link href="/" className="flex items-center gap-3" style={{ textDecoration: 'none', flexShrink: 0, zIndex: 1 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={logoSrc} alt="LookaGraphy" width={44} height={44} style={{ display: 'block', flexShrink: 0 }} />
+            <img src="/images/logo.png" alt="LookaGraphy" width={44} height={44} style={{ display: 'block', flexShrink: 0 }} />
             <div className="flex flex-col">
               <span
                 style={{
@@ -161,7 +134,7 @@ export default function Navbar() {
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={logoSrc} alt="LookaGraphy" width={60} height={60} style={{ display: 'block', opacity: 0.4, marginBottom: '2rem' }} />
+        <img src="/images/logo.png" alt="LookaGraphy" width={60} height={60} style={{ display: 'block', marginBottom: '2rem' }} />
         <ul className="flex flex-col items-center gap-8">
           {links.map((l) => (
             <li key={l.href}>
