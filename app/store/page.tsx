@@ -288,7 +288,7 @@ export default function StorePage() {
                     </p>
                   )}
                   <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.2em', color: '#C9A84C', textTransform: 'uppercase' }}>
-                    {item.categorie}{item.annee ? ` · ${item.annee}` : ''}
+                    {item.categorie}{item.prix ? ` · ${item.prix} €` : ''}
                   </p>
                 </div>
 
