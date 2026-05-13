@@ -553,33 +553,47 @@ export default function AteliersPage() {
                 </a>
 
                 {/* Deux formulaires */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  <div>
-                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: '#C9A84C', marginBottom: '0.6rem' }}>
-                      Atelier d'initiation · Cours à l'unité
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  {/* Formulaire 1 */}
+                  <div style={{ border: '1px solid rgba(201,168,76,0.3)', padding: '1.5rem' }}>
+                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', letterSpacing: '0.32em', textTransform: 'uppercase', color: '#C9A84C', marginBottom: '0.5rem' }}>
+                      Formule ponctuelle
+                    </p>
+                    <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', fontWeight: 400, color: '#F5F0E8', marginBottom: '0.5rem', lineHeight: 1.3 }}>
+                      Atelier d'initiation<br />ou cours à l'unité
+                    </p>
+                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.75rem', fontWeight: 300, color: 'rgba(245,240,232,0.55)', marginBottom: '1.1rem', lineHeight: 1.6 }}>
+                      Pour découvrir la calligraphie en une séance ou quelques cours.
                     </p>
                     <a
                       href="https://forms.gle/yJ7FgXfKRSsjA1V27"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-gold"
-                      style={{ display: 'inline-block' }}
+                      style={{ display: 'inline-block', fontSize: '0.72rem' }}
                     >
-                      Formulaire d'inscription
+                      Remplir le formulaire →
                     </a>
                   </div>
-                  <div>
-                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: '#C9A84C', marginBottom: '0.6rem' }}>
+                  {/* Formulaire 2 */}
+                  <div style={{ border: '1px solid rgba(201,168,76,0.3)', padding: '1.5rem' }}>
+                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', letterSpacing: '0.32em', textTransform: 'uppercase', color: '#C9A84C', marginBottom: '0.5rem' }}>
+                      Formule régulière
+                    </p>
+                    <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', fontWeight: 400, color: '#F5F0E8', marginBottom: '0.5rem', lineHeight: 1.3 }}>
                       Cours semestriel
+                    </p>
+                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.75rem', fontWeight: 300, color: 'rgba(245,240,232,0.55)', marginBottom: '1.1rem', lineHeight: 1.6 }}>
+                      Pour s'engager sur la durée et progresser en profondeur.
                     </p>
                     <a
                       href="https://forms.gle/yJ7FgXfKRSsjA1V27"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-gold"
-                      style={{ display: 'inline-block' }}
+                      style={{ display: 'inline-block', fontSize: '0.72rem' }}
                     >
-                      Formulaire d'inscription
+                      Remplir le formulaire →
                     </a>
                   </div>
                 </div>
