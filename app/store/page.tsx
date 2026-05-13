@@ -277,8 +277,8 @@ export default function StorePage() {
                   />
                 )}
 
-                {/* Gradient + infos (sans prix) */}
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(26,18,9,0.88) 0%, rgba(26,18,9,0.2) 45%, transparent 70%)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '1.25rem' }}>
+                {/* Gradient + infos */}
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(26,18,9,0.92) 0%, rgba(26,18,9,0.25) 50%, transparent 72%)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '1.25rem' }}>
                   <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', color: '#F5F0E8', marginBottom: '0.15rem', lineHeight: 1.25 }}>
                     {item.titre}
                   </h3>
@@ -287,9 +287,14 @@ export default function StorePage() {
                       {item.sous_titre}
                     </p>
                   )}
-                  <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.2em', color: '#C9A84C', textTransform: 'uppercase' }}>
-                    {item.categorie}{item.prix ? ` · ${item.prix} €` : ''}
+                  <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.62rem', letterSpacing: '0.2em', color: 'rgba(201,168,76,0.75)', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
+                    {item.categorie}
                   </p>
+                  {item.prix ? (
+                    <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.35rem', fontWeight: 400, color: '#E4C97A', lineHeight: 1, letterSpacing: '0.02em' }}>
+                      {item.prix} <span style={{ fontSize: '0.85rem', fontWeight: 300 }}>€</span>
+                    </p>
+                  ) : null}
                 </div>
 
                 {/* Badge disponible */}
