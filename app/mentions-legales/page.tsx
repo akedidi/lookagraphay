@@ -1,11 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.7 } },
-};
 
 export default function MentionsLegalesPage() {
   return (
@@ -64,12 +59,9 @@ export default function MentionsLegalesPage() {
                 "LookaGraphy ne saurait être tenu responsable des dommages directs ou indirects causés au matériel de l'utilisateur lors de l'accès au site. Les liens hypertextes mis en place dans le cadre du présent site web en direction d'autres ressources présentes sur le réseau internet ne sauraient engager la responsabilité de LookaGraphy.",
             },
           ].map((section, i) => (
-            <motion.div
+            <div
               key={i}
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
+              
               style={{
                 borderTop: '1px solid rgba(61,43,31,0.12)',
                 padding: '2rem 0',
@@ -99,7 +91,7 @@ export default function MentionsLegalesPage() {
               >
                 {section.content}
               </p>
-            </motion.div>
+            </div>
           ))}
         </div>
       </section>

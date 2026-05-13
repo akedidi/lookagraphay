@@ -1,11 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 32 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' as const } },
-};
 
 const pillars = [
   {
@@ -81,7 +76,7 @@ export default function AssociationPage() {
         {/* Gold ornament line top */}
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg, transparent, #C9A84C, transparent)' }} />
 
-        <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+        <div>
           {/* Gold ornament */}
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1.5rem', marginBottom: '2.5rem' }}>
             <div style={{ width: 60, height: 1, background: 'linear-gradient(to right, transparent, #C9A84C)' }} />
@@ -136,7 +131,7 @@ export default function AssociationPage() {
             déclarée par application de la loi du 1<sup>er</sup> juillet 1901
             et du décret du 16 août 1901.
           </p>
-        </motion.div>
+        </div>
 
         {/* Bottom gold line */}
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg, transparent, rgba(201,168,76,0.4), transparent)' }} />
@@ -144,11 +139,8 @@ export default function AssociationPage() {
 
       {/* ── Mission ─────────────────────────────────────────── */}
       <section style={{ background: '#F5F0E8', padding: '5rem 1.5rem' }}>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeUp}
+        <div
+          
           style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}
         >
           {/* Logo on ivory background */}
@@ -202,16 +194,13 @@ export default function AssociationPage() {
           >
             Cette association a pour objet de promouvoir l'art et participer à la dynamique de l'activité culturelle française — en réunissant calligraphes, artistes et passionnés autour d'une vision commune : faire vivre et rayonner l'art de l'écriture sous toutes ses formes.
           </p>
-        </motion.div>
+        </div>
       </section>
 
       {/* ── 6 Pillars ────────────────────────────────────────── */}
       <section style={{ background: '#100C06', padding: '5rem 1.5rem 6rem' }}>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeUp}
+        <div
+          
           style={{ textAlign: 'center', marginBottom: '4rem' }}
         >
           <span
@@ -239,7 +228,7 @@ export default function AssociationPage() {
             Six piliers,<br />
             <em>une même passion.</em>
           </h2>
-        </motion.div>
+        </div>
 
         <div
           style={{
@@ -252,15 +241,8 @@ export default function AssociationPage() {
           }}
         >
           {pillars.map((pillar, i) => (
-            <motion.div
+            <div
               key={i}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: '-40px' }}
-              variants={{
-                hidden: { opacity: 0, y: 24 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.7, delay: (i % 3) * 0.1, ease: 'easeOut' as const } },
-              }}
               style={{
                 background: '#1A1209',
                 padding: '2.5rem 2rem',
@@ -318,7 +300,7 @@ export default function AssociationPage() {
                   </li>
                 ))}
               </ul>
-            </motion.div>
+            </div>
           ))}
         </div>
       </section>
@@ -332,11 +314,8 @@ export default function AssociationPage() {
           borderTop: '1px solid rgba(201,168,76,0.2)',
         }}
       >
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeUp}
+        <div
+          
         >
           <span
             style={{
@@ -386,7 +365,7 @@ export default function AssociationPage() {
           >
             Nous contacter
           </a>
-        </motion.div>
+        </div>
       </section>
 
     </main>

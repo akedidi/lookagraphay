@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { galerieData } from '@/lib/data';
 
@@ -11,10 +10,6 @@ type Oeuvre = typeof galerieData[0] & {
   images?: string[];
 };
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 28 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: 'easeOut' as const } },
-};
 
 const arabicLetters = ['ب', 'ل', 'ن', 'م', 'ح', 'ع'];
 
@@ -102,15 +97,10 @@ export default function GaleriePage() {
       {/* Grille */}
       <section style={{ padding: '4rem 1.5rem 8rem', background: '#F5F0E8' }}>
         <div style={{ maxWidth: '72rem', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
-          <AnimatePresence>
+          <>
             {(filtered as Oeuvre[]).map((oeuvre, i) => (
-              <motion.div
+              <div
                 key={oeuvre.id}
-                layout
-                initial={{ opacity: 0, scale: 0.97 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.97 }}
-                transition={{ duration: 0.4 }}
                 onClick={() => openOeuvre(oeuvre)}
                 style={{
                   cursor: 'pointer',
@@ -118,8 +108,8 @@ export default function GaleriePage() {
                   aspectRatio: i % 4 === 1 ? '2/3' : '4/5',
                   position: 'relative',
                   overflow: 'hidden',
+                  transition: 'transform 0.3s ease',
                 }}
-                whileHover={{ y: -4 }}
               >
                 {/* Lettre arabe décorative (fond, toujours visible) */}
                 <div
@@ -223,19 +213,16 @@ export default function GaleriePage() {
                     Dispo
                   </span>
                 )}
-              </motion.div>
+              </div>
             ))}
-          </AnimatePresence>
+          </>
         </div>
       </section>
 
       {/* Modal œuvre */}
-      <AnimatePresence>
+      <>
         {selected && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
             onClick={() => setSelected(null)}
             style={{
               position: 'fixed',
@@ -248,10 +235,7 @@ export default function GaleriePage() {
               padding: '1.5rem',
             }}
           >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+            <div
               onClick={(e) => e.stopPropagation()}
               style={{
                 background: '#FAF7F2',
@@ -506,10 +490,10 @@ export default function GaleriePage() {
                   </Link>
                 )}
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         )}
-      </AnimatePresence>
+      </>
     </div>
   );
 }

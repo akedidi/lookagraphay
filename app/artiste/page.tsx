@@ -1,13 +1,8 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { artistData } from '@/lib/data';
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 28 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: 'easeOut' as const } },
-};
 
 export default function ArtistePage() {
   return (
@@ -65,11 +60,8 @@ export default function ArtistePage() {
       <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-16 items-start" style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto' }}>
           {/* Portrait */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1 }}
+          <div
+            
             className="lg:col-span-2"
             style={{
               position: 'relative',
@@ -110,14 +102,11 @@ export default function ArtistePage() {
                 Looka — Calligraphe
               </p>
             </div>
-          </motion.div>
+          </div>
 
           {/* Biographie */}
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeUp}
+          <div
+            
             className="lg:col-span-3"
           >
             <span
@@ -164,16 +153,13 @@ export default function ArtistePage() {
                 {para}
               </p>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Photo pleine largeur — en action */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 1.2 }}
+      <div
+        
         style={{
           position: 'relative',
           height: 'clamp(480px, 65vw, 720px)',
@@ -198,15 +184,12 @@ export default function ArtistePage() {
             background: 'rgba(26,18,9,0.35)',
           }}
         />
-      </motion.div>
+      </div>
 
       {/* Citation centrale */}
       <section className="py-24 section-pad text-center" style={{ background: '#2A2520' }}>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeUp}
+        <div
+          
         >
           <div className="ornament mb-8" style={{ fontSize: '1.5rem' }}>ـ ـ ـ</div>
           <blockquote
@@ -236,17 +219,14 @@ export default function ArtistePage() {
           >
             — Looka
           </cite>
-        </motion.div>
+        </div>
       </section>
 
       {/* Démarche */}
       <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
         <div style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '4rem' }}>
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeUp}
+          <div
+            
           >
             <span
               style={{
@@ -287,14 +267,11 @@ export default function ArtistePage() {
             >
               Dans un audacieux défi artistique, Looka présente les lettres arabes de haut en bas, à la manière des caractères japonais. Elle mêle des formes classiques à ses propres créations de lettres originales, forgiant un langage calligraphique qui célèbre la rencontre entre les civilisations — une ode à l'universalité humaine.
             </p>
-          </motion.div>
+          </div>
 
           {/* Inspirations */}
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeUp}
+          <div
+            
           >
             <span
               style={{
@@ -349,17 +326,14 @@ export default function ArtistePage() {
                 </li>
               ))}
             </ul>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* CTA */}
       <section className="py-20 section-pad text-center" style={{ background: '#3D2B1F' }}>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeUp}
+        <div
+          
         >
           <p
             style={{
@@ -376,7 +350,7 @@ export default function ArtistePage() {
             <Link href="/ateliers" className="btn-gold">Ateliers</Link>
             <Link href="/galerie" className="btn-gold">Galerie</Link>
           </div>
-        </motion.div>
+        </div>
       </section>
     </div>
   );
