@@ -31,12 +31,17 @@ const nextConfig = {
           { key: 'Vary', value: 'Accept-Encoding' },
         ],
       },
-      // Fichiers JS/CSS statiques Next.js — Content-Type correct, immutable car hash dans le nom
+      // Fichiers JS/CSS statiques Next.js — no-store en dev (pas de hash), immutable en prod
       {
         source: '/_next/static/(.*)',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+          {
+            key: 'Cache-Control',
+            value: process.env.NODE_ENV === 'production'
+              ? 'public, max-age=31536000, immutable'
+              : 'no-cache, no-store, must-revalidate',
+          },
           { key: 'Vary', value: 'Accept-Encoding' },
         ],
       },
