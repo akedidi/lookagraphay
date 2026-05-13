@@ -282,29 +282,40 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 1.5rem;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .admin-header {
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 1rem !important;
   }
   .admin-content {
-    padding: 1rem 0.75rem;
+    padding: 1rem 0.75rem !important;
   }
   .admin-form-pad {
-    padding: 1rem;
+    padding: 1rem !important;
   }
   .admin-form-grid {
-    grid-template-columns: 1fr;
-    gap: 0;
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+  }
+  .admin-section-head {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  .admin-section-head button {
+    width: 100%;
+    text-align: center;
   }
   .admin-item-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.6rem;
-    padding: 0.85rem 0.85rem !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.6rem !important;
+    padding: 0.9rem 0.85rem !important;
+  }
+  .admin-item-info {
+    width: 100%;
   }
   .admin-item-actions {
-    width: 100%;
-    justify-content: flex-end;
+    width: 100% !important;
+    justify-content: stretch !important;
   }
   .admin-item-actions button {
     flex: 1;
