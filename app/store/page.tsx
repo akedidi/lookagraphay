@@ -287,12 +287,12 @@ export default function StorePage() {
                       {item.sous_titre}
                     </p>
                   )}
-                  <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.62rem', letterSpacing: '0.2em', color: 'rgba(201,168,76,0.75)', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
+                  <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.62rem', letterSpacing: '0.22em', color: '#E4C97A', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
                     {item.categorie}
                   </p>
                   {item.prix ? (
-                    <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.35rem', fontWeight: 400, color: '#E4C97A', lineHeight: 1, letterSpacing: '0.02em' }}>
-                      {item.prix} <span style={{ fontSize: '0.85rem', fontWeight: 300 }}>€</span>
+                    <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.15rem', fontWeight: 400, color: '#F5F0E8', lineHeight: 1, letterSpacing: '0.02em' }}>
+                      {item.prix} <span style={{ fontSize: '0.8rem', fontWeight: 300, color: '#E4C97A' }}>€</span>
                     </p>
                   ) : null}
                 </div>
