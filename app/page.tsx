@@ -492,17 +492,6 @@ export default function Home() {
                   <br />
                   {atelier.lieu}
                 </p>
-                <span
-                  style={{
-                    fontFamily: 'Montserrat, sans-serif',
-                    fontSize: '0.85rem',
-                    letterSpacing: '0.2em',
-                    color: '#C9A84C',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {atelier.dates}
-                </span>
               </motion.div>
             ))}
             {/* Carte contact */}
@@ -732,16 +721,6 @@ export default function Home() {
                   >
                     {expo.statut}
                   </span>
-                  <p
-                    style={{
-                      fontFamily: 'Cormorant Garamond, serif',
-                      fontSize: '0.9rem',
-                      color: 'rgba(245,240,232,0.75)',
-                      lineHeight: 1.5,
-                    }}
-                  >
-                    {expo.dates}
-                  </p>
                 </div>
                 <div>
                   <h3
