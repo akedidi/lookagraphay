@@ -21,11 +21,12 @@ export const artistData = {
   quote:
     "Ma calligraphie ne cherche pas seulement à être belle : elle cherche à toucher, faire réfléchir et ouvrir les esprits.",
   inspirations: [
-    "La poésie arabe révolutionnaire",
+    "La poésie arabe révolutionnaire, le soufisme et les textes porteurs de sens",
     "La littérature soufie et ses messages universels",
-    "L'écriture japonaise verticale et ses résonances",
+    "La calligraphie latine et japonaise verticale et ses résonances",
     "Les arts islamiques classiques",
     "Sa double culture arabo-musulmane et française",
+    "La volonté de transmettre des valeurs universelles, d'ouvrir les esprits et de créer du lien",
   ],
   image: "/images/artist.jpg",
 };
