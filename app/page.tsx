@@ -180,6 +180,7 @@ export default function Home() {
 
           <p
             className="hero-tagline"
+            suppressHydrationWarning
             style={{
               fontFamily: 'Cormorant Garamond, serif',
               fontStyle: 'italic',
@@ -192,8 +193,7 @@ export default function Home() {
               margin: '0 auto 3rem',
             }}
           >
-            Quand l&apos;encre trace le chemin de l&apos;âme —<br />
-            la calligraphie arabe comme acte de présence.
+            Une calligraphie métissée, portant la liberté et l&apos;humanité dans ses traits, ouverte au monde, inclusive et respectueuse de la planète.
           </p>
 
           <div className="hero-cta" style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', justifyContent: 'center' }}>
