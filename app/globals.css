@@ -228,3 +228,86 @@ h1, h2, h3, h4, h5, h6 {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Admin backoffice — responsive ── */
+.admin-header {
+  padding: 0.9rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.admin-tabs {
+  display: flex;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.admin-tabs::-webkit-scrollbar { display: none; }
+.admin-content {
+  padding: 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.admin-form-pad {
+  padding: 1.5rem;
+}
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1.5rem;
+}
+.admin-item-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.admin-item-info {
+  flex: 1;
+  min-width: 0;
+}
+.admin-item-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+.admin-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .admin-header {
+    padding: 0.75rem 1rem;
+  }
+  .admin-content {
+    padding: 1rem 0.75rem;
+  }
+  .admin-form-pad {
+    padding: 1rem;
+  }
+  .admin-form-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .admin-item-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.85rem 0.85rem !important;
+  }
+  .admin-item-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  .admin-item-actions button {
+    flex: 1;
+    text-align: center;
+  }
+}

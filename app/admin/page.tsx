@@ -335,7 +335,7 @@ export default function AdminPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#2A2520', color: light }}>
       {/* Header */}
-      <div style={{ background: dark, padding: '1rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid rgba(201,168,76,0.15)` }}>
+      <div className="admin-header" style={{ background: dark, borderBottom: `1px solid rgba(201,168,76,0.15)` }}>
         <div>
           <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.3rem', color: light, letterSpacing: '0.05em' }}>LookaGraphy</span>
           <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.25em', color: gold, textTransform: 'uppercase', marginLeft: '1rem' }}>Backoffice</span>
@@ -357,7 +357,7 @@ export default function AdminPage() {
       )}
 
       {/* Tabs */}
-      <div style={{ background: dark, display: 'flex', gap: 0, borderBottom: `1px solid rgba(201,168,76,0.15)` }}>
+      <div className="admin-tabs" style={{ background: dark, gap: 0, borderBottom: `1px solid rgba(201,168,76,0.15)` }}>
         {([['store', 'Store'], ['expositions', 'Expositions'], ['evenements', 'Événements']] as [Tab, string][]).map(([k, label]) => (
           <button
             key={k}
@@ -374,20 +374,20 @@ export default function AdminPage() {
         ))}
       </div>
 
-      <div style={{ padding: '2rem', maxWidth: 1100, margin: '0 auto' }}>
+      <div className="admin-content">
 
         {/* ── STORE ── */}
         {tab === 'store' && (
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+            <div className="admin-section-head">
               {sectionTitle('Articles du Store')}
               <button onClick={() => { setEditStore({ ...emptyStore }); setIsNew(true); }} style={btnGold}>+ Nouvel article</button>
             </div>
 
             {editStore && (
-              <div style={{ background: dark, border: `1px solid rgba(201,168,76,0.2)`, padding: '2rem', marginBottom: '2rem' }}>
+              <div className="admin-form-pad" style={{ background: dark, border: `1px solid rgba(201,168,76,0.2)`, marginBottom: '2rem' }}>
                 <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.3rem', color: light, marginBottom: '1.5rem' }}>{isNew ? 'Nouvel article' : 'Modifier l\'article'}</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1.5rem' }}>
+                <div className="admin-form-grid">
                   <Field label="Titre" value={editStore.titre} onChange={(v: string) => setEditStore({ ...editStore, titre: v })} />
                   <Field label="Sous-titre" value={editStore.sous_titre} onChange={(v: string) => setEditStore({ ...editStore, sous_titre: v })} />
                   <Select label="Catégorie" value={editStore.categorie} onChange={(v: string) => setEditStore({ ...editStore, categorie: v })} options={['Tableau', 'Bague', "Boucles d'oreilles", 'Pendentif']} />
@@ -411,15 +411,15 @@ export default function AdminPage() {
 
             <div style={{ display: 'grid', gap: '1px', background: 'rgba(201,168,76,0.1)' }}>
               {storeItems.map(item => (
-                <div key={item.id} style={{ background: '#2A2520', padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div key={item.id} className="admin-item-row" style={{ background: '#2A2520', padding: '1rem 1.25rem' }}>
                   {item.images?.[0] && (
                     <img src={item.images[0]} alt="" style={{ width: 56, height: 56, objectFit: 'cover', flexShrink: 0 }} />
                   )}
-                  <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="admin-item-info">
                     <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', color: light }}>{item.titre}</div>
                     <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: gold }}>{item.categorie} · {item.prix}€ · {item.disponible ? 'DISPO' : 'Indisponible'}</div>
                   </div>
-                  <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+                  <div className="admin-item-actions">
                     <button onClick={() => { setEditStore({ ...item }); setIsNew(false); }} style={btnOutline}>Modifier</button>
                     <button onClick={() => deleteStore(item.id)} style={btnDanger}>Supprimer</button>
                   </div>
@@ -437,15 +437,15 @@ export default function AdminPage() {
         {/* ── EXPOSITIONS ── */}
         {tab === 'expositions' && (
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+            <div className="admin-section-head">
               {sectionTitle('Expositions')}
               <button onClick={() => { setEditExpo({ ...emptyExpo }); setIsNew(true); }} style={btnGold}>+ Nouvelle exposition</button>
             </div>
 
             {editExpo && (
-              <div style={{ background: dark, border: `1px solid rgba(201,168,76,0.2)`, padding: '2rem', marginBottom: '2rem' }}>
+              <div className="admin-form-pad" style={{ background: dark, border: `1px solid rgba(201,168,76,0.2)`, marginBottom: '2rem' }}>
                 <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.3rem', color: light, marginBottom: '1.5rem' }}>{isNew ? 'Nouvelle exposition' : 'Modifier l\'exposition'}</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1.5rem' }}>
+                <div className="admin-form-grid">
                   <Field label="Titre" value={editExpo.titre} onChange={(v: string) => setEditExpo({ ...editExpo, titre: v })} />
                   <Field label="Lieu" value={editExpo.lieu} onChange={(v: string) => setEditExpo({ ...editExpo, lieu: v })} />
                   <Field label="Dates" value={editExpo.dates} onChange={(v: string) => setEditExpo({ ...editExpo, dates: v })} />
@@ -463,15 +463,15 @@ export default function AdminPage() {
 
             <div style={{ display: 'grid', gap: '1px', background: 'rgba(201,168,76,0.1)' }}>
               {expositions.map(expo => (
-                <div key={expo.id} style={{ background: '#2A2520', padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div key={expo.id} className="admin-item-row" style={{ background: '#2A2520', padding: '1rem 1.25rem' }}>
                   {expo.image && (
                     <img src={expo.image} alt="" style={{ width: 56, height: 56, objectFit: 'cover', flexShrink: 0 }} />
                   )}
-                  <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="admin-item-info">
                     <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', color: light }}>{expo.titre}</div>
                     <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: gold }}>{expo.lieu} · {expo.statut}</div>
                   </div>
-                  <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+                  <div className="admin-item-actions">
                     <button onClick={() => { setEditExpo({ ...expo, images: expo.images || [] }); setIsNew(false); }} style={btnOutline}>Modifier</button>
                     <button onClick={() => deleteExpo(expo.id)} style={btnDanger}>Supprimer</button>
                   </div>
@@ -489,15 +489,15 @@ export default function AdminPage() {
         {/* ── ÉVÉNEMENTS ── */}
         {tab === 'evenements' && (
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+            <div className="admin-section-head">
               {sectionTitle('Événements')}
               <button onClick={() => { setEditEvt({ ...emptyEvt }); setIsNew(true); }} style={btnGold}>+ Nouvel événement</button>
             </div>
 
             {editEvt && (
-              <div style={{ background: dark, border: `1px solid rgba(201,168,76,0.2)`, padding: '2rem', marginBottom: '2rem' }}>
+              <div className="admin-form-pad" style={{ background: dark, border: `1px solid rgba(201,168,76,0.2)`, marginBottom: '2rem' }}>
                 <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.3rem', color: light, marginBottom: '1.5rem' }}>{isNew ? 'Nouvel événement' : 'Modifier l\'événement'}</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1.5rem' }}>
+                <div className="admin-form-grid">
                   <Field label="Titre" value={editEvt.titre} onChange={(v: string) => setEditEvt({ ...editEvt, titre: v })} />
                   <Select label="Type" value={editEvt.type} onChange={(v: string) => setEditEvt({ ...editEvt, type: v })} options={['Vernissage', 'Performance', 'Portes ouvertes', 'Conférence', 'Atelier', 'Autre']} />
                   <Field label="Date" value={editEvt.date} onChange={(v: string) => setEditEvt({ ...editEvt, date: v })} placeholder="12 avril 2026" />
@@ -516,12 +516,12 @@ export default function AdminPage() {
 
             <div style={{ display: 'grid', gap: '1px', background: 'rgba(201,168,76,0.1)' }}>
               {evenements.map(evt => (
-                <div key={evt.id} style={{ background: '#2A2520', padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
+                <div key={evt.id} className="admin-item-row" style={{ background: '#2A2520', padding: '1rem 1.25rem' }}>
+                  <div className="admin-item-info">
                     <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', color: light }}>{evt.titre}</div>
                     <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: gold }}>{evt.type} · {evt.date} · {evt.statut}</div>
                   </div>
-                  <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+                  <div className="admin-item-actions">
                     <button onClick={() => { setEditEvt({ ...evt, images: evt.images || [] }); setIsNew(false); }} style={btnOutline}>Modifier</button>
                     <button onClick={() => deleteEvt(evt.id)} style={btnDanger}>Supprimer</button>
                   </div>
