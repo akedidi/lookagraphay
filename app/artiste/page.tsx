@@ -144,8 +144,8 @@ export default function ArtistePage() {
                 marginBottom: '2rem',
               }}
             >
-              Entre Orient et Occident,<br />
-              <em>une écriture unique.</em>
+              Entre tradition arabe et horizons interculturels :<br />
+              <em>une signature calligraphique personnelle, métissée et engagée.</em>
             </h2>
             <span style={{ display: 'block', width: 40, height: 1, background: '#C9A84C', marginBottom: '2rem' }} />
 
