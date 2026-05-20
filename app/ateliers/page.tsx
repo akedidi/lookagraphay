@@ -381,7 +381,7 @@ export default function AteliersPage() {
       </section>
 
       {/* Infos & Inscription */}
-      <section id="inscription" className="py-28 section-pad" style={{ background: '#FAF7F2' }}>
+      <section id="inscription" className="py-28 section-pad" style={{ background: '#FAF7F2', scrollMarginTop: '80px' }}>
         <div style={{ maxWidth: "56rem", marginLeft: "auto", marginRight: "auto" }}>
           <motion.div
             initial="hidden"
