@@ -85,11 +85,29 @@ export default function AteliersPage() {
               lineHeight: 1.9,
               color: 'rgba(245,240,232,0.85)',
               maxWidth: 560,
-              margin: '0 auto',
+              margin: '0 auto 2.5rem',
             }}
           >
             {cours.description}
           </p>
+
+          <a
+            href="#inscription"
+            style={{
+              display: 'inline-block',
+              fontFamily: 'Montserrat, sans-serif',
+              fontSize: '0.78rem',
+              letterSpacing: '0.28em',
+              textTransform: 'uppercase',
+              color: '#1A1209',
+              background: '#C9A84C',
+              padding: '1rem 2.5rem',
+              textDecoration: 'none',
+              transition: 'background 0.3s',
+            }}
+          >
+            S'inscrire
+          </a>
         </div>
       </section>
 
@@ -363,7 +381,7 @@ export default function AteliersPage() {
       </section>
 
       {/* Infos & Inscription */}
-      <section className="py-28 section-pad" style={{ background: '#FAF7F2' }}>
+      <section id="inscription" className="py-28 section-pad" style={{ background: '#FAF7F2' }}>
         <div style={{ maxWidth: "56rem", marginLeft: "auto", marginRight: "auto" }}>
           <motion.div
             initial="hidden"
