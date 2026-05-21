@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useCart, getPoidsKg } from '@/lib/cart';
 
 type StoreItem = {
   id: number;
@@ -139,6 +140,8 @@ export default function StorePage() {
   const [selectedPrix, setSelectedPrix] = useState(0);
   const [selectedMatiere, setSelectedMatiere] = useState('');
   const [selectedQuantite, setSelectedQuantite] = useState<string | undefined>(undefined);
+  const [addedFeedback, setAddedFeedback] = useState(false);
+  const { addItem } = useCart();
 
   useEffect(() => {
     fetch('/api/store')
@@ -446,20 +449,51 @@ export default function StorePage() {
                 )}
 
                 {selected.disponible && (
-                  <a
-                    href={`https://paypal.me/lookagraphy/${selectedPrix || selected.prix}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-gold"
-                    style={{ display: 'block', textAlign: 'center' }}
-                  >
-                    Commander via PayPal
-                    {isBijou(selected.categorie) && selectedMatiere && (
-                      <span style={{ display: 'block', fontSize: '0.65rem', letterSpacing: '0.15em', marginTop: '0.2rem', opacity: 0.8, fontWeight: 300 }}>
-                        {selectedMatiere}{selectedQuantite ? ` · ${selectedQuantite}` : ''} — {selectedPrix} €
-                      </span>
-                    )}
-                  </a>
+                  <>
+                    <button
+                      onClick={() => {
+                        const prix = selectedPrix || selected.prix;
+                        addItem({
+                          id: selected.id,
+                          titre: selected.titre,
+                          prix,
+                          images: selected.images,
+                          categorie: selected.categorie,
+                          matiere: selectedMatiere || undefined,
+                          quantite_label: selectedQuantite,
+                          poids_kg: getPoidsKg(selected.categorie),
+                        });
+                        setAddedFeedback(true);
+                        setTimeout(() => setAddedFeedback(false), 2200);
+                      }}
+                      style={{
+                        display: 'block', width: '100%', textAlign: 'center',
+                        fontFamily: 'Montserrat, sans-serif', fontSize: '0.78rem',
+                        letterSpacing: '0.25em', textTransform: 'uppercase',
+                        background: addedFeedback ? 'rgba(201,168,76,0.15)' : '#1A1209',
+                        color: addedFeedback ? '#C9A84C' : '#F5F0E8',
+                        border: '2px solid #1A1209',
+                        padding: '0.9rem 1.5rem', cursor: 'pointer', marginBottom: '0.75rem',
+                        fontWeight: 500, transition: 'all 0.3s',
+                      }}
+                    >
+                      {addedFeedback ? '✓ Ajouté au panier' : 'Ajouter au panier'}
+                    </button>
+                    <a
+                      href={`https://paypal.me/lookagraphy/${selectedPrix || selected.prix}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-gold"
+                      style={{ display: 'block', textAlign: 'center' }}
+                    >
+                      Commander directement via PayPal
+                      {isBijou(selected.categorie) && selectedMatiere && (
+                        <span style={{ display: 'block', fontSize: '0.65rem', letterSpacing: '0.15em', marginTop: '0.2rem', opacity: 0.8, fontWeight: 300 }}>
+                          {selectedMatiere}{selectedQuantite ? ` · ${selectedQuantite}` : ''} — {selectedPrix} €
+                        </span>
+                      )}
+                    </a>
+                  </>
                 )}
               </div>
             </motion.div>

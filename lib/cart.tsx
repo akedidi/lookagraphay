@@ -1,0 +1,125 @@
+'use client';
+
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+
+export type CartItem = {
+  id: number;
+  titre: string;
+  prix: number;
+  images?: string[];
+  categorie: string;
+  matiere?: string;
+  quantite_label?: string;
+  poids_kg: number;
+  qty: number;
+};
+
+type CartContextType = {
+  items: CartItem[];
+  addItem: (item: Omit<CartItem, 'qty'>) => void;
+  removeItem: (id: number, matiere?: string) => void;
+  updateQty: (id: number, qty: number, matiere?: string) => void;
+  clearCart: () => void;
+  totalItems: number;
+  totalPrice: number;
+  totalWeight: number;
+  isOpen: boolean;
+  setIsOpen: (v: boolean) => void;
+};
+
+const CartContext = createContext<CartContextType | null>(null);
+
+function itemKey(id: number, matiere?: string) {
+  return `${id}-${matiere ?? ''}`;
+}
+
+export const POIDS_KG: Record<string, number> = {
+  'Tableau': 2.5,
+  'Bague': 0.15,
+  'Pendentif': 0.1,
+  "Boucles d'oreilles": 0.2,
+};
+
+export function getPoidsKg(categorie: string): number {
+  return POIDS_KG[categorie] ?? 0.5;
+}
+
+export function CartProvider({ children }: { children: ReactNode }) {
+  const [items, setItems] = useState<CartItem[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('lookagraphy_cart');
+      if (saved) setItems(JSON.parse(saved));
+    } catch {}
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (hydrated) {
+      localStorage.setItem('lookagraphy_cart', JSON.stringify(items));
+    }
+  }, [items, hydrated]);
+
+  function addItem(newItem: Omit<CartItem, 'qty'>) {
+    const key = itemKey(newItem.id, newItem.matiere);
+    setItems(prev => {
+      const existing = prev.find(i => itemKey(i.id, i.matiere) === key);
+      if (existing) {
+        return prev.map(i => itemKey(i.id, i.matiere) === key ? { ...i, qty: i.qty + 1 } : i);
+      }
+      return [...prev, { ...newItem, qty: 1 }];
+    });
+    setIsOpen(true);
+  }
+
+  function removeItem(id: number, matiere?: string) {
+    const key = itemKey(id, matiere);
+    setItems(prev => prev.filter(i => itemKey(i.id, i.matiere) !== key));
+  }
+
+  function updateQty(id: number, qty: number, matiere?: string) {
+    const key = itemKey(id, matiere);
+    if (qty <= 0) {
+      setItems(prev => prev.filter(i => itemKey(i.id, i.matiere) !== key));
+    } else {
+      setItems(prev => prev.map(i => itemKey(i.id, i.matiere) === key ? { ...i, qty } : i));
+    }
+  }
+
+  function clearCart() { setItems([]); }
+
+  const totalItems = items.reduce((s, i) => s + i.qty, 0);
+  const totalPrice = items.reduce((s, i) => s + i.prix * i.qty, 0);
+  const totalWeight = items.reduce((s, i) => s + i.poids_kg * i.qty, 0);
+
+  return (
+    <CartContext.Provider value={{ items, addItem, removeItem, updateQty, clearCart, totalItems, totalPrice, totalWeight, isOpen, setIsOpen }}>
+      {children}
+    </CartContext.Provider>
+  );
+}
+
+export function useCart() {
+  const ctx = useContext(CartContext);
+  if (!ctx) throw new Error('useCart must be used within CartProvider');
+  return ctx;
+}
+
+export function calcShipping(totalWeight: number, deliveryType: 'relay' | 'home' | 'international', pays: string): number | null {
+  const freeRelayCountries = ['FR', 'BE', 'LU', 'ES', 'PT', 'DE'];
+  if (deliveryType === 'relay') {
+    if (freeRelayCountries.includes(pays)) return 0;
+    return null;
+  }
+  if (deliveryType === 'home' && pays === 'FR') {
+    if (totalWeight <= 1) return 10;
+    if (totalWeight <= 5) return 15;
+    if (totalWeight <= 10) return 25;
+    if (totalWeight <= 30) return 40;
+    return null;
+  }
+  return null;
+}

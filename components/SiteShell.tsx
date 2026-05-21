@@ -3,6 +3,8 @@
 import { usePathname } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import CartDrawer from '@/components/CartDrawer';
+import { CartProvider } from '@/lib/cart';
 
 export default function SiteShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -13,10 +15,11 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <>
+    <CartProvider>
       <Navbar />
       <main>{children}</main>
       <Footer />
-    </>
+      <CartDrawer />
+    </CartProvider>
   );
 }

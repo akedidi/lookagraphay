@@ -9,7 +9,7 @@ const gold = '#C9A84C';
 const dark = '#1A1209';
 const light = '#F5F0E8';
 
-type Tab = 'store' | 'expositions' | 'evenements';
+type Tab = 'store' | 'expositions' | 'evenements' | 'commandes';
 
 const inputStyle = {
   width: '100%',
@@ -205,6 +205,9 @@ export default function AdminPage() {
   const [storeItems, setStoreItems] = useState<any[]>([]);
   const [expositions, setExpositions] = useState<any[]>([]);
   const [evenements, setEvenements] = useState<any[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [updatingOrder, setUpdatingOrder] = useState<string | null>(null);
 
   const [editStore, setEditStore] = useState<any>(null);
   const [editExpo, setEditExpo] = useState<any>(null);
@@ -244,6 +247,33 @@ export default function AdminPage() {
     setInitMsg(data.ok ? '✅ ' + data.message : '❌ ' + data.error);
     setInitDone(data.ok);
     if (data.ok) { fetchAll(); }
+  };
+
+  const fetchOrders = useCallback(async () => {
+    setOrdersLoading(true);
+    try {
+      const data = await fetch('/api/orders').then(r => r.json());
+      if (Array.isArray(data)) setOrders(data);
+    } catch {}
+    setOrdersLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (tab === 'commandes' && loggedIn) fetchOrders();
+  }, [tab, loggedIn, fetchOrders]);
+
+  const updateOrderStatus = async (orderNumber: string, status: string) => {
+    setUpdatingOrder(orderNumber);
+    try {
+      const order = orders.find(o => o.order_number === orderNumber);
+      await fetch(`/api/orders/${orderNumber}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status, notes: order?.notes }),
+      });
+      setOrders(prev => prev.map(o => o.order_number === orderNumber ? { ...o, status } : o));
+    } catch {}
+    setUpdatingOrder(null);
   };
 
   const fetchAll = useCallback(async () => {
@@ -358,7 +388,7 @@ export default function AdminPage() {
 
       {/* Tabs */}
       <div className="admin-tabs" style={{ background: dark, gap: 0, borderBottom: `1px solid rgba(201,168,76,0.15)` }}>
-        {([['store', 'Store'], ['expositions', 'Expositions'], ['evenements', 'Événements']] as [Tab, string][]).map(([k, label]) => (
+        {([['store', 'Store'], ['expositions', 'Expositions'], ['evenements', 'Événements'], ['commandes', 'Commandes']] as [Tab, string][]).map(([k, label]) => (
           <button
             key={k}
             onClick={() => setTab(k)}
@@ -369,8 +399,22 @@ export default function AdminPage() {
               padding: '1rem 1.75rem',
               borderBottom: tab === k ? `2px solid ${gold}` : '2px solid transparent',
               transition: 'all 0.2s',
+              position: 'relative',
             }}
-          >{label}</button>
+          >
+            {label}
+            {k === 'commandes' && orders.filter(o => o.status === 'en_attente').length > 0 && (
+              <span style={{
+                position: 'absolute', top: 8, right: 6,
+                background: gold, color: dark,
+                borderRadius: '50%', width: 16, height: 16,
+                fontFamily: 'Montserrat, sans-serif', fontSize: '0.55rem', fontWeight: 700,
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                {orders.filter(o => o.status === 'en_attente').length}
+              </span>
+            )}
+          </button>
         ))}
       </div>
 
@@ -535,6 +579,111 @@ export default function AdminPage() {
             </div>
           </div>
         )}
+
+        {/* ── COMMANDES ── */}
+        {tab === 'commandes' && (
+          <div>
+            <div className="admin-section-head">
+              {sectionTitle('Commandes')}
+              <button onClick={fetchOrders} style={btnOutline}>↻ Actualiser</button>
+            </div>
+
+            {ordersLoading && (
+              <div style={{ padding: '2rem', textAlign: 'center', fontFamily: 'Montserrat, sans-serif', fontSize: '0.82rem', color: 'rgba(245,240,232,0.4)' }}>
+                Chargement…
+              </div>
+            )}
+
+            {!ordersLoading && (
+              <div style={{ display: 'grid', gap: '1px', background: 'rgba(201,168,76,0.1)' }}>
+                {orders.length === 0 && (
+                  <div style={{ background: '#2A2520', padding: '2rem', textAlign: 'center', fontFamily: 'Montserrat, sans-serif', fontSize: '0.82rem', color: 'rgba(245,240,232,0.4)' }}>
+                    Aucune commande pour le moment.
+                  </div>
+                )}
+                {orders.map(order => {
+                  const statusColors: Record<string, string> = {
+                    en_attente: '#E4C97A', paye: '#6fcf97', expedie: '#56CCF2', livre: '#6fcf97', annule: '#e05555',
+                  };
+                  const statusLabels: Record<string, string> = {
+                    en_attente: 'En attente', paye: 'Payé', expedie: 'Expédié', livre: 'Livré', annule: 'Annulé',
+                  };
+                  const color = statusColors[order.status] ?? gold;
+                  return (
+                    <div key={order.order_number} style={{ background: '#2A2520', padding: '1.25rem' }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'flex-start', marginBottom: '0.85rem' }}>
+                        <div style={{ flex: 1, minWidth: 200 }}>
+                          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', color: light, marginBottom: '0.2rem' }}>
+                            {order.order_number}
+                          </div>
+                          <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: 'rgba(245,240,232,0.55)' }}>
+                            {order.nom} · {order.email}{order.telephone ? ` · ${order.telephone}` : ''}
+                          </div>
+                          <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(245,240,232,0.35)', marginTop: '0.2rem' }}>
+                            {new Date(order.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.25rem', color: gold }}>{Number(order.total).toFixed(2)} €</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', justifyContent: 'flex-end', marginTop: '0.2rem' }}>
+                            <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: color }} />
+                            <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', color, textTransform: 'uppercase', letterSpacing: '0.12em' }}>
+                              {statusLabels[order.status] ?? order.status}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: 'rgba(245,240,232,0.55)', marginBottom: '0.85rem', lineHeight: 1.7 }}>
+                        {(order.items ?? []).map((item: any, i: number) => (
+                          <span key={i}>{item.qty}× {item.titre}{item.matiere ? ` (${item.matiere})` : ''}{i < (order.items?.length ?? 0) - 1 ? ' · ' : ''}</span>
+                        ))}
+                      </div>
+
+                      <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(245,240,232,0.4)', marginBottom: '0.85rem' }}>
+                        {order.delivery_type === 'relay' ? (
+                          <>📍 Point Relais{order.relay_point ? ` — ${order.relay_point.nom}, ${order.relay_point.ville} (${order.pays})` : ''}</>
+                        ) : order.delivery_type === 'home' ? (
+                          <>🏠 Domicile{order.shipping_address ? ` — ${order.shipping_address.rue}, ${order.shipping_address.code_postal} ${order.shipping_address.ville}` : ''} · {Number(order.shipping_cost)} €</>
+                        ) : (
+                          <>🌍 International</>
+                        )}
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        {(['en_attente', 'paye', 'expedie', 'livre', 'annule'] as const).map(s => (
+                          <button
+                            key={s}
+                            disabled={order.status === s || updatingOrder === order.order_number}
+                            onClick={() => updateOrderStatus(order.order_number, s)}
+                            style={{
+                              fontFamily: 'Montserrat, sans-serif', fontSize: '0.62rem', letterSpacing: '0.12em', textTransform: 'uppercase',
+                              padding: '0.35rem 0.75rem', cursor: order.status === s ? 'default' : 'pointer', border: 'none',
+                              background: order.status === s ? (statusColors[s] ?? gold) : 'rgba(245,240,232,0.08)',
+                              color: order.status === s ? dark : 'rgba(245,240,232,0.5)',
+                              fontWeight: order.status === s ? 600 : 300,
+                              transition: 'all 0.2s',
+                              opacity: updatingOrder === order.order_number && order.status !== s ? 0.4 : 1,
+                            }}
+                          >
+                            {statusLabels[s]}
+                          </button>
+                        ))}
+                      </div>
+
+                      {order.notes && (
+                        <div style={{ marginTop: '0.75rem', fontFamily: 'Montserrat, sans-serif', fontSize: '0.7rem', fontWeight: 300, color: 'rgba(245,240,232,0.45)', fontStyle: 'italic' }}>
+                          Note : {order.notes}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
       </div>
     </div>
   );

@@ -105,6 +105,27 @@ export async function POST() {
       }
     }
 
+    await conn.execute(`
+      CREATE TABLE IF NOT EXISTS orders (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        order_number VARCHAR(30) UNIQUE NOT NULL,
+        nom VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        telephone VARCHAR(50),
+        items JSON NOT NULL,
+        delivery_type ENUM('relay','home','international') NOT NULL,
+        relay_point JSON,
+        shipping_address JSON,
+        pays VARCHAR(5) DEFAULT 'FR',
+        shipping_cost DECIMAL(10,2) DEFAULT 0,
+        total DECIMAL(10,2) NOT NULL,
+        status ENUM('en_attente','paye','expedie','livre','annule') DEFAULT 'en_attente',
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+
     conn.release();
     return NextResponse.json({ ok: true, message: 'DB initialisée et données migrées' });
   } catch (e: any) {

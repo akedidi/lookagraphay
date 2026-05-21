@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useCart } from '@/lib/cart';
 
 const links = [
   { href: '/', label: 'Accueil' },
@@ -17,6 +18,7 @@ const links = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { totalItems, setIsOpen: openCart } = useCart();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -92,7 +94,30 @@ export default function Navbar() {
             ))}
           </ul>
 
-          {/* Mobile burger */}
+          {/* Cart icon + Mobile burger */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', zIndex: 1 }}>
+          <button
+            onClick={() => openCart(true)}
+            aria-label="Panier"
+            style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', padding: '0.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 01-8 0"/>
+            </svg>
+            {totalItems > 0 && (
+              <span style={{
+                position: 'absolute', top: 0, right: 0,
+                background: '#C9A84C', color: '#1A1209',
+                borderRadius: '50%', width: 17, height: 17,
+                fontFamily: 'Montserrat, sans-serif', fontSize: '0.6rem', fontWeight: 700,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                {totalItems > 9 ? '9+' : totalItems}
+              </span>
+            )}
+          </button>
           <button
             className="lg:hidden flex flex-col gap-1.5 p-2"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -120,6 +145,7 @@ export default function Navbar() {
               }}
             />
           </button>
+          </div>
         </div>
       </nav>
 
