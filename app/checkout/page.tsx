@@ -125,7 +125,8 @@ export default function CheckoutPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erreur lors de la commande');
       clearCart();
-      router.push(`/commande-confirmee?order=${data.order_number}&paypal=${orderTotal.toFixed(2)}`);
+      const encoded = encodeURIComponent(data.payment_link ?? '');
+      router.push(`/commande-confirmee?order=${data.order_number}&total=${orderTotal.toFixed(2)}&payment_link=${encoded}`);
     } catch (err: any) {
       setErrors({ submit: err.message });
       setLoading(false);

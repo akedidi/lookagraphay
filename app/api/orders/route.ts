@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
+import { sendOrderConfirmationEmail, sendAdminNewOrderEmail } from '@/lib/emails';
+import { generatePaymentLink } from '@/lib/payment';
 
 async function generateOrderNumber(conn: any): Promise<string> {
   const now = new Date();
@@ -37,7 +39,30 @@ export async function POST(req: NextRequest) {
     );
 
     conn.release();
-    return NextResponse.json({ ok: true, order_number });
+
+    // ── Notifications email (asynchrone — ne bloque pas la réponse) ──
+    const paymentLink = generatePaymentLink({ amount: total, orderNumber: order_number }).url;
+    const emailData = {
+      orderNumber: order_number,
+      customerName: nom,
+      customerEmail: email,
+      items,
+      deliveryType: delivery_type as 'relay' | 'home' | 'international',
+      relayPoint: relay_point ?? null,
+      shippingAddress: shipping_address ?? null,
+      pays: pays ?? 'FR',
+      shippingCost: Number(shipping_cost ?? 0),
+      total: Number(total),
+      paymentLink,
+      notes: notes ?? null,
+    };
+
+    Promise.all([
+      sendOrderConfirmationEmail(emailData),
+      sendAdminNewOrderEmail(emailData),
+    ]).catch(err => console.error('[EMAIL ERROR]', err));
+
+    return NextResponse.json({ ok: true, order_number, payment_link: paymentLink });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

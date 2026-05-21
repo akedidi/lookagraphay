@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
+import { sendOrderStatusUpdateEmail } from '@/lib/emails';
 
 export async function GET(req: NextRequest, { params }: { params: { orderNumber: string } }) {
   try {
@@ -50,6 +51,13 @@ export async function PUT(req: NextRequest, { params }: { params: { orderNumber:
     } = body;
 
     const conn = await pool.getConnection();
+
+    // Récupérer l'ancien statut pour détecter un changement
+    const [prev] = await conn.execute(
+      'SELECT status, email, nom FROM orders WHERE order_number = ?',
+      [params.orderNumber]
+    ) as any;
+
     await conn.execute(
       `UPDATE orders SET
         status = COALESCE(?, status),
@@ -75,7 +83,22 @@ export async function PUT(req: NextRequest, { params }: { params: { orderNumber:
         params.orderNumber,
       ]
     );
+
     conn.release();
+
+    // ── Email de mise à jour de statut (si le statut a changé) ──
+    if (status && prev.length > 0 && prev[0].status !== status) {
+      const customerEmail = email ?? prev[0].email;
+      const customerName = nom ?? prev[0].nom;
+      sendOrderStatusUpdateEmail({
+        orderNumber: params.orderNumber,
+        customerEmail,
+        customerName,
+        newStatus: status,
+        notes: notes ?? null,
+      }).catch(err => console.error('[EMAIL ERROR]', err));
+    }
+
     return NextResponse.json({ ok: true });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
