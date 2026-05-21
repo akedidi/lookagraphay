@@ -208,6 +208,10 @@ export default function AdminPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [updatingOrder, setUpdatingOrder] = useState<string | null>(null);
+  const [editingOrder, setEditingOrder] = useState<string | null>(null);
+  const [editOrderDraft, setEditOrderDraft] = useState<any>(null);
+  const [savingOrder, setSavingOrder] = useState(false);
+  const [orderSaveMsg, setOrderSaveMsg] = useState<{ num: string; ok: boolean } | null>(null);
 
   const [editStore, setEditStore] = useState<any>(null);
   const [editExpo, setEditExpo] = useState<any>(null);
@@ -275,6 +279,61 @@ export default function AdminPage() {
     } catch {}
     setUpdatingOrder(null);
   };
+
+  function openEditOrder(order: any) {
+    setEditingOrder(order.order_number);
+    setEditOrderDraft({
+      status: order.status,
+      nom: order.nom ?? '',
+      email: order.email ?? '',
+      telephone: order.telephone ?? '',
+      notes: order.notes ?? '',
+      pays: order.pays ?? 'FR',
+      shipping_cost: order.shipping_cost ?? 0,
+      relay_point: order.relay_point ? { ...order.relay_point } : { id: '', nom: '', adresse: '', ville: '', code_postal: '' },
+      shipping_address: order.shipping_address ? { ...order.shipping_address } : { rue: '', complement: '', code_postal: '', ville: '' },
+      delivery_type: order.delivery_type,
+    });
+    setOrderSaveMsg(null);
+  }
+
+  async function saveOrderEdit(orderNumber: string) {
+    setSavingOrder(true);
+    setOrderSaveMsg(null);
+    try {
+      const d = editOrderDraft;
+      const body: any = {
+        status: d.status,
+        nom: d.nom,
+        email: d.email,
+        telephone: d.telephone || null,
+        notes: d.notes || null,
+        pays: d.pays,
+        shipping_cost: Number(d.shipping_cost),
+      };
+      if (d.delivery_type === 'relay') body.relay_point = d.relay_point;
+      if (d.delivery_type === 'home') body.shipping_address = d.shipping_address;
+
+      const res = await fetch(`/api/orders/${orderNumber}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        setOrders(prev => prev.map(o => o.order_number === orderNumber ? {
+          ...o, ...body,
+          relay_point: d.delivery_type === 'relay' ? d.relay_point : o.relay_point,
+          shipping_address: d.delivery_type === 'home' ? d.shipping_address : o.shipping_address,
+        } : o));
+        setOrderSaveMsg({ num: orderNumber, ok: true });
+      } else {
+        setOrderSaveMsg({ num: orderNumber, ok: false });
+      }
+    } catch {
+      setOrderSaveMsg({ num: orderNumber, ok: false });
+    }
+    setSavingOrder(false);
+  }
 
   const fetchAll = useCallback(async () => {
     const [s, e, ev] = await Promise.all([
@@ -609,9 +668,14 @@ export default function AdminPage() {
                     en_attente: 'En attente', paye: 'Payé', expedie: 'Expédié', livre: 'Livré', annule: 'Annulé',
                   };
                   const color = statusColors[order.status] ?? gold;
+                  const isEditing = editingOrder === order.order_number;
+                  const d = isEditing ? editOrderDraft : null;
+
                   return (
-                    <div key={order.order_number} style={{ background: '#2A2520', padding: '1.25rem' }}>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'flex-start', marginBottom: '0.85rem' }}>
+                    <div key={order.order_number} style={{ background: '#2A2520' }}>
+
+                      {/* ── Ligne résumé ── */}
+                      <div style={{ padding: '1.25rem', display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'flex-start' }}>
                         <div style={{ flex: 1, minWidth: 200 }}>
                           <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', color: light, marginBottom: '0.2rem' }}>
                             {order.order_number}
@@ -619,61 +683,200 @@ export default function AdminPage() {
                           <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: 'rgba(245,240,232,0.55)' }}>
                             {order.nom} · {order.email}{order.telephone ? ` · ${order.telephone}` : ''}
                           </div>
-                          <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(245,240,232,0.35)', marginTop: '0.2rem' }}>
+                          <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(245,240,232,0.35)', marginTop: '0.15rem' }}>
                             {new Date(order.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                           </div>
+                          <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(245,240,232,0.38)', marginTop: '0.25rem', lineHeight: 1.6 }}>
+                            {(order.items ?? []).map((item: any, i: number) => (
+                              <span key={i}>{item.qty}× {item.titre}{item.matiere ? ` (${item.matiere})` : ''}{i < (order.items?.length ?? 0) - 1 ? ' · ' : ''}</span>
+                            ))}
+                          </div>
+                          <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.67rem', color: 'rgba(245,240,232,0.32)', marginTop: '0.2rem' }}>
+                            {order.delivery_type === 'relay'
+                              ? `📍 ${order.relay_point?.nom ?? 'Point Relais'}${order.relay_point?.ville ? `, ${order.relay_point.ville}` : ''} (${order.pays})`
+                              : order.delivery_type === 'home'
+                              ? `🏠 ${order.shipping_address?.rue ?? ''}, ${order.shipping_address?.code_postal ?? ''} ${order.shipping_address?.ville ?? ''} · ${Number(order.shipping_cost)} €`
+                              : '🌍 International'}
+                          </div>
+                          {order.notes && (
+                            <div style={{ marginTop: '0.3rem', fontFamily: 'Montserrat, sans-serif', fontSize: '0.67rem', fontWeight: 300, color: 'rgba(245,240,232,0.38)', fontStyle: 'italic' }}>
+                              💬 {order.notes}
+                            </div>
+                          )}
                         </div>
-                        <div style={{ textAlign: 'right' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
                           <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.25rem', color: gold }}>{Number(order.total).toFixed(2)} €</div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', justifyContent: 'flex-end', marginTop: '0.2rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                             <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: color }} />
                             <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', color, textTransform: 'uppercase', letterSpacing: '0.12em' }}>
                               {statusLabels[order.status] ?? order.status}
                             </span>
                           </div>
+                          <button
+                            onClick={() => isEditing ? setEditingOrder(null) : openEditOrder(order)}
+                            style={{ ...btnOutline, fontSize: '0.65rem', padding: '0.35rem 0.9rem', marginTop: '0.25rem' }}
+                          >
+                            {isEditing ? '✕ Fermer' : '✎ Modifier'}
+                          </button>
                         </div>
                       </div>
 
-                      <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: 'rgba(245,240,232,0.55)', marginBottom: '0.85rem', lineHeight: 1.7 }}>
-                        {(order.items ?? []).map((item: any, i: number) => (
-                          <span key={i}>{item.qty}× {item.titre}{item.matiere ? ` (${item.matiere})` : ''}{i < (order.items?.length ?? 0) - 1 ? ' · ' : ''}</span>
-                        ))}
-                      </div>
+                      {/* ── Panneau d'édition expandable ── */}
+                      {isEditing && d && (
+                        <div style={{ borderTop: '1px solid rgba(201,168,76,0.15)', padding: '1.5rem 1.25rem', background: 'rgba(26,18,9,0.5)' }}>
 
-                      <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(245,240,232,0.4)', marginBottom: '0.85rem' }}>
-                        {order.delivery_type === 'relay' ? (
-                          <>📍 Point Relais{order.relay_point ? ` — ${order.relay_point.nom}, ${order.relay_point.ville} (${order.pays})` : ''}</>
-                        ) : order.delivery_type === 'home' ? (
-                          <>🏠 Domicile{order.shipping_address ? ` — ${order.shipping_address.rue}, ${order.shipping_address.code_postal} ${order.shipping_address.ville}` : ''} · {Number(order.shipping_cost)} €</>
-                        ) : (
-                          <>🌍 International</>
-                        )}
-                      </div>
+                          {/* Statut */}
+                          <div style={{ marginBottom: '1.5rem' }}>
+                            <label style={labelStyle}>Statut de la commande</label>
+                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.4rem' }}>
+                              {(['en_attente', 'paye', 'expedie', 'livre', 'annule'] as const).map(s => (
+                                <button
+                                  key={s}
+                                  onClick={() => setEditOrderDraft({ ...d, status: s })}
+                                  style={{
+                                    fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.12em', textTransform: 'uppercase',
+                                    padding: '0.45rem 0.85rem', border: 'none', cursor: 'pointer',
+                                    background: d.status === s ? (statusColors[s] ?? gold) : 'rgba(245,240,232,0.08)',
+                                    color: d.status === s ? dark : 'rgba(245,240,232,0.5)',
+                                    fontWeight: d.status === s ? 600 : 300,
+                                    transition: 'all 0.2s',
+                                  }}
+                                >
+                                  {statusLabels[s]}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
 
-                      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                        {(['en_attente', 'paye', 'expedie', 'livre', 'annule'] as const).map(s => (
-                          <button
-                            key={s}
-                            disabled={order.status === s || updatingOrder === order.order_number}
-                            onClick={() => updateOrderStatus(order.order_number, s)}
-                            style={{
-                              fontFamily: 'Montserrat, sans-serif', fontSize: '0.62rem', letterSpacing: '0.12em', textTransform: 'uppercase',
-                              padding: '0.35rem 0.75rem', cursor: order.status === s ? 'default' : 'pointer', border: 'none',
-                              background: order.status === s ? (statusColors[s] ?? gold) : 'rgba(245,240,232,0.08)',
-                              color: order.status === s ? dark : 'rgba(245,240,232,0.5)',
-                              fontWeight: order.status === s ? 600 : 300,
-                              transition: 'all 0.2s',
-                              opacity: updatingOrder === order.order_number && order.status !== s ? 0.4 : 1,
-                            }}
-                          >
-                            {statusLabels[s]}
-                          </button>
-                        ))}
-                      </div>
+                          {/* Coordonnées client */}
+                          <div style={{ marginBottom: '1.5rem' }}>
+                            <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: gold, marginBottom: '0.75rem', borderBottom: '1px solid rgba(201,168,76,0.1)', paddingBottom: '0.4rem' }}>
+                              Coordonnées client
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem 1rem' }}>
+                              <div style={{ gridColumn: '1/-1' }}>
+                                <label style={labelStyle}>Nom complet</label>
+                                <input style={inputStyle} value={d.nom} onChange={e => setEditOrderDraft({ ...d, nom: e.target.value })} />
+                              </div>
+                              <div>
+                                <label style={labelStyle}>Email</label>
+                                <input type="email" style={inputStyle} value={d.email} onChange={e => setEditOrderDraft({ ...d, email: e.target.value })} />
+                              </div>
+                              <div>
+                                <label style={labelStyle}>Téléphone</label>
+                                <input type="tel" style={inputStyle} value={d.telephone} onChange={e => setEditOrderDraft({ ...d, telephone: e.target.value })} placeholder="+33 6 00 00 00 00" />
+                              </div>
+                            </div>
+                          </div>
 
-                      {order.notes && (
-                        <div style={{ marginTop: '0.75rem', fontFamily: 'Montserrat, sans-serif', fontSize: '0.7rem', fontWeight: 300, color: 'rgba(245,240,232,0.45)', fontStyle: 'italic' }}>
-                          Note : {order.notes}
+                          {/* Livraison — Mondial Relay */}
+                          {d.delivery_type === 'relay' && (
+                            <div style={{ marginBottom: '1.5rem' }}>
+                              <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: gold, marginBottom: '0.75rem', borderBottom: '1px solid rgba(201,168,76,0.1)', paddingBottom: '0.4rem' }}>
+                                📍 Point Relais Mondial Relay
+                              </div>
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem 1rem' }}>
+                                <div>
+                                  <label style={labelStyle}>Pays</label>
+                                  <select style={{ ...inputStyle }} value={d.pays} onChange={e => setEditOrderDraft({ ...d, pays: e.target.value })}>
+                                    {[['FR','France'],['BE','Belgique'],['LU','Luxembourg'],['ES','Espagne'],['PT','Portugal'],['DE','Allemagne']].map(([code, label]) => (
+                                      <option key={code} value={code}>{label}</option>
+                                    ))}
+                                  </select>
+                                </div>
+                                <div>
+                                  <label style={labelStyle}>ID Point Relais</label>
+                                  <input style={inputStyle} value={d.relay_point.id} onChange={e => setEditOrderDraft({ ...d, relay_point: { ...d.relay_point, id: e.target.value } })} placeholder="123456" />
+                                </div>
+                                <div style={{ gridColumn: '1/-1' }}>
+                                  <label style={labelStyle}>Nom du point relais</label>
+                                  <input style={inputStyle} value={d.relay_point.nom} onChange={e => setEditOrderDraft({ ...d, relay_point: { ...d.relay_point, nom: e.target.value } })} />
+                                </div>
+                                <div style={{ gridColumn: '1/-1' }}>
+                                  <label style={labelStyle}>Adresse</label>
+                                  <input style={inputStyle} value={d.relay_point.adresse} onChange={e => setEditOrderDraft({ ...d, relay_point: { ...d.relay_point, adresse: e.target.value } })} />
+                                </div>
+                                <div>
+                                  <label style={labelStyle}>Code postal</label>
+                                  <input style={inputStyle} value={d.relay_point.code_postal} onChange={e => setEditOrderDraft({ ...d, relay_point: { ...d.relay_point, code_postal: e.target.value } })} />
+                                </div>
+                                <div>
+                                  <label style={labelStyle}>Ville</label>
+                                  <input style={inputStyle} value={d.relay_point.ville} onChange={e => setEditOrderDraft({ ...d, relay_point: { ...d.relay_point, ville: e.target.value } })} />
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Livraison — Domicile */}
+                          {d.delivery_type === 'home' && (
+                            <div style={{ marginBottom: '1.5rem' }}>
+                              <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: gold, marginBottom: '0.75rem', borderBottom: '1px solid rgba(201,168,76,0.1)', paddingBottom: '0.4rem' }}>
+                                🏠 Adresse de livraison (domicile)
+                              </div>
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem 1rem' }}>
+                                <div style={{ gridColumn: '1/-1' }}>
+                                  <label style={labelStyle}>Adresse (rue)</label>
+                                  <input style={inputStyle} value={d.shipping_address.rue} onChange={e => setEditOrderDraft({ ...d, shipping_address: { ...d.shipping_address, rue: e.target.value } })} />
+                                </div>
+                                <div style={{ gridColumn: '1/-1' }}>
+                                  <label style={labelStyle}>Complément</label>
+                                  <input style={inputStyle} value={d.shipping_address.complement ?? ''} onChange={e => setEditOrderDraft({ ...d, shipping_address: { ...d.shipping_address, complement: e.target.value } })} placeholder="Bât. A, Apt. 3..." />
+                                </div>
+                                <div>
+                                  <label style={labelStyle}>Code postal</label>
+                                  <input style={inputStyle} value={d.shipping_address.code_postal} onChange={e => setEditOrderDraft({ ...d, shipping_address: { ...d.shipping_address, code_postal: e.target.value } })} />
+                                </div>
+                                <div>
+                                  <label style={labelStyle}>Ville</label>
+                                  <input style={inputStyle} value={d.shipping_address.ville} onChange={e => setEditOrderDraft({ ...d, shipping_address: { ...d.shipping_address, ville: e.target.value } })} />
+                                </div>
+                                <div>
+                                  <label style={labelStyle}>Frais de livraison (€)</label>
+                                  <input type="number" style={inputStyle} value={d.shipping_cost} onChange={e => setEditOrderDraft({ ...d, shipping_cost: e.target.value })} min="0" step="0.01" />
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* International */}
+                          {d.delivery_type === 'international' && (
+                            <div style={{ marginBottom: '1.5rem', padding: '0.85rem', background: 'rgba(245,240,232,0.04)', border: '1px solid rgba(201,168,76,0.1)' }}>
+                              <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: 'rgba(245,240,232,0.45)' }}>
+                                🌍 Livraison internationale — coordonnées à gérer directement avec le client.
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Commentaire admin */}
+                          <div style={{ marginBottom: '1.5rem' }}>
+                            <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: gold, marginBottom: '0.75rem', borderBottom: '1px solid rgba(201,168,76,0.1)', paddingBottom: '0.4rem' }}>
+                              💬 Commentaire / Note interne
+                            </div>
+                            <textarea
+                              style={{ ...inputStyle, resize: 'vertical', minHeight: 80, lineHeight: 1.6 }}
+                              value={d.notes}
+                              onChange={e => setEditOrderDraft({ ...d, notes: e.target.value })}
+                              placeholder="Note visible dans le suivi client et en interne (ex : numéro de suivi Mondial Relay, remarque, etc.)"
+                            />
+                          </div>
+
+                          {/* Boutons */}
+                          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <button
+                              onClick={() => saveOrderEdit(order.order_number)}
+                              disabled={savingOrder}
+                              style={{ ...btnGold, opacity: savingOrder ? 0.6 : 1 }}
+                            >
+                              {savingOrder ? 'Sauvegarde…' : 'Sauvegarder les modifications'}
+                            </button>
+                            <button onClick={() => setEditingOrder(null)} style={btnOutline}>Annuler</button>
+                            {orderSaveMsg?.num === order.order_number && (
+                              <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: orderSaveMsg.ok ? '#6fcf97' : '#e05555' }}>
+                                {orderSaveMsg.ok ? '✓ Sauvegardé' : '✕ Erreur lors de la sauvegarde'}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       )}
                     </div>
