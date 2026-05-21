@@ -872,8 +872,8 @@ export default function AdminPage() {
                             </button>
                             <button onClick={() => setEditingOrder(null)} style={btnOutline}>Annuler</button>
                             {orderSaveMsg?.num === order.order_number && (
-                              <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: orderSaveMsg.ok ? '#6fcf97' : '#e05555' }}>
-                                {orderSaveMsg.ok ? '✓ Sauvegardé' : '✕ Erreur lors de la sauvegarde'}
+                              <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: orderSaveMsg?.ok ? '#6fcf97' : '#e05555' }}>
+                                {orderSaveMsg?.ok ? '✓ Sauvegardé' : '✕ Erreur lors de la sauvegarde'}
                               </span>
                             )}
                           </div>
