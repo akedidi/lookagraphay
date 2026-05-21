@@ -53,7 +53,7 @@ export default function CheckoutPage() {
   const [relayCountry, setRelayCountry] = useState('FR');
   const [relayPoint, setRelayPoint] = useState({ id: '', nom: '', adresse: '', ville: '', code_postal: '' });
   const [address, setAddress] = useState({ rue: '', complement: '', code_postal: '', ville: '' });
-  const [customer, setCustomer] = useState({ nom: '', email: '', telephone: '' });
+  const [customer, setCustomer] = useState({ prenom: '', nom: '', email: '', telephone: '', pays_residence: 'France' });
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -97,8 +97,10 @@ export default function CheckoutPage() {
       if (!address.code_postal.trim()) e.code_postal = 'Code postal requis.';
       if (!address.ville.trim()) e.ville = 'Ville requise.';
     }
+    if (!customer.prenom.trim()) e.prenom = 'Prénom requis.';
     if (!customer.nom.trim()) e.nom = 'Nom requis.';
     if (!customer.email.trim() || !customer.email.includes('@')) e.email = 'Email valide requis.';
+    if (!customer.telephone.trim()) e.telephone = 'Téléphone requis.';
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -108,10 +110,12 @@ export default function CheckoutPage() {
     if (!validate()) return;
     setLoading(true);
     try {
+      const fullName = `${customer.prenom.trim()} ${customer.nom.trim()}`;
       const body = {
-        nom: customer.nom,
+        nom: fullName,
         email: customer.email,
         telephone: customer.telephone || null,
+        pays_residence: customer.pays_residence || null,
         items: items.map(i => ({ id: i.id, titre: i.titre, prix: i.prix, qty: i.qty, categorie: i.categorie, matiere: i.matiere, quantite_label: i.quantite_label })),
         delivery_type: deliveryType,
         relay_point: deliveryType === 'relay' ? relayPoint : null,
@@ -323,26 +327,99 @@ export default function CheckoutPage() {
               {/* Section 3 — Customer info */}
               <div style={{ background: '#FAF7F2', padding: '2rem', marginBottom: '1.5rem', border: '1px solid rgba(61,43,31,0.08)' }}>
                 {sectionTitle('Vos coordonnées')}
+
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1rem' }}>
-                  <div style={{ gridColumn: '1/-1', marginBottom: '1rem' }}>
-                    <label style={labelStyle}>Nom complet *</label>
-                    <input style={{ ...inputStyle, borderColor: errors.nom ? '#e05555' : 'rgba(61,43,31,0.2)' }} value={customer.nom} onChange={e => setCustomer({ ...customer, nom: e.target.value })} placeholder="Votre nom et prénom" />
+
+                  {/* Prénom */}
+                  <div style={{ marginBottom: '1rem' }}>
+                    <label style={labelStyle}>Prénom *</label>
+                    <input
+                      autoComplete="given-name"
+                      style={{ ...inputStyle, borderColor: errors.prenom ? '#e05555' : 'rgba(61,43,31,0.2)' }}
+                      value={customer.prenom}
+                      onChange={e => setCustomer({ ...customer, prenom: e.target.value })}
+                      placeholder="Marie"
+                    />
+                    {errors.prenom && <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', color: '#e05555', marginTop: '0.25rem' }}>{errors.prenom}</p>}
+                  </div>
+
+                  {/* Nom */}
+                  <div style={{ marginBottom: '1rem' }}>
+                    <label style={labelStyle}>Nom *</label>
+                    <input
+                      autoComplete="family-name"
+                      style={{ ...inputStyle, borderColor: errors.nom ? '#e05555' : 'rgba(61,43,31,0.2)' }}
+                      value={customer.nom}
+                      onChange={e => setCustomer({ ...customer, nom: e.target.value })}
+                      placeholder="Dupont"
+                    />
                     {errors.nom && <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', color: '#e05555', marginTop: '0.25rem' }}>{errors.nom}</p>}
                   </div>
+
+                  {/* Email */}
                   <div style={{ marginBottom: '1rem' }}>
                     <label style={labelStyle}>Email *</label>
-                    <input type="email" style={{ ...inputStyle, borderColor: errors.email ? '#e05555' : 'rgba(61,43,31,0.2)' }} value={customer.email} onChange={e => setCustomer({ ...customer, email: e.target.value })} placeholder="votre@email.com" />
+                    <input
+                      type="email"
+                      autoComplete="email"
+                      style={{ ...inputStyle, borderColor: errors.email ? '#e05555' : 'rgba(61,43,31,0.2)' }}
+                      value={customer.email}
+                      onChange={e => setCustomer({ ...customer, email: e.target.value })}
+                      placeholder="votre@email.com"
+                    />
                     {errors.email && <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', color: '#e05555', marginTop: '0.25rem' }}>{errors.email}</p>}
                   </div>
+
+                  {/* Téléphone — obligatoire (requis par Mondial Relay) */}
                   <div style={{ marginBottom: '1rem' }}>
-                    <label style={labelStyle}>Téléphone</label>
-                    <input type="tel" style={inputStyle} value={customer.telephone} onChange={e => setCustomer({ ...customer, telephone: e.target.value })} placeholder="+33 6 00 00 00 00" />
+                    <label style={labelStyle}>Téléphone *</label>
+                    <input
+                      type="tel"
+                      autoComplete="tel"
+                      style={{ ...inputStyle, borderColor: errors.telephone ? '#e05555' : 'rgba(61,43,31,0.2)' }}
+                      value={customer.telephone}
+                      onChange={e => setCustomer({ ...customer, telephone: e.target.value })}
+                      placeholder="+33 6 00 00 00 00"
+                    />
+                    {errors.telephone
+                      ? <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', color: '#e05555', marginTop: '0.25rem' }}>{errors.telephone}</p>
+                      : <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.62rem', color: 'rgba(61,43,31,0.4)', marginTop: '0.25rem' }}>Requis pour la livraison</p>
+                    }
                   </div>
+
+                  {/* Pays de résidence — affiché pour international */}
+                  {deliveryType === 'international' && (
+                    <div style={{ gridColumn: '1/-1', marginBottom: '1rem' }}>
+                      <label style={labelStyle}>Pays de résidence *</label>
+                      <input
+                        autoComplete="country-name"
+                        style={{ ...inputStyle, borderColor: errors.pays_residence ? '#e05555' : 'rgba(61,43,31,0.2)' }}
+                        value={customer.pays_residence}
+                        onChange={e => setCustomer({ ...customer, pays_residence: e.target.value })}
+                        placeholder="Ex : Maroc, Canada, États-Unis…"
+                      />
+                      <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.62rem', color: 'rgba(61,43,31,0.4)', marginTop: '0.25rem' }}>
+                        Nous vous contacterons pour établir le devis de livraison.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Message / instructions */}
                   <div style={{ gridColumn: '1/-1' }}>
-                    <label style={labelStyle}>Notes / message</label>
-                    <textarea style={{ ...inputStyle, resize: 'vertical', minHeight: 80, lineHeight: 1.6 }} value={notes} onChange={e => setNotes(e.target.value)} placeholder="Instructions particulières, message pour le vendeur…" />
+                    <label style={labelStyle}>Message / instructions (facultatif)</label>
+                    <textarea
+                      style={{ ...inputStyle, resize: 'vertical', minHeight: 90, lineHeight: 1.7 }}
+                      value={notes}
+                      onChange={e => setNotes(e.target.value)}
+                      placeholder="Dédicace souhaitée, instructions particulières pour l'emballage, message pour l'artiste…"
+                    />
                   </div>
+
                 </div>
+
+                <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.62rem', color: 'rgba(61,43,31,0.38)', marginTop: '1.25rem', lineHeight: 1.7 }}>
+                  Ces informations sont utilisées uniquement pour le traitement de votre commande et ne sont pas partagées avec des tiers.
+                </p>
               </div>
             </div>
 
