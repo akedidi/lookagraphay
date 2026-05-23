@@ -9,6 +9,7 @@ const pageHeaders = [
 ];
 
 const nextConfig = {
+  output: 'standalone',
   reactStrictMode: false,
   images: {
     unoptimized: true,

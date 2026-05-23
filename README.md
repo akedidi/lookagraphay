@@ -82,7 +82,7 @@ npm run build
 npm run check-secrets
 ```
 
-Démarrage prod : `npm start` (`node server.js`, port `PORT` ou 3000). Le dossier `.next` doit exister après le build.
+Démarrage prod : `npm start` (serveur standalone Next.js, port `PORT` ou 3000). Le dossier `.next/standalone` doit exister après le build.
 
 Dans hPanel → **Websites → Node.js** (ou Git deploy), vérifier :
 
@@ -92,7 +92,7 @@ Dans hPanel → **Websites → Node.js** (ou Git deploy), vérifier :
 | Start command | `npm start` |
 | Node version | 18 ou 20 |
 
-Ne pas utiliser `next start` ni un chemin `.next/standalone/server.js` — le projet tourne avec `node server.js`.
+**Ne pas** utiliser `next start` — le build produit un serveur standalone (`node .next/standalone/server.js` via `npm start`).
 
 ### 2. Variables hPanel
 
