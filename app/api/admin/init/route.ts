@@ -121,6 +121,8 @@ export async function POST() {
         total DECIMAL(10,2) NOT NULL,
         status ENUM('en_attente','paye','expedie','livre','annule') DEFAULT 'en_attente',
         notes TEXT,
+        stripe_session_id VARCHAR(255) NULL,
+        stripe_payment_intent_id VARCHAR(255) NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci

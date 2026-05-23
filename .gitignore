@@ -87,6 +87,9 @@ web_modules/
 .next
 out
 
+# Vérification design (screenshots locaux)
+.design-check
+
 # Nuxt.js build / generate output
 .nuxt
 dist

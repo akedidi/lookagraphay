@@ -47,11 +47,9 @@ export function generatePaymentLink(options: PaymentLinkOptions): PaymentLinkRes
       };
 
     case 'stripe':
-      // TODO: Créer un PaymentIntent via l'API Stripe
-      // Nécessite : STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY
-      // Exemple : https://stripe.com/docs/api/payment_links
+      // Checkout Session créée dans app/api/orders (lib/stripe-checkout.ts)
       return {
-        url: `#stripe-not-configured`,
+        url: `#stripe-use-checkout-flow`,
         provider: 'stripe',
         label: `Payer ${amount.toFixed(2)} € par carte`,
       };

@@ -61,6 +61,13 @@ export default function CheckoutPage() {
 
   useEffect(() => { setMounted(true); }, []);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (new URLSearchParams(window.location.search).get('cancelled') === '1') {
+      setErrors({ submit: 'Paiement annulé. Votre panier est intact — vous pouvez réessayer.' });
+    }
+  }, []);
+
   if (!mounted) return null;
 
   if (items.length === 0) {
@@ -128,6 +135,10 @@ export default function CheckoutPage() {
       const res = await fetch('/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erreur lors de la commande');
+      if (data.payment_provider === 'stripe' && data.payment_link) {
+        window.location.href = data.payment_link;
+        return;
+      }
       clearCart();
       const encoded = encodeURIComponent(data.payment_link ?? '');
       router.push(`/commande-confirmee?order=${data.order_number}&total=${orderTotal.toFixed(2)}&payment_link=${encoded}`);
