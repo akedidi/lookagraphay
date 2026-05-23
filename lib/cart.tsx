@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
 
 export type CartItem = {
   id: number;
@@ -18,6 +18,7 @@ export type CartItem = {
 
 type CartContextType = {
   items: CartItem[];
+  hydrated: boolean;
   addItem: (item: Omit<CartItem, 'qty'>) => void;
   removeItem: (id: number, matiere?: string) => void;
   updateQty: (id: number, qty: number, matiere?: string) => void;
@@ -50,6 +51,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const skipNextSave = useRef(true);
 
   useEffect(() => {
     try {
@@ -60,9 +62,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (hydrated) {
-      localStorage.setItem('lookagraphy_cart', JSON.stringify(items));
+    if (!hydrated) return;
+    if (skipNextSave.current) {
+      skipNextSave.current = false;
+      return;
     }
+    localStorage.setItem('lookagraphy_cart', JSON.stringify(items));
   }, [items, hydrated]);
 
   function addItem(newItem: Omit<CartItem, 'qty'>) {
@@ -98,7 +103,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const totalWeight = items.reduce((s, i) => s + i.poids_kg * i.qty, 0);
 
   return (
-    <CartContext.Provider value={{ items, addItem, removeItem, updateQty, clearCart, totalItems, totalPrice, totalWeight, isOpen, setIsOpen }}>
+    <CartContext.Provider value={{ items, hydrated, addItem, removeItem, updateQty, clearCart, totalItems, totalPrice, totalWeight, isOpen, setIsOpen }}>
       {children}
     </CartContext.Provider>
   );

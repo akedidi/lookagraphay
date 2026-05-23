@@ -47,9 +47,9 @@ type DeliveryType = 'relay' | 'home' | 'international' | '';
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, totalPrice, totalWeight, clearCart } = useCart();
+  const { items, totalPrice, totalWeight, clearCart, hydrated: cartHydrated } = useCart();
 
-  const [deliveryType, setDeliveryType] = useState<DeliveryType>('');
+  const [deliveryType, setDeliveryType] = useState<DeliveryType>('relay');
   const [relayCountry, setRelayCountry] = useState('FR');
   const [relayPoint, setRelayPoint] = useState({ id: '', nom: '', adresse: '', ville: '', code_postal: '' });
   const [address, setAddress] = useState({ rue: '', complement: '', code_postal: '', ville: '' });
@@ -68,7 +68,7 @@ export default function CheckoutPage() {
     }
   }, []);
 
-  if (!mounted) return null;
+  if (!mounted || !cartHydrated) return null;
 
   if (items.length === 0) {
     return (
@@ -347,7 +347,8 @@ export default function CheckoutPage() {
                 )}
               </div>
 
-              {/* Section 3 — Customer info */}
+              {/* Section 3 — Customer info (relay / domicile uniquement) */}
+              {deliveryType && deliveryType !== 'international' && (
               <div style={{ background: '#FAF7F2', padding: '2rem', marginBottom: '1.5rem', border: '1px solid rgba(61,43,31,0.08)' }}>
                 {sectionTitle('Vos coordonnées')}
 
@@ -410,23 +411,6 @@ export default function CheckoutPage() {
                     }
                   </div>
 
-                  {/* Pays de résidence — affiché pour international */}
-                  {deliveryType === 'international' && (
-                    <div style={{ gridColumn: '1/-1', marginBottom: '1rem' }}>
-                      <label style={labelStyle}>Pays de résidence *</label>
-                      <input
-                        autoComplete="country-name"
-                        style={{ ...inputStyle, borderColor: errors.pays_residence ? '#e05555' : 'rgba(61,43,31,0.2)' }}
-                        value={customer.pays_residence}
-                        onChange={e => setCustomer({ ...customer, pays_residence: e.target.value })}
-                        placeholder="Ex : Maroc, Canada, États-Unis…"
-                      />
-                      <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.62rem', color: 'rgba(61,43,31,0.4)', marginTop: '0.25rem' }}>
-                        Nous vous contacterons pour établir le devis de livraison.
-                      </p>
-                    </div>
-                  )}
-
                   {/* Message / instructions */}
                   <div style={{ gridColumn: '1/-1' }}>
                     <label style={labelStyle}>Message / instructions (facultatif)</label>
@@ -444,6 +428,8 @@ export default function CheckoutPage() {
                   Ces informations sont utilisées uniquement pour le traitement de votre commande et ne sont pas partagées avec des tiers.
                 </p>
               </div>
+              )}
+
             </div>
 
             {/* Right col — order summary */}
@@ -516,7 +502,7 @@ export default function CheckoutPage() {
 
               {/* Shipping info */}
               <div style={{ background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.15)', padding: '1rem 1.25rem', marginTop: '1px' }}>
-                <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', color: 'rgba(61,43,31,0.6)', lineHeight: 1.7 }}>
+                <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.78rem', color: 'rgba(61,43,31,0.72)', lineHeight: 1.75 }}>
                   📍 Livraison gratuite en points relais Mondial Relay (FR, BE, LU, ES, PT, DE)<br />
                   🏠 Livraison à domicile en France à partir de 10 €<br />
                   🌍 International : contactez-nous pour un devis
