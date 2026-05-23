@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
-import { sendOrderStatusUpdateEmail } from '@/lib/emails';
 import { ensureOrderColumns } from '@/lib/orders-schema';
 import { requireAdmin } from '@/lib/admin-auth';
+import { detectOrderCustomerNotification, notifyOrderCustomerUpdate } from '@/lib/order-update-notify';
 
 export async function GET(req: NextRequest, { params }: { params: { orderNumber: string } }) {
   try {
@@ -66,16 +66,38 @@ export async function PUT(req: NextRequest, { params }: { params: { orderNumber:
     await ensureOrderColumns(conn);
 
     const [prev] = await conn.execute(
-      'SELECT status, email, nom, tracking_number FROM orders WHERE order_number = ?',
+      `SELECT status, email, nom, admin_notes, carrier, tracking_number, tracking_url,
+              relay_point, shipping_address, shipping_cost, pays, delivery_type
+       FROM orders WHERE order_number = ?`,
       [params.orderNumber]
-    ) as [{ status: string; email: string; nom: string; tracking_number: string | null }[], unknown];
+    ) as [Record<string, unknown>[], unknown];
+
+    if (prev.length === 0) {
+      conn.release();
+      return NextResponse.json({ error: 'Commande introuvable' }, { status: 404 });
+    }
+
+    const prevOrder = prev[0] as {
+      status: string;
+      email: string;
+      nom: string;
+      admin_notes: string | null;
+      carrier: string | null;
+      tracking_number: string | null;
+      tracking_url: string | null;
+      relay_point: string | null;
+      shipping_address: string | null;
+      shipping_cost: number | null;
+      pays: string | null;
+      delivery_type: string | null;
+    };
 
     const customerNotes =
       customer_notes !== undefined ? customer_notes : notes !== undefined ? notes : undefined;
 
     const markShipped =
       status === 'expedie' ||
-      (tracking_number && String(tracking_number).trim() && !prev[0]?.tracking_number);
+      (tracking_number && String(tracking_number).trim() && !prevOrder.tracking_number);
 
     const markDelivered = status === 'livre';
 
@@ -127,19 +149,21 @@ export async function PUT(req: NextRequest, { params }: { params: { orderNumber:
 
     conn.release();
 
-    if (status && prev.length > 0 && prev[0].status !== status) {
-      const customerEmail = email ?? prev[0].email;
-      const customerName = nom ?? prev[0].nom;
-      sendOrderStatusUpdateEmail({
-        orderNumber: params.orderNumber,
-        customerEmail,
-        customerName,
-        newStatus: status,
-        notes: admin_notes ?? null,
-        carrier: carrier ?? null,
-        trackingNumber: tracking_number ?? null,
-        trackingUrl: tracking_url ?? null,
-      }).catch((err) => console.error('[EMAIL ERROR]', err));
+    const emailPayload = detectOrderCustomerNotification(prevOrder, {
+      status,
+      admin_notes,
+      nom,
+      email,
+      carrier,
+      tracking_number,
+      tracking_url,
+      relay_point,
+      shipping_address,
+      shipping_cost,
+      pays,
+    });
+    if (emailPayload) {
+      notifyOrderCustomerUpdate(params.orderNumber, emailPayload);
     }
 
     return NextResponse.json({ ok: true });

@@ -1018,7 +1018,7 @@ export default function AdminPage() {
                               style={{ ...inputStyle, resize: 'vertical', minHeight: 80, lineHeight: 1.6 }}
                               value={d.admin_notes}
                               onChange={e => setEditOrderDraft({ ...d, admin_notes: e.target.value })}
-                              placeholder="Message envoyé avec les mises à jour de statut (email)"
+                              placeholder="Message client (envoyé par email avec statut, expédition ou suivi)"
                             />
                           </div>
 

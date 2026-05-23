@@ -60,6 +60,26 @@ export type StatusEmailData = {
   trackingUrl?: string | null;
 };
 
+export type OrderUpdateEmailData = {
+  orderNumber: string;
+  customerEmail: string;
+  customerName: string;
+  currentStatus: string;
+  previousStatus?: string;
+  statusChanged: boolean;
+  shippingChanged: boolean;
+  notesChanged: boolean;
+  notes?: string | null;
+  carrier?: string | null;
+  trackingNumber?: string | null;
+  trackingUrl?: string | null;
+  deliveryType?: string | null;
+  relayPoint?: OrderEmailData['relayPoint'];
+  shippingAddress?: OrderEmailData['shippingAddress'];
+  pays?: string | null;
+  shippingCost?: number | null;
+};
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function esc(s: string | null | undefined): string {
@@ -361,45 +381,94 @@ function buildAdminNewOrderHtml(data: OrderEmailData): string {
   return emailWrapper(content);
 }
 
-function buildStatusUpdateHtml(data: StatusEmailData): string {
-  const label = STATUS_LABELS[data.newStatus] ?? data.newStatus;
-  const description = STATUS_DESCRIPTIONS[data.newStatus] ?? '';
+function buildShippingDetailsBlock(data: OrderUpdateEmailData): string {
+  if (data.deliveryType === 'relay' && data.relayPoint) {
+    const r = data.relayPoint;
+    return `
+    <div style="background:rgba(61,43,31,0.03);border:1px solid rgba(61,43,31,0.08);padding:14px 18px;margin-bottom:24px;">
+      <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:rgba(61,43,31,0.5);text-transform:uppercase;letter-spacing:2px;margin:0 0 6px;">Point relais</p>
+      <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;color:#1A1209;margin:0;line-height:1.7;">
+        <strong>${esc(r.nom)}</strong><br/>
+        ${r.adresse ? `${esc(r.adresse)}<br/>` : ''}
+        ${esc(r.code_postal)} ${esc(r.ville)}
+        ${r.id ? `<br/><span style="opacity:0.75;">ID : ${esc(r.id)}</span>` : ''}
+        ${data.pays ? `<br/><span style="opacity:0.75;">Pays : ${esc(data.pays)}</span>` : ''}
+      </p>
+    </div>
+    `;
+  }
+  if (data.deliveryType === 'home' && data.shippingAddress) {
+    const a = data.shippingAddress;
+    return `
+    <div style="background:rgba(61,43,31,0.03);border:1px solid rgba(61,43,31,0.08);padding:14px 18px;margin-bottom:24px;">
+      <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:rgba(61,43,31,0.5);text-transform:uppercase;letter-spacing:2px;margin:0 0 6px;">Adresse de livraison</p>
+      <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;color:#1A1209;margin:0;line-height:1.7;">
+        ${esc(a.rue)}${a.complement ? `<br/>${esc(a.complement)}` : ''}<br/>
+        ${esc(a.code_postal)} ${esc(a.ville)}
+        ${data.shippingCost != null ? `<br/><span style="opacity:0.75;">Frais de port : ${data.shippingCost === 0 ? 'Offerts' : `${Number(data.shippingCost).toFixed(2)} €`}</span>` : ''}
+      </p>
+    </div>
+    `;
+  }
+  return '';
+}
+
+function buildOrderUpdateHtml(data: OrderUpdateEmailData): string {
+  const label = STATUS_LABELS[data.currentStatus] ?? data.currentStatus;
+  const description = STATUS_DESCRIPTIONS[data.currentStatus] ?? '';
+
+  const title = data.statusChanged && !data.shippingChanged && !data.notesChanged
+    ? 'Mise à jour de votre commande'
+    : data.shippingChanged && !data.statusChanged && !data.notesChanged
+    ? 'Mise à jour de votre expédition'
+    : data.notesChanged && !data.statusChanged && !data.shippingChanged
+    ? 'Message concernant votre commande'
+    : 'Mise à jour de votre commande';
+
+  const intro = data.shippingChanged && !data.statusChanged
+    ? 'Nous avons mis à jour les informations d\'expédition de votre commande.'
+    : data.notesChanged && !data.statusChanged && !data.shippingChanged
+    ? 'LookaGraphy vous adresse une mise à jour concernant votre commande.'
+    : 'Le statut ou les informations de votre commande ont été mis à jour.';
 
   const content = `
     <h2 style="font-family:'Georgia',serif;font-weight:300;font-size:22px;color:#1A1209;margin:0 0 8px;">
-      Mise à jour de votre commande
+      ${title}
     </h2>
     <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;color:rgba(61,43,31,0.55);margin:0 0 28px;letter-spacing:1px;">
       Réf. <strong style="color:#C9A84C;">${esc(data.orderNumber)}</strong>
     </p>
 
-    <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;color:rgba(61,43,31,0.7);margin:0 0 20px;">
-      Bonjour <strong>${esc(data.customerName)}</strong>,
+    <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;color:rgba(61,43,31,0.7);margin:0 0 20px;line-height:1.7;">
+      Bonjour <strong>${esc(data.customerName)}</strong>,<br/>
+      ${intro}
     </p>
 
     <div style="background:rgba(201,168,76,0.06);border-left:4px solid #C9A84C;padding:20px 24px;margin-bottom:24px;">
-      <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:#C9A84C;text-transform:uppercase;letter-spacing:3px;margin:0 0 8px;">Statut</p>
+      <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:#C9A84C;text-transform:uppercase;letter-spacing:3px;margin:0 0 8px;">Statut actuel</p>
       <p style="font-family:'Georgia',serif;font-size:20px;color:#1A1209;margin:0 0 10px;">${esc(label)}</p>
-      <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;color:rgba(61,43,31,0.65);line-height:1.7;margin:0;">${esc(description)}</p>
+      ${description ? `<p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;color:rgba(61,43,31,0.65);line-height:1.7;margin:0;">${esc(description)}</p>` : ''}
     </div>
 
     ${
-      data.trackingNumber
+      data.trackingNumber || data.carrier || data.trackingUrl
         ? `
     <div style="background:rgba(61,43,31,0.03);border:1px solid rgba(61,43,31,0.08);padding:14px 18px;margin-bottom:24px;">
       <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:rgba(61,43,31,0.5);text-transform:uppercase;letter-spacing:2px;margin:0 0 6px;">Suivi colis${data.carrier ? ` — ${esc(data.carrier)}` : ''}</p>
-      <p style="font-family:'Georgia',serif;font-size:18px;color:#1A1209;margin:0 0 10px;letter-spacing:1px;">${esc(data.trackingNumber)}</p>
+      ${data.trackingNumber ? `<p style="font-family:'Georgia',serif;font-size:18px;color:#1A1209;margin:0 0 10px;letter-spacing:1px;">${esc(data.trackingNumber)}</p>` : ''}
       ${data.trackingUrl ? `<p style="margin:0;"><a href="${esc(data.trackingUrl)}" style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:#C9A84C;text-decoration:none;border-bottom:1px solid #C9A84C;">Suivre le colis en ligne →</a></p>` : ''}
     </div>
     `
         : ''
     }
 
+    ${data.shippingChanged ? buildShippingDetailsBlock(data) : ''}
+
     ${
-      data.notes
+      data.notesChanged && data.notes
         ? `
     <div style="background:rgba(61,43,31,0.03);border:1px solid rgba(61,43,31,0.08);padding:14px 18px;margin-bottom:24px;">
-      <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:rgba(61,43,31,0.5);text-transform:uppercase;letter-spacing:2px;margin:0 0 6px;">Message</p>
+      <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:rgba(61,43,31,0.5);text-transform:uppercase;letter-spacing:2px;margin:0 0 6px;">Message de LookaGraphy</p>
       <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;color:#1A1209;margin:0;line-height:1.7;">${esc(data.notes)}</p>
     </div>
     `
@@ -409,6 +478,22 @@ function buildStatusUpdateHtml(data: StatusEmailData): string {
     ${trackingInstructionsBlock(data.orderNumber, data.customerEmail)}
   `;
   return emailWrapper(content);
+}
+
+function buildStatusUpdateHtml(data: StatusEmailData): string {
+  return buildOrderUpdateHtml({
+    orderNumber: data.orderNumber,
+    customerEmail: data.customerEmail,
+    customerName: data.customerName,
+    currentStatus: data.newStatus,
+    statusChanged: true,
+    shippingChanged: Boolean(data.trackingNumber || data.carrier || data.trackingUrl),
+    notesChanged: Boolean(data.notes),
+    notes: data.notes,
+    carrier: data.carrier,
+    trackingNumber: data.trackingNumber,
+    trackingUrl: data.trackingUrl,
+  });
 }
 
 // ─── Envoi ───────────────────────────────────────────────────────────────────
@@ -446,6 +531,22 @@ export async function sendAdminNewOrderEmail(data: OrderEmailData): Promise<bool
     : `[${SITE_NAME}] Commande en attente ${data.orderNumber} — ${data.total.toFixed(2)} €`;
   const html = buildAdminNewOrderHtml(data);
   return sendEmail(ADMIN_EMAIL, subject, html);
+}
+
+export async function sendOrderUpdateEmail(data: OrderUpdateEmailData): Promise<boolean> {
+  const label = STATUS_LABELS[data.currentStatus] ?? data.currentStatus;
+  let subject: string;
+  if (data.statusChanged && !data.shippingChanged && !data.notesChanged) {
+    subject = `Votre commande ${data.orderNumber} : ${label} — ${SITE_NAME}`;
+  } else if (data.shippingChanged && !data.statusChanged && !data.notesChanged) {
+    subject = `Votre commande ${data.orderNumber} : mise à jour expédition — ${SITE_NAME}`;
+  } else if (data.notesChanged && !data.statusChanged && !data.shippingChanged) {
+    subject = `Votre commande ${data.orderNumber} : message — ${SITE_NAME}`;
+  } else {
+    subject = `Votre commande ${data.orderNumber} : mise à jour — ${SITE_NAME}`;
+  }
+  const html = buildOrderUpdateHtml(data);
+  return sendEmail(data.customerEmail, subject, html);
 }
 
 export async function sendOrderStatusUpdateEmail(data: StatusEmailData): Promise<boolean> {
