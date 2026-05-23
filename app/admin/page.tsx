@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { CARRIER_SUGGESTIONS } from '@/lib/carriers';
 import { adminFetchInit, adminJsonInit } from '@/lib/admin-fetch';
+import { toDatetimeLocalValue } from '@/lib/store-item';
+import { formatPromoLabel } from '@/lib/promo';
 
 const gold = '#C9A84C';
 const dark = '#1A1209';
@@ -187,7 +189,11 @@ function ImagesField({ label, value, onChange }: any) {
   );
 }
 
-const emptyStore = { titre: '', sous_titre: '', categorie: 'Tableau', description: '', citation: '', technique: '', dimensions: '', annee: '', prix: '', images: [], disponible: true, paypal_link: '', ordre: 0, style: 'Calligraphie contemporaine', extrait: '', in_galerie: true };
+const emptyStore = {
+  titre: '', sous_titre: '', categorie: 'Tableau', description: '', citation: '', technique: '', dimensions: '', annee: '',
+  prix: '', images: [], disponible: true, paypal_link: '', ordre: 0, style: 'Calligraphie contemporaine', extrait: '', in_galerie: true,
+  promo_enabled: false, promo_type: 'percent', promo_value: '', promo_start: '', promo_end: '',
+};
 const emptyExpo = { titre: '', lieu: '', dates: '', statut: 'passé', description: '', image: '', images: [] };
 const emptyEvt = { titre: '', date: '', heure: '', lieu: '', type: 'Vernissage', statut: 'à venir', description: '', images: [] };
 
@@ -372,7 +378,12 @@ export default function AdminPage() {
 
   const saveStore = async () => {
     setSaving(true);
-    const body = { ...editStore, prix: parseFloat(editStore.prix) || 0, ordre: parseInt(editStore.ordre) || 0 };
+    const body = {
+      ...editStore,
+      prix: parseFloat(editStore.prix) || 0,
+      ordre: parseInt(editStore.ordre) || 0,
+      promo_value: editStore.promo_enabled ? (parseFloat(editStore.promo_value) || 0) : null,
+    };
     const url = isNew ? '/api/store' : `/api/store/${editStore.id}`;
     const method = isNew ? 'POST' : 'PUT';
     await fetch(url, { method, ...adminJsonInit(body) });
@@ -525,7 +536,6 @@ export default function AdminPage() {
                   <Field label="Technique" value={editStore.technique} onChange={(v: string) => setEditStore({ ...editStore, technique: v })} />
                   <Field label="Dimensions" value={editStore.dimensions} onChange={(v: string) => setEditStore({ ...editStore, dimensions: v })} />
                   <Field label="Prix (€)" value={editStore.prix} onChange={(v: string) => setEditStore({ ...editStore, prix: v })} type="number" />
-                  <Field label="Lien PayPal" value={editStore.paypal_link} onChange={(v: string) => setEditStore({ ...editStore, paypal_link: v })} />
                   <Field label="Ordre d'affichage" value={editStore.ordre} onChange={(v: string) => setEditStore({ ...editStore, ordre: v })} type="number" />
                 </div>
                 <Field label="Citation" value={editStore.citation} onChange={(v: string) => setEditStore({ ...editStore, citation: v })} type="textarea" />
@@ -537,6 +547,45 @@ export default function AdminPage() {
                 <ImagesField label="Images (chemins /images/...)" value={editStore.images} onChange={(v: string[]) => setEditStore({ ...editStore, images: v })} />
                 <Toggle label="Disponibilité" value={editStore.disponible} onChange={(v: boolean) => setEditStore({ ...editStore, disponible: v })} />
                 <Toggle label="Afficher dans la galerie" value={editStore.in_galerie} onChange={(v: boolean) => setEditStore({ ...editStore, in_galerie: v })} />
+
+                <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid rgba(201,168,76,0.2)' }}>
+                  <p style={{ ...labelStyle, marginBottom: '0.75rem', fontSize: '0.72rem' }}>Promotion</p>
+                  <Toggle label="Promotion active (manuel)" value={editStore.promo_enabled} onChange={(v: boolean) => setEditStore({ ...editStore, promo_enabled: v })} />
+                  {editStore.promo_enabled && (
+                    <>
+                      <Select
+                        label="Type de réduction"
+                        value={editStore.promo_type || 'percent'}
+                        onChange={(v: string) => setEditStore({ ...editStore, promo_type: v })}
+                        options={['percent', 'amount']}
+                      />
+                      <Field
+                        label={editStore.promo_type === 'amount' ? 'Montant de réduction (€)' : 'Pourcentage de réduction (%)'}
+                        value={editStore.promo_value}
+                        onChange={(v: string) => setEditStore({ ...editStore, promo_value: v })}
+                        type="number"
+                        placeholder={editStore.promo_type === 'amount' ? '20' : '15'}
+                      />
+                      <div className="admin-form-grid">
+                        <Field
+                          label="Début (optionnel)"
+                          value={editStore.promo_start}
+                          onChange={(v: string) => setEditStore({ ...editStore, promo_start: v })}
+                          type="datetime-local"
+                        />
+                        <Field
+                          label="Fin (optionnel)"
+                          value={editStore.promo_end}
+                          onChange={(v: string) => setEditStore({ ...editStore, promo_end: v })}
+                          type="datetime-local"
+                        />
+                      </div>
+                      <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: 'rgba(245,240,232,0.45)', lineHeight: 1.6, margin: 0 }}>
+                        La promo s&apos;affiche si elle est activée ici et dans la période définie. Laissez les dates vides pour une promo sans limite de temps.
+                      </p>
+                    </>
+                  )}
+                </div>
                 <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
                   <button onClick={saveStore} disabled={saving} style={btnGold}>{saving ? 'Sauvegarde...' : 'Sauvegarder'}</button>
                   <button onClick={() => setEditStore(null)} style={btnOutline}>Annuler</button>
@@ -552,10 +601,25 @@ export default function AdminPage() {
                   )}
                   <div className="admin-item-info">
                     <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', color: light }}>{item.titre}</div>
-                    <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: gold }}>{item.categorie} · {item.prix}€ · {item.disponible ? 'DISPO' : 'Indisponible'}</div>
+                    <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: gold }}>
+                      {item.categorie} · {item.promo_active ? `${item.prix_promo}€ (promo, était ${item.prix}€)` : `${item.prix}€`} · {item.disponible ? 'DISPO' : 'Indisponible'}
+                      {item.promo_enabled && !item.promo_active ? ' · promo programmée/off' : ''}
+                      {item.promo_active && formatPromoLabel(item) ? ` · ${formatPromoLabel(item)}` : ''}
+                    </div>
                   </div>
                   <div className="admin-item-actions">
-                    <button onClick={() => { setEditStore({ ...item, in_galerie: item.in_galerie ?? false }); setIsNew(false); }} style={btnOutline}><span className="admin-btn-text">Modifier</span><span className="admin-icon">✎</span></button>
+                    <button onClick={() => {
+                      setEditStore({
+                        ...item,
+                        in_galerie: item.in_galerie ?? false,
+                        promo_enabled: item.promo_enabled ?? false,
+                        promo_type: item.promo_type || 'percent',
+                        promo_value: item.promo_value ?? '',
+                        promo_start: toDatetimeLocalValue(item.promo_start),
+                        promo_end: toDatetimeLocalValue(item.promo_end),
+                      });
+                      setIsNew(false);
+                    }} style={btnOutline}><span className="admin-btn-text">Modifier</span><span className="admin-icon">✎</span></button>
                     <button onClick={() => deleteStore(item.id)} style={btnDanger}><span className="admin-btn-text">Supprimer</span><span className="admin-icon">✕</span></button>
                   </div>
                 </div>

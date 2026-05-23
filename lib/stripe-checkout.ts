@@ -51,7 +51,7 @@ export async function createStripeCheckoutSession(input: CreateCheckoutSessionIn
     customer_email: input.email,
     line_items: lineItems,
     metadata: { order_number: input.orderNumber },
-    success_url: `${siteUrl}/commande-confirmee?order=${encodeURIComponent(input.orderNumber)}&session_id={CHECKOUT_SESSION_ID}`,
+    success_url: `${siteUrl}/commande-confirmee?order=${encodeURIComponent(input.orderNumber)}&email=${encodeURIComponent(input.email)}&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${siteUrl}/checkout?cancelled=1`,
   });
 

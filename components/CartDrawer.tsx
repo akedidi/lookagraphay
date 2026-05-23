@@ -3,6 +3,7 @@
 import { useCart } from '@/lib/cart';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
+import PriceDisplay from '@/components/PriceDisplay';
 
 const gold = '#C9A84C';
 const dark = '#1A1209';
@@ -92,9 +93,15 @@ export default function CartDrawer() {
                             {item.matiere}{item.quantite_label ? ` · ${item.quantite_label}` : ''}
                           </p>
                         )}
-                        <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', color: gold, marginBottom: '0.6rem' }}>
-                          {item.prix} €
-                        </p>
+                        <div style={{ marginBottom: '0.6rem' }}>
+                          <PriceDisplay
+                            original={item.prix_original ?? item.prix}
+                            final={item.prix}
+                            active={item.prix_original != null && item.prix < (item.prix_original ?? item.prix)}
+                            size="sm"
+                            light
+                          />
+                        </div>
                         {/* Qty controls */}
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                           <button

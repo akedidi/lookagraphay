@@ -35,7 +35,7 @@ const labelStyle: React.CSSProperties = {
 };
 
 const RELAY_COUNTRIES = [
-  { code: 'FR', label: 'France', finder: 'https://www.mondialrelay.fr/trouver-un-point-relais/' },
+  { code: 'FR', label: 'France', finder: 'https://www.mondialrelay.fr/trouver-le-point-relais-le-plus-proche-de-chez-moi/' },
   { code: 'BE', label: 'Belgique', finder: 'https://www.mondialrelay.be/fr-be/trouver-un-point-relais/' },
   { code: 'LU', label: 'Luxembourg', finder: 'https://www.mondialrelay.lu/fr-lu/trouver-un-point-relais/' },
   { code: 'ES', label: 'Espagne', finder: 'https://www.inpost.es/en/find-location?type=parcel-locker' },
@@ -142,7 +142,9 @@ export default function CheckoutPage() {
       }
       clearCart();
       const encoded = encodeURIComponent(data.payment_link ?? '');
-      router.push(`/commande-confirmee?order=${data.order_number}&total=${orderTotal.toFixed(2)}&payment_link=${encoded}`);
+      router.push(
+        `/commande-confirmee?order=${encodeURIComponent(data.order_number)}&email=${encodeURIComponent(customer.email)}&total=${orderTotal.toFixed(2)}&payment_link=${encoded}`
+      );
     } catch (err: any) {
       setErrors({ submit: err.message });
       setLoading(false);
@@ -238,7 +240,7 @@ export default function CheckoutPage() {
                         <li>Recopiez les informations du point dans le formulaire</li>
                       </ol>
                       <a
-                        href={RELAY_COUNTRIES.find(c => c.code === relayCountry)?.finder ?? 'https://www.mondialrelay.fr/trouver-un-point-relais/'}
+                        href={RELAY_COUNTRIES.find(c => c.code === relayCountry)?.finder ?? 'https://www.mondialrelay.fr/trouver-le-point-relais-le-plus-proche-de-chez-moi/'}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.7rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: gold, textDecoration: 'none', borderBottom: `1px solid ${gold}`, paddingBottom: '1px' }}
@@ -508,7 +510,7 @@ export default function CheckoutPage() {
                 </button>
 
                 <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.62rem', color: 'rgba(245,240,232,0.35)', textAlign: 'center', marginTop: '0.85rem', lineHeight: 1.6 }}>
-                  Paiement sécurisé via PayPal à l'étape suivante
+                  Paiement sécurisé par carte bancaire (Stripe) à l&apos;étape suivante
                 </p>
               </div>
 

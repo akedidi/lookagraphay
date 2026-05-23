@@ -3,6 +3,7 @@
  */
 
 import { isGmailConfigured, sendGmailMessage } from '@/lib/gmail';
+import { trackingPageUrl } from '@/lib/tracking-url';
 
 const SITE_NAME = 'LookaGraphy';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://lookagraphy.fr';
@@ -194,7 +195,8 @@ function buildDeliveryBlock(data: OrderEmailData): string {
   `;
 }
 
-function trackingInstructionsBlock(orderNumber: string): string {
+function trackingInstructionsBlock(orderNumber: string, customerEmail: string): string {
+  const trackingHref = trackingPageUrl(orderNumber, customerEmail);
   return `
     <div style="background:rgba(61,43,31,0.03);border:1px solid rgba(61,43,31,0.08);padding:16px 20px;margin-bottom:24px;">
       <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:rgba(61,43,31,0.5);text-transform:uppercase;letter-spacing:2px;margin:0 0 8px;">Suivi de commande</p>
@@ -204,7 +206,7 @@ function trackingInstructionsBlock(orderNumber: string): string {
         et l'<strong>email</strong> utilisé lors de l'achat.
       </p>
       <p style="margin:14px 0 0;">
-        <a href="${SITE_URL}/suivi-commande" style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:#C9A84C;letter-spacing:2px;text-transform:uppercase;text-decoration:none;border-bottom:1px solid #C9A84C;padding-bottom:2px;">
+        <a href="${esc(trackingHref)}" style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:#C9A84C;letter-spacing:2px;text-transform:uppercase;text-decoration:none;border-bottom:1px solid #C9A84C;padding-bottom:2px;">
           Accéder au suivi →
         </a>
       </p>
@@ -255,7 +257,7 @@ function buildOrderConfirmationHtml(data: OrderEmailData): string {
     </table>
 
     ${buildDeliveryBlock(data)}
-    ${paid ? trackingInstructionsBlock(data.orderNumber) : ''}
+    ${paid ? trackingInstructionsBlock(data.orderNumber, data.customerEmail) : ''}
 
     ${
       !paid && data.paymentLink
@@ -273,7 +275,7 @@ function buildOrderConfirmationHtml(data: OrderEmailData): string {
       !paid
         ? `
     <p style="margin:0;">
-      <a href="${SITE_URL}/suivi-commande" style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:#C9A84C;letter-spacing:2px;text-transform:uppercase;text-decoration:none;border-bottom:1px solid #C9A84C;padding-bottom:2px;">
+      <a href="${esc(trackingPageUrl(data.orderNumber, data.customerEmail))}" style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:#C9A84C;letter-spacing:2px;text-transform:uppercase;text-decoration:none;border-bottom:1px solid #C9A84C;padding-bottom:2px;">
         Suivre ma commande →
       </a>
     </p>
@@ -404,7 +406,7 @@ function buildStatusUpdateHtml(data: StatusEmailData): string {
         : ''
     }
 
-    ${trackingInstructionsBlock(data.orderNumber)}
+    ${trackingInstructionsBlock(data.orderNumber, data.customerEmail)}
   `;
   return emailWrapper(content);
 }

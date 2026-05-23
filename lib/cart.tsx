@@ -6,6 +6,8 @@ export type CartItem = {
   id: number;
   titre: string;
   prix: number;
+  /** Prix catalogue avant promo (affichage barré) */
+  prix_original?: number;
   images?: string[];
   categorie: string;
   matiere?: string;

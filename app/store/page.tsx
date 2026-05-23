@@ -1,25 +1,24 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart, getPoidsKg } from '@/lib/cart';
+import PriceDisplay from '@/components/PriceDisplay';
+import type { PromoInput } from '@/lib/promo';
+import { resolvePriceForBase, type MappedStoreItem } from '@/lib/store-item';
 
-type StoreItem = {
-  id: number;
-  titre: string;
-  sous_titre?: string;
-  categorie: string;
-  description?: string;
-  citation?: string;
-  technique?: string;
-  dimensions?: string;
-  annee?: string;
-  prix: number;
-  images?: string[];
-  disponible: boolean;
-  paypal_link?: string;
-  ordre?: number;
-};
+type StoreItem = MappedStoreItem;
+
+function promoSource(item: StoreItem): PromoInput {
+  return {
+    prix: item.prix,
+    promo_enabled: item.promo_enabled,
+    promo_type: item.promo_type,
+    promo_value: item.promo_value,
+    promo_start: item.promo_start,
+    promo_end: item.promo_end,
+  };
+}
 
 type Matiere = 'argent' | 'or';
 type Quantite = 'unite' | 'paire';
@@ -50,23 +49,43 @@ function quantiteLabel(q: Quantite): string {
   return q === 'paire' ? 'la paire' : "à l'unité";
 }
 
-function PrixSelector({ categorie, onChange }: { categorie: string; onChange: (prix: number, matiere: string, quantite?: string) => void }) {
+function PrixSelector({
+  categorie,
+  itemPromo,
+  onChange,
+}: {
+  categorie: string;
+  itemPromo: PromoInput;
+  onChange: (prix: number, prixOriginal: number | undefined, matiere: string, quantite?: string) => void;
+}) {
   const [matiere, setMatiere] = useState<Matiere>('argent');
   const [quantite, setQuantite] = useState<Quantite>('paire');
   const isBoucle = categorie === "Boucles d'oreilles";
-  const prix = calcPrix(categorie, matiere, quantite);
+  const priced = resolvePriceForBase(itemPromo, calcPrix(categorie, matiere, quantite));
+  const mounted = useRef(false);
+
+  function emit(m: Matiere, q: Quantite) {
+    const base = calcPrix(categorie, m, q);
+    const { final, active, original } = resolvePriceForBase(itemPromo, base);
+    onChange(final, active ? original : undefined, matiereLabel(m), isBoucle ? quantiteLabel(q) : undefined);
+  }
 
   function handleMatiere(m: Matiere) {
     setMatiere(m);
-    const p = calcPrix(categorie, m, quantite);
-    onChange(p, matiereLabel(m), isBoucle ? quantiteLabel(quantite) : undefined);
+    emit(m, quantite);
   }
 
   function handleQuantite(q: Quantite) {
     setQuantite(q);
-    const p = calcPrix(categorie, matiere, q);
-    onChange(p, matiereLabel(matiere), quantiteLabel(q));
+    emit(matiere, q);
   }
+
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      emit(matiere, quantite);
+    }
+  }, []);
 
   const optBtn = (label: string, active: boolean, onClick: () => void) => (
     <button
@@ -112,10 +131,13 @@ function PrixSelector({ categorie, onChange }: { categorie: string; onChange: (p
         </div>
       )}
 
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
-        <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2.2rem', fontWeight: 300, color: '#C9A84C', letterSpacing: '0.02em' }}>
-          {prix} €
-        </span>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', flexWrap: 'wrap' }}>
+        <PriceDisplay
+          original={priced.original}
+          final={priced.final}
+          active={priced.active}
+          size="lg"
+        />
         <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(61,43,31,0.45)', letterSpacing: '0.1em' }}>
           TVA incluse
         </span>
@@ -159,20 +181,16 @@ export default function StorePage() {
     if (isBijou(item.categorie)) {
       const fn = TARIFS[item.categorie];
       const defaultQ: Quantite = "Boucles d'oreilles" === item.categorie ? 'paire' : 'paire';
-      const defaultPrix = fn ? fn('argent', defaultQ) : item.prix;
-      setSelectedPrix(defaultPrix);
+      const base = fn ? fn('argent', defaultQ) : item.prix;
+      const { final } = resolvePriceForBase(promoSource(item), base);
+      setSelectedPrix(final);
       setSelectedMatiere('Argent');
       setSelectedQuantite(item.categorie === "Boucles d'oreilles" ? 'la paire' : undefined);
     } else {
-      setSelectedPrix(item.prix);
+      setSelectedPrix(item.prix_promo);
       setSelectedMatiere('');
       setSelectedQuantite(undefined);
     }
-  }
-
-  function buildPaypalLink(baseLink: string | undefined, prix: number) {
-    if (!baseLink) return undefined;
-    return `https://paypal.me/lookagraphy/${prix}`;
   }
 
   const modalImages = selected?.images ?? [];
@@ -294,18 +312,31 @@ export default function StorePage() {
                     {item.categorie}
                   </p>
                   {item.prix ? (
-                    <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.15rem', fontWeight: 400, color: '#E4C97A', lineHeight: 1, letterSpacing: '0.02em' }}>
-                      {item.prix} <span style={{ fontSize: '0.8rem', fontWeight: 300 }}>€</span>
-                    </p>
+                    <div style={{ lineHeight: 1 }}>
+                      <PriceDisplay
+                        original={item.prix}
+                        final={item.prix_promo}
+                        active={item.promo_active}
+                        size="sm"
+                        light
+                      />
+                    </div>
                   ) : null}
                 </div>
 
                 {/* Badge disponible */}
-                {item.disponible && (
-                  <span style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', fontFamily: 'Montserrat, sans-serif', fontSize: '0.62rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C9A84C', background: 'rgba(26,18,9,0.75)', padding: '0.25rem 0.5rem', border: '1px solid rgba(201,168,76,0.4)' }}>
-                    Dispo
-                  </span>
-                )}
+                <div style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', alignItems: 'flex-end' }}>
+                  {item.promo_active && (
+                    <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.58rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#1A1209', background: '#C9A84C', padding: '0.2rem 0.45rem', fontWeight: 600 }}>
+                      Promo
+                    </span>
+                  )}
+                  {item.disponible && (
+                    <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.62rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C9A84C', background: 'rgba(26,18,9,0.75)', padding: '0.25rem 0.5rem', border: '1px solid rgba(201,168,76,0.4)' }}>
+                      Dispo
+                    </span>
+                  )}
+                </div>
               </motion.div>
             ))}
           </AnimatePresence>
@@ -431,7 +462,8 @@ export default function StorePage() {
                 {isBijou(selected.categorie) ? (
                   <PrixSelector
                     categorie={selected.categorie}
-                    onChange={(prix, matiere, quantite) => {
+                    itemPromo={promoSource(selected)}
+                    onChange={(prix, _orig, matiere, quantite) => {
                       setSelectedPrix(prix);
                       setSelectedMatiere(matiere);
                       setSelectedQuantite(quantite);
@@ -439,9 +471,12 @@ export default function StorePage() {
                   />
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                    <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem', fontWeight: 300, color: '#C9A84C' }}>
-                      {selected.prix} €
-                    </div>
+                    <PriceDisplay
+                      original={selected.prix}
+                      final={selected.prix_promo}
+                      active={selected.promo_active}
+                      size="lg"
+                    />
                     <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: selected.disponible ? '#C9A84C' : 'rgba(61,43,31,0.4)', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
                       {selected.disponible ? 'Disponible' : 'Indisponible'}
                     </span>
@@ -452,11 +487,15 @@ export default function StorePage() {
                   <>
                     <button
                       onClick={() => {
-                        const prix = selectedPrix || selected.prix;
+                        const base = selectedPrix || selected.prix_promo;
+                        const priced = isBijou(selected.categorie)
+                          ? resolvePriceForBase(promoSource(selected), base)
+                          : { final: selected.prix_promo, original: selected.prix, active: selected.promo_active };
                         addItem({
                           id: selected.id,
                           titre: selected.titre,
-                          prix,
+                          prix: priced.final,
+                          prix_original: priced.active ? priced.original : undefined,
                           images: selected.images,
                           categorie: selected.categorie,
                           matiere: selectedMatiere || undefined,
@@ -473,26 +512,12 @@ export default function StorePage() {
                         background: addedFeedback ? 'rgba(201,168,76,0.15)' : '#1A1209',
                         color: addedFeedback ? '#C9A84C' : '#F5F0E8',
                         border: '2px solid #1A1209',
-                        padding: '0.9rem 1.5rem', cursor: 'pointer', marginBottom: '0.75rem',
+                        padding: '0.9rem 1.5rem', cursor: 'pointer',
                         fontWeight: 500, transition: 'all 0.3s',
                       }}
                     >
                       {addedFeedback ? '✓ Ajouté au panier' : 'Ajouter au panier'}
                     </button>
-                    <a
-                      href={`https://paypal.me/lookagraphy/${selectedPrix || selected.prix}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn-gold"
-                      style={{ display: 'block', textAlign: 'center' }}
-                    >
-                      Commander directement via PayPal
-                      {isBijou(selected.categorie) && selectedMatiere && (
-                        <span style={{ display: 'block', fontSize: '0.65rem', letterSpacing: '0.15em', marginTop: '0.2rem', opacity: 0.8, fontWeight: 300 }}>
-                          {selectedMatiere}{selectedQuantite ? ` · ${selectedQuantite}` : ''} — {selectedPrix} €
-                        </span>
-                      )}
-                    </a>
                   </>
                 )}
               </div>

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 
 const gold = '#C9A84C';
@@ -38,21 +39,28 @@ const labelStyle: React.CSSProperties = {
   marginBottom: '0.4rem',
 };
 
-export default function SuiviCommandePage() {
+function SuiviCommandeForm() {
+  const searchParams = useSearchParams();
+  const autoLoaded = useRef(false);
+
   const [orderNumber, setOrderNumber] = useState('');
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [order, setOrder] = useState<any>(null);
   const [error, setError] = useState('');
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!orderNumber.trim() || !email.trim()) return;
+  const fetchOrder = useCallback(async (num: string, mail: string) => {
+    const n = num.trim().toUpperCase();
+    const e = mail.trim();
+    if (!n || !e) return;
+
     setLoading(true);
     setError('');
     setOrder(null);
     try {
-      const res = await fetch(`/api/orders/${orderNumber.trim().toUpperCase()}?email=${encodeURIComponent(email.trim())}`);
+      const res = await fetch(
+        `/api/orders/${encodeURIComponent(n)}?email=${encodeURIComponent(e)}`
+      );
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || 'Commande introuvable. Vérifiez le numéro et l\'email.');
@@ -64,13 +72,33 @@ export default function SuiviCommandePage() {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    const o = searchParams.get('order') ?? '';
+    const e = searchParams.get('email') ?? '';
+    if (o) setOrderNumber(o);
+    if (e) setEmail(e);
+  }, [searchParams]);
+
+  useEffect(() => {
+    const o = (searchParams.get('order') ?? '').trim();
+    const e = (searchParams.get('email') ?? '').trim();
+    if (o && e && !autoLoaded.current) {
+      autoLoaded.current = true;
+      fetchOrder(o, e);
+    }
+  }, [searchParams, fetchOrder]);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    await fetchOrder(orderNumber, email);
   }
 
   const statusInfo = order ? (STATUS_LABELS[order.status] ?? { label: order.status, color: gold, desc: '' }) : null;
 
   return (
     <div style={{ background: '#F5F0E8', minHeight: '100vh' }}>
-      {/* Header */}
       <section style={{ background: dark, padding: '7rem 1.5rem 4rem', textAlign: 'center' }}>
         <div className="page-header-anim">
           <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', letterSpacing: '0.42em', textTransform: 'uppercase', color: gold, display: 'block', marginBottom: '1.25rem' }}>
@@ -136,7 +164,6 @@ export default function SuiviCommandePage() {
               transition={{ duration: 0.5 }}
               style={{ marginTop: '2.5rem' }}
             >
-              {/* Status */}
               <div style={{ background: dark, padding: '2rem', marginBottom: '1px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
                   <span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: statusInfo.color, flexShrink: 0 }} />
@@ -149,7 +176,6 @@ export default function SuiviCommandePage() {
                 </p>
               </div>
 
-              {/* Commande info */}
               <div style={{ background: '#FAF7F2', padding: '2rem', border: '1px solid rgba(61,43,31,0.08)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.5rem' }}>
                   <div>
@@ -256,5 +282,19 @@ export default function SuiviCommandePage() {
         </motion.div>
       </section>
     </div>
+  );
+}
+
+export default function SuiviCommandePage() {
+  return (
+    <Suspense
+      fallback={
+        <div style={{ background: '#F5F0E8', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.75rem', letterSpacing: '0.2em', color: gold, textTransform: 'uppercase' }}>Chargement…</span>
+        </div>
+      }
+    >
+      <SuiviCommandeForm />
+    </Suspense>
   );
 }

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Suspense, useEffect, useState } from 'react';
 import { useCart } from '@/lib/cart';
+import { trackingPagePath } from '@/lib/tracking-url';
 
 const gold = '#C9A84C';
 const dark = '#1A1209';
@@ -13,7 +14,9 @@ const ivory = '#F5F0E8';
 function ConfirmationContent() {
   const params = useSearchParams();
   const orderNumber = params.get('order') ?? '';
+  const customerEmail = params.get('email') ?? '';
   const total = params.get('total') ?? '';
+  const trackingHref = trackingPagePath(orderNumber, customerEmail);
   const paymentLink = params.get('payment_link') ?? '';
   const sessionId = params.get('session_id') ?? '';
 
@@ -146,7 +149,7 @@ function ConfirmationContent() {
 
         <div style={{ background: '#FAF7F2', padding: '1.5rem 2.5rem', border: '1px solid rgba(61,43,31,0.08)', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
           <Link
-            href="/suivi-commande"
+            href={trackingHref}
             style={{
               flex: 1, display: 'block', textAlign: 'center',
               fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem',

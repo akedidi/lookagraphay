@@ -30,6 +30,11 @@ export async function POST(req: NextRequest) {
         style VARCHAR(120) DEFAULT 'Calligraphie contemporaine',
         extrait VARCHAR(255),
         in_galerie TINYINT(1) DEFAULT 0,
+        promo_enabled TINYINT(1) DEFAULT 0,
+        promo_type ENUM('percent','amount') NULL,
+        promo_value DECIMAL(10,2) NULL,
+        promo_start DATETIME NULL,
+        promo_end DATETIME NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
