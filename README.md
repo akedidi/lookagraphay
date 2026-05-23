@@ -84,6 +84,16 @@ npm run check-secrets
 
 Démarrage prod : `npm start` (`node server.js`, port `PORT` ou 3000). Le dossier `.next` doit exister après le build.
 
+Dans hPanel → **Websites → Node.js** (ou Git deploy), vérifier :
+
+| Champ | Valeur |
+|-------|--------|
+| Build command | `npm run build` |
+| Start command | `npm start` |
+| Node version | 18 ou 20 |
+
+Ne pas utiliser `next start` ni un chemin `.next/standalone/server.js` — le projet tourne avec `node server.js`.
+
 ### 2. Variables hPanel
 
 Dans **Advanced → Environment variables**, définir toutes les variables listées ci-dessus.

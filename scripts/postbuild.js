@@ -23,8 +23,8 @@ const root = path.resolve(__dirname, '..');
 const standaloneDir = path.join(root, '.next', 'standalone');
 
 if (!fs.existsSync(standaloneDir)) {
-  console.error('[postbuild] .next/standalone not found — did the build succeed with output: "standalone"?');
-  process.exit(1);
+  console.log('[postbuild] Skipped — no standalone output (prod uses node server.js).');
+  process.exit(0);
 }
 
 console.log('[postbuild] Copying public/ → .next/standalone/public/');
