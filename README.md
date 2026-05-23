@@ -82,17 +82,25 @@ npm run build
 npm run check-secrets
 ```
 
-Démarrage prod : `npm start` (serveur standalone Next.js, port `PORT` ou 3000). Le dossier `.next/standalone` doit exister après le build.
+Démarrage prod : `npm start` → `node server.js` (délègue au serveur standalone si présent).
 
-Dans hPanel → **Websites → Node.js** (ou Git deploy), vérifier :
+Dans hPanel → **Websites → Node.js** :
 
 | Champ | Valeur |
 |-------|--------|
 | Build command | `npm run build` |
 | Start command | `npm start` |
+| Entry file | `server.js` |
+| Output directory | *(laisser vide ou `.next`)* |
 | Node version | 18 ou 20 |
 
-**Ne pas** utiliser `next start` — le build produit un serveur standalone (`node .next/standalone/server.js` via `npm start`).
+**Ne pas** utiliser `next start` comme entry file ni start command.
+
+Après redeploy, les logs **runtime** doivent afficher :
+```
+> Starting standalone server on http://0.0.0.0:3000
+✓ Ready in ...
+```
 
 ### 2. Variables hPanel
 
