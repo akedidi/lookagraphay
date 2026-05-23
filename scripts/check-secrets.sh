@@ -4,7 +4,7 @@ set -e
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-PATTERN='sk_(live|test)_[A-Za-z0-9]{20,}|whsec_[A-Za-z0-9]{20,}'
+PATTERN='sk_(live|test)_[A-Za-z0-9]{20,}|whsec_[A-Za-z0-9]{20,}|GOCSPX-[A-Za-z0-9_-]{10,}|REDACTED'
 
 if git grep -nE "$PATTERN" -- ':!scripts/check-secrets.sh' ':!.env.example' 2>/dev/null; then
   echo "❌ Clé secrète détectée dans des fichiers versionnés. Retirez-la et régénérez la clé dans Stripe."

@@ -17,6 +17,7 @@ const stagger = {
 export default function Home() {
   const [muted, setMuted] = useState(true);
   const [tagline, setTagline] = useState('');
+  const [galeriePreview, setGaleriePreview] = useState(galerieData.slice(0, 6));
   const videoDesktopRef = useRef<HTMLVideoElement>(null);
   const videoMobileRef = useRef<HTMLVideoElement>(null);
 
@@ -26,6 +27,17 @@ export default function Home() {
       const saved = localStorage.getItem('hero-sound');
       if (saved === 'on') setMuted(false);
     } catch (_) {}
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/galerie')
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setGaleriePreview(data.slice(0, 6));
+        }
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -576,7 +588,7 @@ export default function Home() {
             variants={stagger}
             className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-12"
           >
-            {galerieData.slice(0, 6).map((oeuvre, i) => (
+            {galeriePreview.map((oeuvre, i) => (
               <motion.div
                 key={oeuvre.id}
                 variants={fadeUp}

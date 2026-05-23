@@ -27,7 +27,7 @@ app/
   mentions-legales/page.tsx — Mentions légales
   admin/
     layout.tsx        — Layout isolé sans Navbar/Footer
-    page.tsx          — Backoffice admin (login admin/REDACTED, localStorage)
+    page.tsx          — Backoffice admin (auth serveur, cookie httpOnly, ADMIN_PASSWORD)
   api/
     store/route.ts          — GET/POST articles store
     store/[id]/route.ts     — PUT/DELETE article

@@ -4,7 +4,8 @@ import { sendOrderConfirmationEmail, sendAdminNewOrderEmail } from '@/lib/emails
 import { generatePaymentLink } from '@/lib/payment';
 import { isStripePaymentProvider } from '@/lib/stripe';
 import { createStripeCheckoutSession } from '@/lib/stripe-checkout';
-import { ensureStripeOrderColumns } from '@/lib/orders-schema';
+import { ensureOrderColumns } from '@/lib/orders-schema';
+import { requireAdmin } from '@/lib/admin-auth';
 
 async function generateOrderNumber(conn: Awaited<ReturnType<typeof pool.getConnection>>): Promise<string> {
   const now = new Date();
@@ -20,24 +21,22 @@ async function generateOrderNumber(conn: Awaited<ReturnType<typeof pool.getConne
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { nom, email, telephone, items, delivery_type, relay_point, shipping_address, pays, shipping_cost, total, notes } = body;
+    const { nom, email, telephone, pays_residence, items, delivery_type, relay_point, shipping_address, pays, shipping_cost, total, notes } = body;
 
     if (!nom || !email || !items || !delivery_type || total === undefined) {
       return NextResponse.json({ error: 'Champs requis manquants' }, { status: 400 });
     }
 
     const conn = await pool.getConnection();
-    if (isStripePaymentProvider()) {
-      await ensureStripeOrderColumns(conn);
-    }
+    await ensureOrderColumns(conn);
 
     const order_number = await generateOrderNumber(conn);
 
     await conn.execute(
-      `INSERT INTO orders (order_number, nom, email, telephone, items, delivery_type, relay_point, shipping_address, pays, shipping_cost, total, notes)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO orders (order_number, nom, email, telephone, pays_residence, items, delivery_type, relay_point, shipping_address, pays, shipping_cost, total, notes)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        order_number, nom, email, telephone ?? null,
+        order_number, nom, email, telephone ?? null, pays_residence ?? null,
         JSON.stringify(items), delivery_type,
         relay_point ? JSON.stringify(relay_point) : null,
         shipping_address ? JSON.stringify(shipping_address) : null,
@@ -69,25 +68,31 @@ export async function POST(req: NextRequest) {
 
     conn.release();
 
-    const emailData = {
-      orderNumber: order_number,
-      customerName: nom,
-      customerEmail: email,
-      items,
-      deliveryType: delivery_type as 'relay' | 'home' | 'international',
-      relayPoint: relay_point ?? null,
-      shippingAddress: shipping_address ?? null,
-      pays: pays ?? 'FR',
-      shippingCost: Number(shipping_cost ?? 0),
-      total: Number(total),
-      paymentLink: payment_link,
-      notes: notes ?? null,
-    };
+    // Stripe : emails après paiement confirmé (webhook / verify-session). PayPal : à la création.
+    if (!isStripePaymentProvider()) {
+      const emailData = {
+        orderNumber: order_number,
+        customerName: nom,
+        customerEmail: email,
+        customerPhone: telephone ?? null,
+        items,
+        deliveryType: delivery_type as 'relay' | 'home' | 'international',
+        relayPoint: relay_point ?? null,
+        shippingAddress: shipping_address ?? null,
+        pays: pays ?? 'FR',
+        paysResidence: pays_residence ?? null,
+        shippingCost: Number(shipping_cost ?? 0),
+        total: Number(total),
+        paymentLink: payment_link,
+        notes: notes ?? null,
+        paymentConfirmed: false,
+      };
 
-    Promise.all([
-      sendOrderConfirmationEmail(emailData),
-      sendAdminNewOrderEmail(emailData),
-    ]).catch(err => console.error('[EMAIL ERROR]', err));
+      Promise.all([
+        sendOrderConfirmationEmail(emailData),
+        sendAdminNewOrderEmail(emailData),
+      ]).catch((err) => console.error('[EMAIL ERROR]', err));
+    }
 
     return NextResponse.json({
       ok: true,
@@ -101,7 +106,10 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const denied = await requireAdmin(req);
+  if (denied) return denied;
+
   try {
     const conn = await pool.getConnection();
     const [rows] = await conn.execute(

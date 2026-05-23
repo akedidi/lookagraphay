@@ -1,7 +1,13 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
+import { ensureOrderColumns } from '@/lib/orders-schema';
+import { ensureStoreColumns } from '@/lib/store-schema';
+import { requireAdmin } from '@/lib/admin-auth';
 
-export async function POST() {
+export async function POST(req: NextRequest) {
+  const denied = await requireAdmin(req);
+  if (denied) return denied;
+
   try {
     const conn = await pool.getConnection();
 
@@ -21,6 +27,9 @@ export async function POST() {
         disponible TINYINT(1) DEFAULT 1,
         paypal_link VARCHAR(500),
         ordre INT DEFAULT 0,
+        style VARCHAR(120) DEFAULT 'Calligraphie contemporaine',
+        extrait VARCHAR(255),
+        in_galerie TINYINT(1) DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
@@ -60,20 +69,25 @@ export async function POST() {
     const [storeRows] = await conn.execute('SELECT COUNT(*) as count FROM store_items') as any;
     if (storeRows[0].count === 0) {
       const storeItems = [
-        ['Chawq al-Hayat — شوق الحياة','Désir ardent de la vie','Tableau','Ce vers du poète tunisien Abou el-Kassem el-Chebbi exprime la force vitale sans laquelle l\'existence se fane. La couleur bleue évoque les sources de la vie — le ciel et la mer. Les points dorés sont autant de lumières vers lesquelles notre esprit peut tendre.','« Celui que le désir ardent de la vie n\'enlace pas, se dissipera dans son ciel et disparaîtra en poussière. »','Acrylique sur toile de lin','60 × 90 cm','2024',500,JSON.stringify(['/images/articles/tableau-chawq-2.jpg','/images/articles/tableau-chawq-1.jpg']),1,'https://paypal.me/lookagraphy/500',1],
-        ['Fîhâ liman sâlamoûna — وفيها لمن سالمونا','La paix à ceux qui viennent en paix','Tableau','Cette œuvre rend hommage à la fraternité et à l\'hospitalité. La calligraphie ample et lumineuse célèbre la paix offerte à ceux qui nous approchent avec de bonnes intentions. Le losange d\'or symbolise la préciosité du lien humain.','« Trouvera la paix celui qui nous approche avec un cœur de paix. »','Acrylique sur toile de lin','60 × 80 cm','2024',450,JSON.stringify(['/images/articles/tableau-salam-1.jpg','/images/articles/tableau-salam-2.jpg']),1,'https://paypal.me/lookagraphy/450',2],
-        ['Da\' al-Hayat — دع الحياة','Laisse la vie vivre en toi','Tableau','Extrait de Rumi : le mot « vivre » sort du cadre doré, qui symbolise notre cage d\'or, notre zone de confort. Sortir de cette cage est la seule voie pour retrouver la paix intérieure.','« Ne cherche pas à résister aux changements qui se dressent sur ton chemin. Laisse la vie vivre en toi. »','Toile de coton, feuille d\'or, acrylique et encre japonaise','Toile originale','2005',400,JSON.stringify(['/images/articles/tableau-laisse-vie-2.jpg','/images/articles/tableau-laisse-vie-1.jpg']),1,'https://paypal.me/lookagraphy/400',3],
-        ['Haq — حق','Vérité & Justice','Tableau','Haq désigne à la fois justice et droit en un seul mot. Au centre du tableau, ce mot est calligraphié avec une partie estompée et l\'autre manifeste — symbolisant que la vérité finit toujours par apparaître.','« Peu importe nos efforts pour estomper, cacher ou faire taire la vérité, elle finit toujours par apparaître au grand jour. »','Acrylique sur toile','Toile originale','2015',350,JSON.stringify(['/images/articles/tableau-haq-1.jpg','/images/articles/tableau-haq-2.jpg']),1,'https://paypal.me/lookagraphy/350',4],
-        ['Howa al-Mahabba — هو المحبة','L\'amour dont on ne saisit l\'essence qu\'à travers la souffrance','Tableau','Hommage à la vision de l\'amour selon Ibn Hazm al-Andalousî. La composition circulaire en noir et blanc rayonne autour d\'un cœur d\'or.','« C\'est l\'amour dont on ne saisit la véritable essence qu\'à travers la souffrance. »','Acrylique sur toile de lin','60 × 80 cm','2015',300,JSON.stringify(['/images/articles/tableau-mahabba-1.jpg','/images/articles/tableau-mahabba-2.jpg']),1,'https://paypal.me/lookagraphy/300',5],
-        ['Adînu bi-dîn al-hubb — أدين بدين الحب','L\'amour est ma croyance','Tableau','Ibn al-Arabi exprime une vision universelle de la spiritualité. Le texte est composé en cercle — symbole de la planète Terre. Les différentes couleurs représentent la diversité des peuples.','« L\'amour est ma croyance et m\'incline devant ses enseignements. Mon cœur serait ouvert à toute forme. »','Acrylique sur toile de lin','60 × 90 cm','2024',300,JSON.stringify(['/images/articles/tableau-amour-3.jpg','/images/articles/tableau-amour-1.jpg','/images/articles/tableau-amour-2.jpg']),1,'https://paypal.me/lookagraphy/300',6],
+        ['Chawq al-Hayat — شوق الحياة','Désir ardent de la vie','Tableau','Ce vers du poète tunisien Abou el-Kassem el-Chebbi exprime la force vitale sans laquelle l\'existence se fane. La couleur bleue évoque les sources de la vie — le ciel et la mer. Les points dorés sont autant de lumières vers lesquelles notre esprit peut tendre.','« Celui que le désir ardent de la vie n\'enlace pas, se dissipera dans son ciel et disparaîtra en poussière. »','Acrylique sur toile de lin','60 × 90 cm','2024',500,JSON.stringify(['/images/articles/tableau-chawq-2.jpg','/images/articles/tableau-chawq-1.jpg']),1,'https://paypal.me/lookagraphy/500',1,'Calligraphie contemporaine','أبو القاسم الشابي',1],
+        ['Fîhâ liman sâlamoûna — وفيها لمن سالمونا','La paix à ceux qui viennent en paix','Tableau','Cette œuvre rend hommage à la fraternité et à l\'hospitalité. La calligraphie ample et lumineuse célèbre la paix offerte à ceux qui nous approchent avec de bonnes intentions. Le losange d\'or symbolise la préciosité du lien humain.','« Trouvera la paix celui qui nous approche avec un cœur de paix. »','Acrylique sur toile de lin','60 × 80 cm','2024',450,JSON.stringify(['/images/articles/tableau-salam-1.jpg','/images/articles/tableau-salam-2.jpg']),1,'https://paypal.me/lookagraphy/450',2,'Calligraphie contemporaine','مصطفى صادق الرافعي',1],
+        ['Da\' al-Hayat — دع الحياة','Laisse la vie vivre en toi','Tableau','Extrait de Rumi : le mot « vivre » sort du cadre doré, qui symbolise notre cage d\'or, notre zone de confort. Sortir de cette cage est la seule voie pour retrouver la paix intérieure.','« Ne cherche pas à résister aux changements qui se dressent sur ton chemin. Laisse la vie vivre en toi. »','Toile de coton, feuille d\'or, acrylique et encre japonaise','Toile originale','2005',400,JSON.stringify(['/images/articles/tableau-laisse-vie-2.jpg','/images/articles/tableau-laisse-vie-1.jpg']),1,'https://paypal.me/lookagraphy/400',3,'Calligraphie contemporaine','جالل الدين الرومي',1],
+        ['Haq — حق','Vérité & Justice','Tableau','Haq désigne à la fois justice et droit en un seul mot. Au centre du tableau, ce mot est calligraphié avec une partie estompée et l\'autre manifeste — symbolisant que la vérité finit toujours par apparaître.','« Peu importe nos efforts pour estomper, cacher ou faire taire la vérité, elle finit toujours par apparaître au grand jour. »','Acrylique sur toile','Toile originale','2015',350,JSON.stringify(['/images/articles/tableau-haq-1.jpg','/images/articles/tableau-haq-2.jpg']),1,'https://paypal.me/lookagraphy/350',4,'Calligraphie contemporaine','Looka',1],
+        ['Howa al-Mahabba — هو المحبة','L\'amour dont on ne saisit l\'essence qu\'à travers la souffrance','Tableau','Hommage à la vision de l\'amour selon Ibn Hazm al-Andalousî. La composition circulaire en noir et blanc rayonne autour d\'un cœur d\'or.','« C\'est l\'amour dont on ne saisit la véritable essence qu\'à travers la souffrance. »','Acrylique sur toile de lin','60 × 80 cm','2015',300,JSON.stringify(['/images/articles/tableau-mahabba-1.jpg','/images/articles/tableau-mahabba-2.jpg']),1,'https://paypal.me/lookagraphy/300',5,'Calligraphie contemporaine','ابن حزم الأندلسي — Ṭawq al-Ḥamāma',1],
+        ['Adînu bi-dîn al-hubb — أدين بدين الحب','L\'amour est ma croyance','Tableau','Ibn al-Arabi exprime une vision universelle de la spiritualité. Le texte est composé en cercle — symbole de la planète Terre. Les différentes couleurs représentent la diversité des peuples.','« L\'amour est ma croyance et m\'incline devant ses enseignements. Mon cœur serait ouvert à toute forme. »','Acrylique sur toile de lin','60 × 90 cm','2024',300,JSON.stringify(['/images/articles/tableau-amour-3.jpg','/images/articles/tableau-amour-1.jpg','/images/articles/tableau-amour-2.jpg']),1,'https://paypal.me/lookagraphy/300',6,'Calligraphie contemporaine','محيي الدين بن عربي',1],
       ];
       for (const item of storeItems) {
         await conn.execute(
-          'INSERT INTO store_items (titre,sous_titre,categorie,description,citation,technique,dimensions,annee,prix,images,disponible,paypal_link,ordre) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
+          'INSERT INTO store_items (titre,sous_titre,categorie,description,citation,technique,dimensions,annee,prix,images,disponible,paypal_link,ordre,style,extrait,in_galerie) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
           item
         );
       }
     }
+
+    await ensureStoreColumns(conn);
+    await conn.execute(
+      "UPDATE store_items SET in_galerie = 1 WHERE categorie = 'Tableau' AND (in_galerie IS NULL OR in_galerie = 0)"
+    );
 
     const [expoRows] = await conn.execute('SELECT COUNT(*) as count FROM expositions') as any;
     if (expoRows[0].count === 0) {
@@ -112,6 +126,7 @@ export async function POST() {
         nom VARCHAR(255) NOT NULL,
         email VARCHAR(255) NOT NULL,
         telephone VARCHAR(50),
+        pays_residence VARCHAR(100) NULL,
         items JSON NOT NULL,
         delivery_type ENUM('relay','home','international') NOT NULL,
         relay_point JSON,
@@ -121,12 +136,20 @@ export async function POST() {
         total DECIMAL(10,2) NOT NULL,
         status ENUM('en_attente','paye','expedie','livre','annule') DEFAULT 'en_attente',
         notes TEXT,
+        admin_notes TEXT NULL,
         stripe_session_id VARCHAR(255) NULL,
         stripe_payment_intent_id VARCHAR(255) NULL,
+        carrier VARCHAR(100) NULL,
+        tracking_number VARCHAR(100) NULL,
+        tracking_url VARCHAR(500) NULL,
+        shipped_at TIMESTAMP NULL,
+        delivered_at TIMESTAMP NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
+
+    await ensureOrderColumns(conn);
 
     conn.release();
     return NextResponse.json({ ok: true, message: 'DB initialisée et données migrées' });

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStripe, isStripePaymentProvider } from '@/lib/stripe';
 import { markOrderPaid } from '@/lib/mark-order-paid';
+import { sendOrderPaidNotificationEmails } from '@/lib/order-paid-emails';
 
 export async function GET(req: NextRequest) {
   if (!isStripePaymentProvider()) {
@@ -21,11 +22,16 @@ export async function GET(req: NextRequest) {
 
     const paid = session.payment_status === 'paid';
     if (paid) {
-      await markOrderPaid(orderNumber, {
+      const result = await markOrderPaid(orderNumber, {
         stripeSessionId: session.id,
         stripePaymentIntentId:
           typeof session.payment_intent === 'string' ? session.payment_intent : undefined,
       });
+      if (result === 'updated') {
+        sendOrderPaidNotificationEmails(orderNumber).catch((err) =>
+          console.error('[EMAIL ERROR] verify-session', err)
+        );
+      }
     }
 
     return NextResponse.json({

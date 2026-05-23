@@ -1,9 +1,7 @@
 'use client';
 import React, { useState, useEffect, useCallback } from 'react';
-
-const ADMIN_USER = 'admin';
-const ADMIN_PASS = 'REDACTED';
-const SESSION_KEY = 'lookagraphy_admin_session';
+import { CARRIER_SUGGESTIONS } from '@/lib/carriers';
+import { adminFetchInit, adminJsonInit } from '@/lib/admin-fetch';
 
 const gold = '#C9A84C';
 const dark = '#1A1209';
@@ -148,7 +146,7 @@ function ImagesField({ label, value, onChange }: any) {
     try {
       const fd = new FormData();
       fd.append('file', file);
-      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd, credentials: 'include' });
       const data = await res.json();
       if (data.path) {
         onChange([...imgs, data.path]);
@@ -189,13 +187,13 @@ function ImagesField({ label, value, onChange }: any) {
   );
 }
 
-const emptyStore = { titre: '', sous_titre: '', categorie: 'Tableau', description: '', citation: '', technique: '', dimensions: '', annee: '', prix: '', images: [], disponible: true, paypal_link: '', ordre: 0 };
+const emptyStore = { titre: '', sous_titre: '', categorie: 'Tableau', description: '', citation: '', technique: '', dimensions: '', annee: '', prix: '', images: [], disponible: true, paypal_link: '', ordre: 0, style: 'Calligraphie contemporaine', extrait: '', in_galerie: true };
 const emptyExpo = { titre: '', lieu: '', dates: '', statut: 'passé', description: '', image: '', images: [] };
 const emptyEvt = { titre: '', date: '', heure: '', lieu: '', type: 'Vernissage', statut: 'à venir', description: '', images: [] };
 
 export default function AdminPage() {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [loginUser, setLoginUser] = useState('');
+  const [authChecking, setAuthChecking] = useState(true);
   const [loginPass, setLoginPass] = useState('');
   const [loginError, setLoginError] = useState('');
   const [tab, setTab] = useState<Tab>('store');
@@ -221,32 +219,40 @@ export default function AdminPage() {
   const [msg, setMsg] = useState('');
 
   useEffect(() => {
-    try {
-      if (typeof window !== 'undefined') {
-        const s = localStorage.getItem(SESSION_KEY);
-        if (s === 'true') setLoggedIn(true);
-      }
-    } catch (_) {}
+    fetch('/api/admin/session', adminFetchInit)
+      .then((r) => r.json())
+      .then((data) => setLoggedIn(Boolean(data.authenticated)))
+      .catch(() => setLoggedIn(false))
+      .finally(() => setAuthChecking(false));
   }, []);
 
-  const login = () => {
-    if (loginUser === ADMIN_USER && loginPass === ADMIN_PASS) {
-      try { localStorage.setItem(SESSION_KEY, 'true'); } catch (_) {}
-      setLoggedIn(true);
-      setLoginError('');
-    } else {
-      setLoginError('Identifiants incorrects');
+  const login = async () => {
+    setLoginError('');
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        ...adminJsonInit({ password: loginPass }),
+      });
+      if (res.ok) {
+        setLoggedIn(true);
+        setLoginPass('');
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setLoginError(data.error || 'Mot de passe incorrect');
+      }
+    } catch {
+      setLoginError('Erreur de connexion');
     }
   };
 
-  const logout = () => {
-    try { localStorage.removeItem(SESSION_KEY); } catch (_) {}
+  const logout = async () => {
+    await fetch('/api/admin/logout', { method: 'POST', ...adminFetchInit }).catch(() => {});
     setLoggedIn(false);
   };
 
   const initDb = async () => {
     setInitMsg('Initialisation...');
-    const r = await fetch('/api/admin/init', { method: 'POST' });
+    const r = await fetch('/api/admin/init', { method: 'POST', ...adminFetchInit });
     const data = await r.json();
     setInitMsg(data.ok ? '✅ ' + data.message : '❌ ' + data.error);
     setInitDone(data.ok);
@@ -256,7 +262,7 @@ export default function AdminPage() {
   const fetchOrders = useCallback(async () => {
     setOrdersLoading(true);
     try {
-      const data = await fetch('/api/orders').then(r => r.json());
+      const data = await fetch('/api/orders', adminFetchInit).then(r => r.json());
       if (Array.isArray(data)) setOrders(data);
     } catch {}
     setOrdersLoading(false);
@@ -272,8 +278,7 @@ export default function AdminPage() {
       const order = orders.find(o => o.order_number === orderNumber);
       await fetch(`/api/orders/${orderNumber}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status, notes: order?.notes }),
+        ...adminJsonInit({ status }),
       });
       setOrders(prev => prev.map(o => o.order_number === orderNumber ? { ...o, status } : o));
     } catch {}
@@ -287,12 +292,17 @@ export default function AdminPage() {
       nom: order.nom ?? '',
       email: order.email ?? '',
       telephone: order.telephone ?? '',
-      notes: order.notes ?? '',
+      customer_notes: order.notes ?? '',
+      admin_notes: order.admin_notes ?? '',
+      pays_residence: order.pays_residence ?? '',
       pays: order.pays ?? 'FR',
       shipping_cost: order.shipping_cost ?? 0,
       relay_point: order.relay_point ? { ...order.relay_point } : { id: '', nom: '', adresse: '', ville: '', code_postal: '' },
       shipping_address: order.shipping_address ? { ...order.shipping_address } : { rue: '', complement: '', code_postal: '', ville: '' },
       delivery_type: order.delivery_type,
+      carrier: order.carrier ?? '',
+      tracking_number: order.tracking_number ?? '',
+      tracking_url: order.tracking_url ?? '',
     });
     setOrderSaveMsg(null);
   }
@@ -307,23 +317,33 @@ export default function AdminPage() {
         nom: d.nom,
         email: d.email,
         telephone: d.telephone || null,
-        notes: d.notes || null,
+        customer_notes: d.customer_notes || null,
+        admin_notes: d.admin_notes || null,
+        pays_residence: d.pays_residence?.trim() || null,
         pays: d.pays,
         shipping_cost: Number(d.shipping_cost),
+        carrier: d.carrier?.trim() || null,
+        tracking_number: d.tracking_number?.trim() || null,
+        tracking_url: d.tracking_url?.trim() || null,
       };
       if (d.delivery_type === 'relay') body.relay_point = d.relay_point;
       if (d.delivery_type === 'home') body.shipping_address = d.shipping_address;
 
       const res = await fetch(`/api/orders/${orderNumber}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        ...adminJsonInit(body),
       });
       if (res.ok) {
         setOrders(prev => prev.map(o => o.order_number === orderNumber ? {
           ...o, ...body,
           relay_point: d.delivery_type === 'relay' ? d.relay_point : o.relay_point,
           shipping_address: d.delivery_type === 'home' ? d.shipping_address : o.shipping_address,
+                          carrier: d.carrier,
+                          tracking_number: d.tracking_number,
+                          tracking_url: d.tracking_url,
+                          notes: d.customer_notes,
+                          admin_notes: d.admin_notes,
+                          pays_residence: d.pays_residence,
         } : o));
         setOrderSaveMsg({ num: orderNumber, ok: true });
       } else {
@@ -337,9 +357,9 @@ export default function AdminPage() {
 
   const fetchAll = useCallback(async () => {
     const [s, e, ev] = await Promise.all([
-      fetch('/api/store').then(r => r.json()),
-      fetch('/api/expositions').then(r => r.json()),
-      fetch('/api/evenements').then(r => r.json()),
+      fetch('/api/store', adminFetchInit).then(r => r.json()),
+      fetch('/api/expositions', adminFetchInit).then(r => r.json()),
+      fetch('/api/evenements', adminFetchInit).then(r => r.json()),
     ]);
     if (Array.isArray(s)) setStoreItems(s);
     if (Array.isArray(e)) setExpositions(e);
@@ -355,13 +375,13 @@ export default function AdminPage() {
     const body = { ...editStore, prix: parseFloat(editStore.prix) || 0, ordre: parseInt(editStore.ordre) || 0 };
     const url = isNew ? '/api/store' : `/api/store/${editStore.id}`;
     const method = isNew ? 'POST' : 'PUT';
-    await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    await fetch(url, { method, ...adminJsonInit(body) });
     await fetchAll(); setEditStore(null); setSaving(false); flash('✅ Article sauvegardé');
   };
 
   const deleteStore = async (id: number) => {
     if (!confirm('Supprimer cet article ?')) return;
-    await fetch(`/api/store/${id}`, { method: 'DELETE' });
+    await fetch(`/api/store/${id}`, { method: 'DELETE', ...adminFetchInit });
     await fetchAll(); flash('Article supprimé');
   };
 
@@ -369,13 +389,13 @@ export default function AdminPage() {
     setSaving(true);
     const url = isNew ? '/api/expositions' : `/api/expositions/${editExpo.id}`;
     const method = isNew ? 'POST' : 'PUT';
-    await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(editExpo) });
+    await fetch(url, { method, ...adminJsonInit(editExpo) });
     await fetchAll(); setEditExpo(null); setSaving(false); flash('✅ Exposition sauvegardée');
   };
 
   const deleteExpo = async (id: number) => {
     if (!confirm('Supprimer cette exposition ?')) return;
-    await fetch(`/api/expositions/${id}`, { method: 'DELETE' });
+    await fetch(`/api/expositions/${id}`, { method: 'DELETE', ...adminFetchInit });
     await fetchAll(); flash('Exposition supprimée');
   };
 
@@ -383,15 +403,23 @@ export default function AdminPage() {
     setSaving(true);
     const url = isNew ? '/api/evenements' : `/api/evenements/${editEvt.id}`;
     const method = isNew ? 'POST' : 'PUT';
-    await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(editEvt) });
+    await fetch(url, { method, ...adminJsonInit(editEvt) });
     await fetchAll(); setEditEvt(null); setSaving(false); flash('✅ Événement sauvegardé');
   };
 
   const deleteEvt = async (id: number) => {
     if (!confirm('Supprimer cet événement ?')) return;
-    await fetch(`/api/evenements/${id}`, { method: 'DELETE' });
+    await fetch(`/api/evenements/${id}`, { method: 'DELETE', ...adminFetchInit });
     await fetchAll(); flash('Événement supprimé');
   };
+
+  if (authChecking) {
+    return (
+      <div style={{ minHeight: '100vh', background: dark, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.75rem', letterSpacing: '0.2em', color: gold, textTransform: 'uppercase' }}>Chargement…</span>
+      </div>
+    );
+  }
 
   if (!loggedIn) {
     return (
@@ -402,8 +430,7 @@ export default function AdminPage() {
             <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', letterSpacing: '0.3em', color: gold, textTransform: 'uppercase', marginTop: '0.3rem' }}>Backoffice</div>
           </div>
           <form onSubmit={e => { e.preventDefault(); login(); }}>
-            <Field label="Identifiant" value={loginUser} onChange={setLoginUser} placeholder="admin" />
-            <Field label="Mot de passe" value={loginPass} onChange={setLoginPass} type="password" placeholder="••••••••" />
+            <Field label="Mot de passe admin" value={loginPass} onChange={setLoginPass} type="password" placeholder="••••••••" autoComplete="current-password" />
             {loginError && <p style={{ color: '#e05555', fontFamily: 'Montserrat, sans-serif', fontSize: '0.8rem', marginBottom: '1rem' }}>{loginError}</p>}
             <button
               type="submit"
@@ -502,9 +529,14 @@ export default function AdminPage() {
                   <Field label="Ordre d'affichage" value={editStore.ordre} onChange={(v: string) => setEditStore({ ...editStore, ordre: v })} type="number" />
                 </div>
                 <Field label="Citation" value={editStore.citation} onChange={(v: string) => setEditStore({ ...editStore, citation: v })} type="textarea" />
+                <div className="admin-form-grid">
+                  <Field label="Style (galerie)" value={editStore.style} onChange={(v: string) => setEditStore({ ...editStore, style: v })} />
+                  <Field label="Extrait / auteur (galerie)" value={editStore.extrait} onChange={(v: string) => setEditStore({ ...editStore, extrait: v })} />
+                </div>
                 <Field label="Description" value={editStore.description} onChange={(v: string) => setEditStore({ ...editStore, description: v })} type="textarea" />
                 <ImagesField label="Images (chemins /images/...)" value={editStore.images} onChange={(v: string[]) => setEditStore({ ...editStore, images: v })} />
                 <Toggle label="Disponibilité" value={editStore.disponible} onChange={(v: boolean) => setEditStore({ ...editStore, disponible: v })} />
+                <Toggle label="Afficher dans la galerie" value={editStore.in_galerie} onChange={(v: boolean) => setEditStore({ ...editStore, in_galerie: v })} />
                 <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
                   <button onClick={saveStore} disabled={saving} style={btnGold}>{saving ? 'Sauvegarde...' : 'Sauvegarder'}</button>
                   <button onClick={() => setEditStore(null)} style={btnOutline}>Annuler</button>
@@ -523,7 +555,7 @@ export default function AdminPage() {
                     <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: gold }}>{item.categorie} · {item.prix}€ · {item.disponible ? 'DISPO' : 'Indisponible'}</div>
                   </div>
                   <div className="admin-item-actions">
-                    <button onClick={() => { setEditStore({ ...item }); setIsNew(false); }} style={btnOutline}><span className="admin-btn-text">Modifier</span><span className="admin-icon">✎</span></button>
+                    <button onClick={() => { setEditStore({ ...item, in_galerie: item.in_galerie ?? false }); setIsNew(false); }} style={btnOutline}><span className="admin-btn-text">Modifier</span><span className="admin-icon">✎</span></button>
                     <button onClick={() => deleteStore(item.id)} style={btnDanger}><span className="admin-btn-text">Supprimer</span><span className="admin-icon">✕</span></button>
                   </div>
                 </div>
@@ -682,6 +714,7 @@ export default function AdminPage() {
                           </div>
                           <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: 'rgba(245,240,232,0.55)' }}>
                             {order.nom} · {order.email}{order.telephone ? ` · ${order.telephone}` : ''}
+                            {order.pays_residence ? ` · Rés. ${order.pays_residence}` : ''}
                           </div>
                           <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(245,240,232,0.35)', marginTop: '0.15rem' }}>
                             {new Date(order.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
@@ -695,9 +728,14 @@ export default function AdminPage() {
                             {order.delivery_type === 'relay'
                               ? `📍 ${order.relay_point?.nom ?? 'Point Relais'}${order.relay_point?.ville ? `, ${order.relay_point.ville}` : ''} (${order.pays})`
                               : order.delivery_type === 'home'
-                              ? `🏠 ${order.shipping_address?.rue ?? ''}, ${order.shipping_address?.code_postal ?? ''} ${order.shipping_address?.ville ?? ''} · ${Number(order.shipping_cost)} €`
+                              ? `🏠 ${order.shipping_address?.rue ?? ''}, ${order.shipping_address?.code_postal ?? ''} ${order.shipping_address?.ville ?? ''} · ${Number(order.shipping_cost)} € port`
                               : '🌍 International'}
                           </div>
+                          {order.tracking_number && (
+                            <div style={{ marginTop: '0.3rem', fontFamily: 'Montserrat, sans-serif', fontSize: '0.67rem', color: 'rgba(201,168,76,0.75)' }}>
+                              📦 Suivi{order.carrier ? ` (${order.carrier})` : ''} : {order.tracking_number}
+                            </div>
+                          )}
                           {order.notes && (
                             <div style={{ marginTop: '0.3rem', fontFamily: 'Montserrat, sans-serif', fontSize: '0.67rem', fontWeight: 300, color: 'rgba(245,240,232,0.38)', fontStyle: 'italic' }}>
                               💬 {order.notes}
@@ -765,6 +803,10 @@ export default function AdminPage() {
                               <div>
                                 <label style={labelStyle}>Téléphone</label>
                                 <input type="tel" style={inputStyle} value={d.telephone} onChange={e => setEditOrderDraft({ ...d, telephone: e.target.value })} placeholder="+33 6 00 00 00 00" />
+                              </div>
+                              <div style={{ gridColumn: '1/-1' }}>
+                                <label style={labelStyle}>Pays de résidence</label>
+                                <input style={inputStyle} value={d.pays_residence} onChange={e => setEditOrderDraft({ ...d, pays_residence: e.target.value })} placeholder="France" />
                               </div>
                             </div>
                           </div>
@@ -848,16 +890,71 @@ export default function AdminPage() {
                             </div>
                           )}
 
-                          {/* Commentaire admin */}
+                          {/* Expédition & suivi */}
                           <div style={{ marginBottom: '1.5rem' }}>
                             <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: gold, marginBottom: '0.75rem', borderBottom: '1px solid rgba(201,168,76,0.1)', paddingBottom: '0.4rem' }}>
-                              💬 Commentaire / Note interne
+                              📦 Expédition & suivi colis
+                            </div>
+                            <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(245,240,232,0.45)', marginBottom: '0.85rem', lineHeight: 1.6 }}>
+                              Backoffice uniquement — le client ne choisit pas. À renseigner quand vous expédiez (Mondial Relay, La Poste, Colissimo, DPD…). Affiché sur la page de suivi et dans les emails.
+                            </p>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem 1rem' }}>
+                              <div style={{ gridColumn: '1/-1' }}>
+                                <label style={labelStyle}>Transporteur utilisé</label>
+                                <input
+                                  style={inputStyle}
+                                  list="carrier-suggestions"
+                                  value={d.carrier}
+                                  onChange={e => setEditOrderDraft({ ...d, carrier: e.target.value })}
+                                  placeholder="Ex : Mondial Relay, Colissimo…"
+                                />
+                                <datalist id="carrier-suggestions">
+                                  {CARRIER_SUGGESTIONS.map(c => (
+                                    <option key={c} value={c} />
+                                  ))}
+                                </datalist>
+                              </div>
+                              <div style={{ gridColumn: '1/-1' }}>
+                                <label style={labelStyle}>Numéro de suivi</label>
+                                <input
+                                  style={inputStyle}
+                                  value={d.tracking_number}
+                                  onChange={e => setEditOrderDraft({ ...d, tracking_number: e.target.value })}
+                                  placeholder="Ex : 12345678901234"
+                                />
+                              </div>
+                              <div style={{ gridColumn: '1/-1' }}>
+                                <label style={labelStyle}>Lien de suivi (optionnel)</label>
+                                <input
+                                  style={inputStyle}
+                                  value={d.tracking_url}
+                                  onChange={e => setEditOrderDraft({ ...d, tracking_url: e.target.value })}
+                                  placeholder="https://…"
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          {d.customer_notes ? (
+                            <div style={{ marginBottom: '1.5rem', padding: '0.85rem', background: 'rgba(245,240,232,0.04)', border: '1px solid rgba(201,168,76,0.1)' }}>
+                              <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: gold, marginBottom: '0.5rem' }}>
+                                Message client (checkout)
+                              </p>
+                              <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: 'rgba(245,240,232,0.55)', lineHeight: 1.6, fontStyle: 'italic' }}>
+                                {d.customer_notes}
+                              </p>
+                            </div>
+                          ) : null}
+
+                          <div style={{ marginBottom: '1.5rem' }}>
+                            <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: gold, marginBottom: '0.75rem', borderBottom: '1px solid rgba(201,168,76,0.1)', paddingBottom: '0.4rem' }}>
+                              💬 Message au client (optionnel)
                             </div>
                             <textarea
                               style={{ ...inputStyle, resize: 'vertical', minHeight: 80, lineHeight: 1.6 }}
-                              value={d.notes}
-                              onChange={e => setEditOrderDraft({ ...d, notes: e.target.value })}
-                              placeholder="Note visible dans le suivi client et en interne (ex : numéro de suivi Mondial Relay, remarque, etc.)"
+                              value={d.admin_notes}
+                              onChange={e => setEditOrderDraft({ ...d, admin_notes: e.target.value })}
+                              placeholder="Message envoyé avec les mises à jour de statut (email)"
                             />
                           </div>
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe';
 import { markOrderPaid } from '@/lib/mark-order-paid';
+import { sendOrderPaidNotificationEmails } from '@/lib/order-paid-emails';
 
 const HANDLED_EVENTS = new Set(['checkout.session.completed']);
 
@@ -30,12 +31,17 @@ export async function handleStripeWebhook(req: NextRequest): Promise<NextRespons
       const session = event.data.object;
       const orderNumber = session.metadata?.order_number;
       if (orderNumber && session.payment_status === 'paid') {
-        await markOrderPaid(orderNumber, {
+        const result = await markOrderPaid(orderNumber, {
           stripeSessionId: session.id,
           stripePaymentIntentId:
             typeof session.payment_intent === 'string' ? session.payment_intent : undefined,
         });
-        console.log('[STRIPE WEBHOOK] Commande payée:', orderNumber);
+        if (result === 'updated') {
+          sendOrderPaidNotificationEmails(orderNumber).catch((err) =>
+            console.error('[EMAIL ERROR] webhook', err)
+          );
+        }
+        console.log('[STRIPE WEBHOOK] Commande payée:', orderNumber, result);
       }
     }
     return NextResponse.json({ received: true });

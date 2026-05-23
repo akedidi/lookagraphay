@@ -1,9 +1,11 @@
 import pool from '@/lib/db';
 
+export type MarkOrderPaidResult = 'not_found' | 'already_paid' | 'updated';
+
 export async function markOrderPaid(
   orderNumber: string,
   opts?: { stripeSessionId?: string; stripePaymentIntentId?: string }
-): Promise<boolean> {
+): Promise<MarkOrderPaidResult> {
   const conn = await pool.getConnection();
   try {
     const [rows] = await conn.execute(
@@ -11,8 +13,8 @@ export async function markOrderPaid(
       [orderNumber]
     ) as [{ status: string }[], unknown];
 
-    if (rows.length === 0) return false;
-    if (rows[0].status === 'paye') return true;
+    if (rows.length === 0) return 'not_found';
+    if (rows[0].status === 'paye') return 'already_paid';
 
     await conn.execute(
       `UPDATE orders SET
@@ -26,7 +28,7 @@ export async function markOrderPaid(
         orderNumber,
       ]
     );
-    return true;
+    return 'updated';
   } finally {
     conn.release();
   }

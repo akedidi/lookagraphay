@@ -131,6 +131,10 @@ export const evenementsData = [
   },
 ];
 
+/**
+ * @deprecated Source de vérité = MySQL (`store_items` avec `in_galerie = 1`, API `/api/galerie`).
+ * Conservé comme repli si la base est vide ou indisponible.
+ */
 export const galerieData = [
   {
     id: "oeuvre-chawq-al-hayat",

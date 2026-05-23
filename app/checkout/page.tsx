@@ -35,12 +35,12 @@ const labelStyle: React.CSSProperties = {
 };
 
 const RELAY_COUNTRIES = [
-  { code: 'FR', label: 'France' },
-  { code: 'BE', label: 'Belgique' },
-  { code: 'LU', label: 'Luxembourg' },
-  { code: 'ES', label: 'Espagne' },
-  { code: 'PT', label: 'Portugal' },
-  { code: 'DE', label: 'Allemagne' },
+  { code: 'FR', label: 'France', finder: 'https://www.mondialrelay.fr/trouver-un-point-relais/' },
+  { code: 'BE', label: 'Belgique', finder: 'https://www.mondialrelay.be/fr-be/trouver-un-point-relais/' },
+  { code: 'LU', label: 'Luxembourg', finder: 'https://www.mondialrelay.lu/fr-lu/trouver-un-point-relais/' },
+  { code: 'ES', label: 'Espagne', finder: 'https://www.inpost.es/en/find-location?type=parcel-locker' },
+  { code: 'PT', label: 'Portugal', finder: 'https://www.inpost.pt/en/find-location?type=parcel-locker' },
+  { code: 'DE', label: 'Allemagne', finder: 'https://www.mondialrelay.de/paket-shop-suche/' },
 ];
 
 type DeliveryType = 'relay' | 'home' | 'international' | '';
@@ -97,6 +97,7 @@ export default function CheckoutPage() {
     if (!deliveryType) e.delivery = 'Veuillez choisir un mode de livraison.';
     if (deliveryType === 'relay') {
       if (!relayPoint.nom.trim()) e.relay_nom = 'Nom du point relais requis.';
+      if (!relayPoint.code_postal.trim()) e.relay_cp = 'Code postal du point relais requis.';
       if (!relayPoint.ville.trim()) e.relay_ville = 'Ville requise.';
     }
     if (deliveryType === 'home') {
@@ -218,8 +219,8 @@ export default function CheckoutPage() {
                 {sectionTitle('Mode de livraison')}
 
                 <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: errors.delivery ? '0.5rem' : '1.5rem' }}>
-                  {deliveryCard('relay', '📍', 'Point Relais Mondial Relay', 'Gratuit — France, Belgique, Luxembourg, Espagne, Portugal, Allemagne')}
-                  {deliveryCard('home', '🏠', 'Livraison à domicile', 'France uniquement — à partir de 10 €')}
+                  {deliveryCard('relay', '📍', 'Point Relais / Locker Mondial Relay', 'Gratuit — retrait en point relais ou locker (pas de livraison à domicile MR)')}
+                  {deliveryCard('home', '🏠', 'Livraison à domicile', 'France — frais selon le poids, expédition par Looka')}
                   {deliveryCard('international', '🌍', 'International', 'Devis personnalisé sur demande')}
                 </div>
                 {errors.delivery && <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: '#e05555', marginBottom: '1rem' }}>{errors.delivery}</p>}
@@ -228,16 +229,21 @@ export default function CheckoutPage() {
                 {deliveryType === 'relay' && (
                   <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
                     <div style={{ padding: '1.5rem', background: 'rgba(201,168,76,0.04)', border: '1px solid rgba(201,168,76,0.15)', marginBottom: '1.25rem' }}>
-                      <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', fontWeight: 300, color: 'rgba(61,43,31,0.65)', lineHeight: 1.7, marginBottom: '0.85rem' }}>
-                        Livraison gratuite en locker ou point relais Mondial Relay dans les pays éligibles.
+                      <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', fontWeight: 300, color: 'rgba(61,43,31,0.65)', lineHeight: 1.7, marginBottom: '0.75rem' }}>
+                        <strong style={{ fontWeight: 500 }}>Point relais ou locker uniquement</strong> — pas de livraison à domicile via Mondial Relay. Livraison offerte dans les pays éligibles.
                       </p>
+                      <ol style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', fontWeight: 300, color: 'rgba(61,43,31,0.6)', lineHeight: 1.75, margin: '0 0 1rem 1.1rem', padding: 0 }}>
+                        <li>Choisissez votre pays de livraison</li>
+                        <li>Ouvrez le lien ci-dessous pour trouver votre relais</li>
+                        <li>Recopiez les informations du point dans le formulaire</li>
+                      </ol>
                       <a
-                        href="https://www.mondialrelay.fr/trouver-un-point-relais/"
+                        href={RELAY_COUNTRIES.find(c => c.code === relayCountry)?.finder ?? 'https://www.mondialrelay.fr/trouver-un-point-relais/'}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.7rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: gold, textDecoration: 'none', borderBottom: `1px solid ${gold}`, paddingBottom: '1px' }}
                       >
-                        Trouver mon point relais →
+                        Trouver mon point relais / locker →
                       </a>
                     </div>
 
@@ -262,8 +268,9 @@ export default function CheckoutPage() {
                         <input style={inputStyle} value={relayPoint.id} onChange={e => setRelayPoint({ ...relayPoint, id: e.target.value })} placeholder="Ex : 123456" />
                       </div>
                       <div style={{ marginBottom: '1rem' }}>
-                        <label style={labelStyle}>Code postal *</label>
-                        <input style={inputStyle} value={relayPoint.code_postal} onChange={e => setRelayPoint({ ...relayPoint, code_postal: e.target.value })} placeholder="75001" />
+                        <label style={labelStyle}>Code postal du point relais *</label>
+                        <input style={{ ...inputStyle, borderColor: errors.relay_cp ? '#e05555' : 'rgba(61,43,31,0.2)' }} value={relayPoint.code_postal} onChange={e => setRelayPoint({ ...relayPoint, code_postal: e.target.value })} placeholder="75001" />
+                        {errors.relay_cp && <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', color: '#e05555', marginTop: '0.25rem' }}>{errors.relay_cp}</p>}
                       </div>
                       <div style={{ gridColumn: '1/-1', marginBottom: '1rem' }}>
                         <label style={labelStyle}>Adresse du point relais</label>
@@ -294,6 +301,9 @@ export default function CheckoutPage() {
                           <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', color: gold }}>{shippingCost} €</span>
                         </div>
                       )}
+                      <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', fontWeight: 300, color: 'rgba(61,43,31,0.55)', lineHeight: 1.7, marginTop: '0.85rem' }}>
+                        Vous ne choisissez pas le transporteur : Looka sélectionne le prestataire à l&apos;expédition (La Poste, Colissimo, DPD, etc.). Le transporteur et le numéro de suivi apparaîtront sur votre page de suivi et par email.
+                      </p>
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1rem' }}>

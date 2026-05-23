@@ -10,7 +10,7 @@ const ivory = '#F5F0E8';
 const STATUS_LABELS: Record<string, { label: string; color: string; desc: string }> = {
   en_attente: { label: 'En attente de paiement', color: '#E4C97A', desc: 'Votre commande a bien été enregistrée. En attente de confirmation de paiement.' },
   paye: { label: 'Paiement confirmé', color: '#6fcf97', desc: 'Votre paiement a été confirmé. Nous préparons votre commande.' },
-  expedie: { label: 'Expédiée', color: '#56CCF2', desc: 'Votre commande est en route ! Vous recevrez bientôt les informations de suivi.' },
+  expedie: { label: 'Expédiée', color: '#56CCF2', desc: 'Votre commande a été expédiée. Consultez le numéro de suivi ci-dessous.' },
   livre: { label: 'Livrée', color: '#6fcf97', desc: 'Votre commande a été livrée. Merci pour votre confiance.' },
   annule: { label: 'Annulée', color: '#e05555', desc: 'Cette commande a été annulée. Contactez-nous pour plus d\'informations.' },
 };
@@ -198,8 +198,53 @@ export default function SuiviCommandePage() {
                   </span>
                 </div>
 
+                {order.delivery_type === 'relay' && order.relay_point && (
+                  <div style={{ marginTop: '1.25rem', padding: '0.85rem', background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.15)' }}>
+                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: gold, marginBottom: '0.35rem' }}>Point relais</p>
+                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.78rem', fontWeight: 300, color: dark, lineHeight: 1.7 }}>
+                      {order.relay_point.nom}
+                      {order.relay_point.adresse ? <><br />{order.relay_point.adresse}</> : null}
+                      <br />{order.relay_point.code_postal} {order.relay_point.ville}
+                      {order.relay_point.id ? <><br /><span style={{ opacity: 0.7 }}>ID : {order.relay_point.id}</span></> : null}
+                    </p>
+                  </div>
+                )}
+
+                {order.tracking_number && (
+                  <div style={{ marginTop: '1.25rem', padding: '0.85rem', background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.15)' }}>
+                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: gold, marginBottom: '0.35rem' }}>
+                      Suivi colis{order.carrier ? ` — ${order.carrier}` : ''}
+                    </p>
+                    <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.15rem', color: dark, marginBottom: '0.5rem', letterSpacing: '0.04em' }}>
+                      {order.tracking_number}
+                    </p>
+                    {order.tracking_url && (
+                      <a
+                        href={order.tracking_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: gold, textDecoration: 'none', borderBottom: `1px solid ${gold}` }}
+                      >
+                        Suivre mon colis →
+                      </a>
+                    )}
+                  </div>
+                )}
+
+                {order.delivery_type === 'home' && order.shipping_address && (
+                  <div style={{ marginTop: '1.25rem', padding: '0.85rem', background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.15)' }}>
+                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: gold, marginBottom: '0.35rem' }}>Adresse de livraison</p>
+                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.78rem', fontWeight: 300, color: dark, lineHeight: 1.7 }}>
+                      {order.shipping_address.rue}
+                      {order.shipping_address.complement ? <><br />{order.shipping_address.complement}</> : null}
+                      <br />{order.shipping_address.code_postal} {order.shipping_address.ville}
+                    </p>
+                  </div>
+                )}
+
                 {order.notes && (
                   <div style={{ marginTop: '1.25rem', padding: '0.85rem', background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.15)' }}>
+                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: gold, marginBottom: '0.35rem' }}>Votre message</p>
                     <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.75rem', fontWeight: 300, color: dark, lineHeight: 1.7 }}>
                       {order.notes}
                     </p>

@@ -1,15 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import type { GalerieOeuvre } from '@/lib/galerie';
 import { galerieData } from '@/lib/data';
 
-type Oeuvre = typeof galerieData[0] & {
-  sousTitre?: string;
-  citation?: string;
-  images?: string[];
-};
+type Oeuvre = GalerieOeuvre;
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -18,14 +15,50 @@ const fadeUp = {
 
 const arabicLetters = ['ب', 'ل', 'ن', 'م', 'ح', 'ع'];
 
+function mapStaticFallback(): Oeuvre[] {
+  return galerieData.map((o) => ({
+    id: o.id,
+    titre: o.titre,
+    sousTitre: o.sousTitre,
+    technique: o.technique,
+    dimensions: o.dimensions,
+    annee: o.annee,
+    style: o.style,
+    disponible: o.disponible,
+    prix: o.prix,
+    image: o.image,
+    images: o.images ?? [o.image],
+    extrait: o.extrait,
+    citation: o.citation,
+    description: o.description,
+  }));
+}
+
 export default function GaleriePage() {
+  const [oeuvres, setOeuvres] = useState<Oeuvre[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Oeuvre | null>(null);
   const [filter, setFilter] = useState('Tous');
   const [modalImg, setModalImg] = useState(0);
-  const styles = ['Tous', ...Array.from(new Set(galerieData.map((o) => o.style)))];
+
+  useEffect(() => {
+    fetch('/api/galerie')
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setOeuvres(data);
+        } else {
+          setOeuvres(mapStaticFallback());
+        }
+      })
+      .catch(() => setOeuvres(mapStaticFallback()))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const styles = ['Tous', ...Array.from(new Set(oeuvres.map((o) => o.style)))];
 
   const filtered =
-    filter === 'Tous' ? galerieData : galerieData.filter((o) => o.style === filter);
+    filter === 'Tous' ? oeuvres : oeuvres.filter((o) => o.style === filter);
 
   function openOeuvre(oeuvre: Oeuvre) {
     setSelected(oeuvre);
@@ -101,9 +134,12 @@ export default function GaleriePage() {
 
       {/* Grille */}
       <section style={{ padding: '4rem 1.5rem 8rem', background: '#F5F0E8' }}>
+        {loading ? (
+          <p style={{ textAlign: 'center', fontFamily: 'Montserrat, sans-serif', fontSize: '0.8rem', letterSpacing: '0.2em', color: 'rgba(61,43,31,0.5)', textTransform: 'uppercase' }}>Chargement…</p>
+        ) : (
         <div style={{ maxWidth: '72rem', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
           <AnimatePresence>
-            {(filtered as Oeuvre[]).map((oeuvre, i) => (
+            {filtered.map((oeuvre, i) => (
               <motion.div
                 key={oeuvre.id}
                 layout
@@ -227,6 +263,7 @@ export default function GaleriePage() {
             ))}
           </AnimatePresence>
         </div>
+        )}
       </section>
 
       {/* Modal œuvre */}
