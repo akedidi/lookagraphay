@@ -45,12 +45,25 @@ Pour **forcer un nouveau démarrage** après un deploy Git :
 3. Ou modifier une variable d’environnement (ex. ajouter `DEPLOY_TS=1`), **Save** — souvent ça relance les workers.
 4. Attendre la fin du **build** (`lookagraphy-lock-v4` dans les logs build), puis ouvrir les logs **runtime**.
 
-**SSH / Gestionnaire de fichiers** (si accès) : supprimer d’éventuels verrous obsolètes après un ancien deploy flock :
+## Dossier réellement exécuté par LiteSpeed
 
-- `.next/standalone/.lookagraphy-instance.lock`
-- `.next/standalone/.lookagraphy.pid.lock`
+Hostinger lance souvent l’app depuis :
 
-Puis redeploy.
+`~/domains/VOTRE-SITE.hostingersite.com/nodejs/`
+
+et non depuis `public_html/` seul. Un deploy Git peut mettre à jour `public_html/.next/standalone/` (v4) alors que `nodejs/` reste bloqué sur un ancien **flock v16** + fichier `.lookagraphy-instance.lock` vide → **503**.
+
+**Correctif SSH** : synchroniser `public_html/.next/standalone/` vers `nodejs/`, supprimer `.lookagraphy-instance.lock`, retirer `server-app.js` / `load-env.js` (v16).
+
+**SSH** (port `65002`, user `u376353647`) — depuis votre Mac, **avec votre mot de passe SSH** :
+
+```bash
+ssh -p 65002 u376353647@82.29.191.162 'sh -s' < scripts/hostinger-ssh-fix.sh
+```
+
+Le script cherche le projet, supprime les verrous flock/PID obsolètes, affiche le patch `server.js` et les processus sur le port 3000. Puis **Redeploy** depuis hPanel.
+
+Mot de passe : ne le collez pas dans le chat ; saisissez-le uniquement dans le terminal quand SSH le demande.
 
 ## Si les logs affichent `Gate | flock` ou `Instance déjà active (flock)`
 
