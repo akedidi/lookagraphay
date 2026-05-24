@@ -72,4 +72,33 @@ if (!serverSrc.includes('minimalMode:')) {
 
 fs.writeFileSync(standaloneServer, prelude + serverSrc);
 console.log('[postbuild] Patched standalone/server.js (' + marker + ')');
+
+// Hostinger Passenger exécute ../nodejs/ — pas public_html/.next/standalone seul.
+const hostingerNodejs = path.join(root, '..', 'nodejs');
+if (fs.existsSync(hostingerNodejs)) {
+  console.log('[postbuild] Sync standalone → ../nodejs/ (Passenger runtime)');
+  for (const legacy of ['server-app.js', 'load-env.js', '.lookagraphy-instance.lock', '.lookagraphy.pid.lock']) {
+    try {
+      fs.unlinkSync(path.join(hostingerNodejs, legacy));
+    } catch (_) {}
+  }
+  for (const item of ['server.js', 'package.json', 'public', 'node_modules', '.next']) {
+    const src = path.join(standaloneDir, item);
+    const dest = path.join(hostingerNodejs, item);
+    if (!fs.existsSync(src)) continue;
+    fs.rmSync(dest, { recursive: true, force: true });
+    if (fs.statSync(src).isDirectory()) {
+      copyDir(src, dest);
+    } else {
+      fs.mkdirSync(path.dirname(dest), { recursive: true });
+      fs.copyFileSync(src, dest);
+    }
+    console.log('[postbuild]   → nodejs/' + item);
+  }
+  const restartDir = path.join(hostingerNodejs, 'tmp');
+  fs.mkdirSync(restartDir, { recursive: true });
+  fs.writeFileSync(path.join(restartDir, 'restart.txt'), String(Date.now()));
+  console.log('[postbuild]   → nodejs/tmp/restart.txt');
+}
+
 console.log('[postbuild] Done.');
