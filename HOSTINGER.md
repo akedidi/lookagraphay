@@ -84,6 +84,24 @@ LiteSpeed lance plusieurs workers Node. Un seul doit démarrer le serveur (fichi
 
 Après le dernier correctif, vous ne devriez voir **qu’un seul** `✓ Ready` par redémarrage.
 
+## 504 Gateway Timeout sur `/api/ping`
+
+Cause fréquente avec **v4** : les workers LiteSpeed **secondaires** restaient vivants (`setInterval`) sans servir HTTP — Passenger leur envoyait les requêtes → timeout.
+
+**Correctif** (dans `postbuild` v4+) : les secondaires font `process.exit(0)`. Puis sur le serveur :
+
+```bash
+touch ~/domains/VOTRE-SITE.hostingersite.com/nodejs/tmp/restart.txt
+```
+
+Si **503** après ça : verrou PID obsolète ou processus Next orphelin — en SSH :
+
+```bash
+kill $(cat ~/domains/.../nodejs/.lookagraphy.pid.lock) 2>/dev/null
+rm -f ~/domains/.../nodejs/.lookagraphy.pid.lock
+touch ~/domains/.../nodejs/tmp/restart.txt
+```
+
 ## Si 503 malgré `✓ Ready`
 
 1. Tester `/api/ping` — si ça répond, le souci vient du cache LiteSpeed ou des assets.

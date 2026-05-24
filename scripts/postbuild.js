@@ -105,9 +105,7 @@ function __lookaTryLock() {
 }
 
 if (!__lookaTryLock()) {
-  console.log(
-    '[lookagraphy] Worker LiteSpeed secondaire — exit (instance principale active)'
-  );
+  console.log('[lookagraphy] Worker secondaire — exit 0 (instance principale active)');
   process.exit(0);
 } else {
   console.log('[lookagraphy] ${marker} | instance principale | Node', process.version, '| PORT', __lookaPort);
