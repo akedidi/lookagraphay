@@ -246,7 +246,7 @@ export default function AssociationPage() {
             maxWidth: '72rem',
             margin: '0 auto',
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
             gap: '1.5px',
             background: 'rgba(201,168,76,0.15)',
           }}

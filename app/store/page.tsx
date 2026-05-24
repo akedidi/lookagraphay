@@ -4,8 +4,14 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart, getPoidsKg } from '@/lib/cart';
 import PriceDisplay from '@/components/PriceDisplay';
+import PromoBadge from '@/components/PromoBadge';
 import type { PromoInput } from '@/lib/promo';
-import { resolvePriceForBase, type MappedStoreItem } from '@/lib/store-item';
+import {
+  getStoreItemDisplayPrice,
+  promoInputFromStoreItem,
+  resolvePriceForBase,
+  type MappedStoreItem,
+} from '@/lib/store-item';
 import {
   calcBijouBasePrice,
   isBijouCategory,
@@ -14,17 +20,6 @@ import {
 } from '@/lib/bijou-pricing';
 
 type StoreItem = MappedStoreItem;
-
-function promoSource(item: StoreItem): PromoInput {
-  return {
-    prix: item.prix,
-    promo_enabled: item.promo_enabled,
-    promo_type: item.promo_type,
-    promo_value: item.promo_value,
-    promo_start: item.promo_start,
-    promo_end: item.promo_end,
-  };
-}
 
 function isBijou(cat: string) {
   return isBijouCategory(cat);
@@ -174,7 +169,7 @@ export default function StorePage() {
     if (isBijou(item.categorie)) {
       const defaultQ: Quantite = 'paire';
       const base = calcBijouBasePrice(item.categorie, 'argent', defaultQ) || item.prix;
-      const { final } = resolvePriceForBase(promoSource(item), base);
+      const { final } = resolvePriceForBase(promoInputFromStoreItem(item), base);
       setSelectedPrix(final);
       setSelectedMatiere('Argent');
       setSelectedQuantite(item.categorie === "Boucles d'oreilles" ? 'la paire' : undefined);
@@ -247,14 +242,16 @@ export default function StorePage() {
 
       {/* Grille */}
       <section style={{ padding: '4rem 1rem 8rem', background: '#F5F0E8' }}>
-        <div style={{ maxWidth: '72rem', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '1rem' }}>
+        <div className="responsive-card-grid" style={{ maxWidth: '72rem', margin: '0 auto', gap: '1rem' }}>
           {loading && (
             <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '4rem', fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', color: 'rgba(61,43,31,0.4)' }}>
               Chargement…
             </div>
           )}
           <AnimatePresence>
-            {filtered.map((item, i) => (
+            {filtered.map((item, i) => {
+              const display = getStoreItemDisplayPrice(item);
+              return (
               <motion.div
                 key={item.id}
                 layout
@@ -303,26 +300,22 @@ export default function StorePage() {
                   <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.62rem', letterSpacing: '0.22em', color: '#E4C97A', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
                     {item.categorie}
                   </p>
-                  {item.prix ? (
-                    <div style={{ lineHeight: 1 }}>
+                  {(display.original > 0 || display.active) && (
+                    <div style={{ lineHeight: 1, marginTop: '0.35rem' }}>
                       <PriceDisplay
-                        original={item.prix}
-                        final={item.prix_promo}
-                        active={item.promo_active}
+                        original={display.original}
+                        final={display.final}
+                        active={display.active}
                         size="sm"
                         light
                       />
                     </div>
-                  ) : null}
+                  )}
                 </div>
 
                 {/* Badge disponible */}
                 <div style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', alignItems: 'flex-end' }}>
-                  {item.promo_active && (
-                    <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.58rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#1A1209', background: '#C9A84C', padding: '0.2rem 0.45rem', fontWeight: 600 }}>
-                      Promo
-                    </span>
-                  )}
+                  {display.active && <PromoBadge label={display.label} light />}
                   {item.disponible && (
                     <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.62rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C9A84C', background: 'rgba(26,18,9,0.75)', padding: '0.25rem 0.5rem', border: '1px solid rgba(201,168,76,0.4)' }}>
                       Dispo
@@ -330,7 +323,8 @@ export default function StorePage() {
                   )}
                 </div>
               </motion.div>
-            ))}
+            );
+            })}
           </AnimatePresence>
         </div>
       </section>
@@ -343,17 +337,18 @@ export default function StorePage() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setSelected(null)}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(26,18,9,0.92)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}
+            className="modal-overlay"
+            style={{ background: 'rgba(26,18,9,0.92)', zIndex: 100 }}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              style={{ background: '#FAF7F2', maxWidth: 900, width: '100%', maxHeight: '92vh', overflow: 'auto', display: 'flex', flexWrap: 'wrap' }}
+              className="modal-split"
             >
               {/* Visuel gauche */}
-              <div style={{ position: 'relative', background: '#1A1209', flex: '1 1 320px', minWidth: 0, minHeight: 360 }}>
+              <div className="modal-split-visual" style={{ minHeight: 360 }}>
                 {modalImages.length > 0 ? (
                   <>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -377,12 +372,16 @@ export default function StorePage() {
                     {modalImages.length > 1 && (
                       <>
                         <button
+                          type="button"
+                          className="modal-nav-btn"
                           onClick={(e) => { e.stopPropagation(); setModalImg((modalImg - 1 + modalImages.length) % modalImages.length); }}
-                          style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(26,18,9,0.7)', border: '1px solid rgba(201,168,76,0.3)', color: '#C9A84C', width: 36, height: 36, cursor: 'pointer', fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                          style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(26,18,9,0.7)', border: '1px solid rgba(201,168,76,0.3)', color: '#C9A84C', cursor: 'pointer', fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem' }}
                         >‹</button>
                         <button
+                          type="button"
+                          className="modal-nav-btn"
                           onClick={(e) => { e.stopPropagation(); setModalImg((modalImg + 1) % modalImages.length); }}
-                          style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(26,18,9,0.7)', border: '1px solid rgba(201,168,76,0.3)', color: '#C9A84C', width: 36, height: 36, cursor: 'pointer', fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                          style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(26,18,9,0.7)', border: '1px solid rgba(201,168,76,0.3)', color: '#C9A84C', cursor: 'pointer', fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem' }}
                         >›</button>
                       </>
                     )}
@@ -395,7 +394,7 @@ export default function StorePage() {
               </div>
 
               {/* Info droite */}
-              <div style={{ flex: '1 1 320px', minWidth: 0, padding: '2.5rem 2rem', overflowY: 'auto' }}>
+              <div className="modal-split-body">
                 <button
                   onClick={() => setSelected(null)}
                   style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', letterSpacing: '0.25em', color: '#C9A84C', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', textTransform: 'uppercase' }}
@@ -451,29 +450,49 @@ export default function StorePage() {
                 <div style={{ height: 1, background: 'rgba(61,43,31,0.1)', marginBottom: '1.5rem' }} />
 
                 {/* Sélecteur prix pour bijoux */}
-                {isBijou(selected.categorie) ? (
+                {isBijou(selected.categorie) ? (() => {
+                  const bijouDisplay = getStoreItemDisplayPrice(selected);
+                  return (
+                  <>
+                  {bijouDisplay.active && (
+                    <div style={{ marginBottom: '0.75rem' }}>
+                      <PromoBadge label={bijouDisplay.label} />
+                    </div>
+                  )}
                   <PrixSelector
                     categorie={selected.categorie}
-                    itemPromo={promoSource(selected)}
+                    itemPromo={promoInputFromStoreItem(selected)}
                     onChange={(prix, _orig, matiere, quantite) => {
                       setSelectedPrix(prix);
                       setSelectedMatiere(matiere);
                       setSelectedQuantite(quantite);
                     }}
                   />
-                ) : (
-                  <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                    <PriceDisplay
-                      original={selected.prix}
-                      final={selected.prix_promo}
-                      active={selected.promo_active}
-                      size="lg"
-                    />
-                    <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: selected.disponible ? '#C9A84C' : 'rgba(61,43,31,0.4)', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
-                      {selected.disponible ? 'Disponible' : 'Indisponible'}
-                    </span>
+                  </>
+                  );
+                })() : (() => {
+                  const display = getStoreItemDisplayPrice(selected);
+                  return (
+                  <div style={{ marginBottom: '1.5rem' }}>
+                    {display.active && (
+                      <div style={{ marginBottom: '0.65rem' }}>
+                        <PromoBadge label={display.label} />
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+                      <PriceDisplay
+                        original={display.original}
+                        final={display.final}
+                        active={display.active}
+                        size="lg"
+                      />
+                      <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: selected.disponible ? '#C9A84C' : 'rgba(61,43,31,0.4)', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
+                        {selected.disponible ? 'Disponible' : 'Indisponible'}
+                      </span>
+                    </div>
                   </div>
-                )}
+                  );
+                })()}
 
                 {selected.disponible && (
                   <>
@@ -481,8 +500,8 @@ export default function StorePage() {
                       onClick={() => {
                         const base = selectedPrix || selected.prix_promo;
                         const priced = isBijou(selected.categorie)
-                          ? resolvePriceForBase(promoSource(selected), base)
-                          : { final: selected.prix_promo, original: selected.prix, active: selected.promo_active };
+                          ? resolvePriceForBase(promoInputFromStoreItem(selected), base)
+                          : getStoreItemDisplayPrice(selected);
                         addItem({
                           id: selected.id,
                           titre: selected.titre,

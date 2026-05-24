@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import PriceDisplay from '@/components/PriceDisplay';
+import PromoBadge from '@/components/PromoBadge';
 import type { GalerieOeuvre } from '@/lib/galerie';
 import { galerieData } from '@/lib/data';
 
@@ -137,7 +139,7 @@ export default function GaleriePage() {
         {loading ? (
           <p style={{ textAlign: 'center', fontFamily: 'Montserrat, sans-serif', fontSize: '0.8rem', letterSpacing: '0.2em', color: 'rgba(61,43,31,0.5)', textTransform: 'uppercase' }}>Chargement…</p>
         ) : (
-        <div style={{ maxWidth: '72rem', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+        <div className="responsive-card-grid responsive-card-grid--galerie" style={{ maxWidth: '72rem', margin: '0 auto', gap: '1.5rem' }}>
           <AnimatePresence>
             {filtered.map((oeuvre, i) => (
               <motion.div
@@ -233,32 +235,51 @@ export default function GaleriePage() {
                       letterSpacing: '0.2em',
                       color: '#C9A84C',
                       textTransform: 'uppercase',
+                      marginBottom: oeuvre.disponible && oeuvre.prix ? '0.35rem' : 0,
                     }}
                   >
                     {oeuvre.style} · {oeuvre.annee}
                   </p>
+                  {oeuvre.disponible && oeuvre.prix != null && oeuvre.prix > 0 && (
+                    <PriceDisplay
+                      original={oeuvre.prix}
+                      final={oeuvre.prix_promo ?? oeuvre.prix}
+                      active={oeuvre.promo_active}
+                      size="sm"
+                      light
+                    />
+                  )}
                 </div>
 
-                {/* Badge disponible */}
-                {oeuvre.disponible && (
-                  <span
-                    style={{
-                      position: 'absolute',
-                      top: '0.75rem',
-                      right: '0.75rem',
-                      fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.62rem',
-                      letterSpacing: '0.2em',
-                      textTransform: 'uppercase',
-                      color: '#C9A84C',
-                      background: 'rgba(26,18,9,0.75)',
-                      padding: '0.25rem 0.5rem',
-                      border: '1px solid rgba(201,168,76,0.4)',
-                    }}
-                  >
-                    Dispo
-                  </span>
-                )}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '0.75rem',
+                    right: '0.75rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.35rem',
+                    alignItems: 'flex-end',
+                  }}
+                >
+                  {oeuvre.promo_active && <PromoBadge label={oeuvre.promo_label} light />}
+                  {oeuvre.disponible && (
+                    <span
+                      style={{
+                        fontFamily: 'Montserrat, sans-serif',
+                        fontSize: '0.62rem',
+                        letterSpacing: '0.2em',
+                        textTransform: 'uppercase',
+                        color: '#C9A84C',
+                        background: 'rgba(26,18,9,0.75)',
+                        padding: '0.25rem 0.5rem',
+                        border: '1px solid rgba(201,168,76,0.4)',
+                      }}
+                    >
+                      Dispo
+                    </span>
+                  )}
+                </div>
               </motion.div>
             ))}
           </AnimatePresence>
@@ -274,34 +295,19 @@ export default function GaleriePage() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setSelected(null)}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              background: 'rgba(26,18,9,0.92)',
-              zIndex: 100,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '1.5rem',
-            }}
+            className="modal-overlay"
+            style={{ background: 'rgba(26,18,9,0.92)' }}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              style={{
-                background: '#FAF7F2',
-                maxWidth: 860,
-                width: '100%',
-                maxHeight: '92vh',
-                overflow: 'auto',
-                display: 'grid',
-                gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
-              }}
+              className="modal-split"
+              style={{ maxWidth: 860 }}
             >
               {/* Visuel gauche */}
-              <div style={{ position: 'relative', background: '#1A1209', minHeight: 420 }}>
+              <div className="modal-split-visual">
                 {modalImages.length > 0 ? (
                   <>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -352,23 +358,27 @@ export default function GaleriePage() {
                     {modalImages.length > 1 && (
                       <>
                         <button
+                          type="button"
+                          className="modal-nav-btn"
                           onClick={(e) => { e.stopPropagation(); setModalImg((modalImg - 1 + modalImages.length) % modalImages.length); }}
                           style={{
                             position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)',
                             background: 'rgba(26,18,9,0.7)', border: '1px solid rgba(201,168,76,0.3)',
-                            color: '#C9A84C', width: 36, height: 36, cursor: 'pointer',
-                            fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: '#C9A84C', cursor: 'pointer',
+                            fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem',
                           }}
                         >
                           ‹
                         </button>
                         <button
+                          type="button"
+                          className="modal-nav-btn"
                           onClick={(e) => { e.stopPropagation(); setModalImg((modalImg + 1) % modalImages.length); }}
                           style={{
                             position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)',
                             background: 'rgba(26,18,9,0.7)', border: '1px solid rgba(201,168,76,0.3)',
-                            color: '#C9A84C', width: 36, height: 36, cursor: 'pointer',
-                            fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: '#C9A84C', cursor: 'pointer',
+                            fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem',
                           }}
                         >
                           ›
@@ -384,7 +394,7 @@ export default function GaleriePage() {
               </div>
 
               {/* Info droite */}
-              <div style={{ padding: '2.5rem 2rem', overflowY: 'auto' }}>
+              <div className="modal-split-body">
                 <button
                   onClick={() => setSelected(null)}
                   style={{
@@ -513,29 +523,34 @@ export default function GaleriePage() {
                   ))}
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                  <div
-                    style={{
-                      fontFamily: 'Cormorant Garamond, serif',
-                      fontSize: '2rem',
-                      fontWeight: 300,
-                      color: '#C9A84C',
-                    }}
-                  >
-                    {selected.prix} €
+                {selected.disponible && selected.prix != null && selected.prix > 0 && (
+                  <div style={{ marginBottom: '1.5rem' }}>
+                    {selected.promo_active && (
+                      <div style={{ marginBottom: '0.65rem' }}>
+                        <PromoBadge label={selected.promo_label} />
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+                      <PriceDisplay
+                        original={selected.prix}
+                        final={selected.prix_promo ?? selected.prix}
+                        active={selected.promo_active}
+                        size="lg"
+                      />
+                      <span
+                        style={{
+                          fontFamily: 'Montserrat, sans-serif',
+                          fontSize: '0.72rem',
+                          color: '#C9A84C',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.15em',
+                        }}
+                      >
+                        Disponible
+                      </span>
+                    </div>
                   </div>
-                  <span
-                    style={{
-                      fontFamily: 'Montserrat, sans-serif',
-                      fontSize: '0.72rem',
-                      color: selected.disponible ? '#C9A84C' : 'rgba(61,43,31,0.4)',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.15em',
-                    }}
-                  >
-                    {selected.disponible ? 'Disponible' : 'Collection privée'}
-                  </span>
-                </div>
+                )}
 
                 {selected.disponible && (
                   <Link href="/contact" className="btn-gold btn-gold-solid" style={{ display: 'block', textAlign: 'center' }}>

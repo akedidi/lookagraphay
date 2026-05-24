@@ -125,13 +125,10 @@ export default function EvenementsPage() {
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeUp}
+                className="page-two-col-aside"
                 style={{
                   borderTop: '1px solid rgba(61,43,31,0.12)',
                   padding: '2.5rem 0',
-                  display: 'grid',
-                  gridTemplateColumns: '140px 1fr',
-                  gap: '3rem',
-                  alignItems: 'start',
                 }}
               >
                 {/* Date */}
@@ -276,13 +273,11 @@ export default function EvenementsPage() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
+              className="page-two-col-aside"
               style={{
                 borderTop: '1px solid rgba(201,168,76,0.1)',
                 padding: '1.5rem 0',
-                display: 'grid',
-                gridTemplateColumns: '140px 1fr',
                 gap: '2rem',
-                alignItems: 'start',
               }}
             >
               <span

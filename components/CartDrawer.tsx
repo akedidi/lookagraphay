@@ -49,8 +49,10 @@ export default function CartDrawer() {
                 )}
               </div>
               <button
+                type="button"
+                className="touch-target"
                 onClick={() => setIsOpen(false)}
-                style={{ background: 'none', border: 'none', color: ivory, fontSize: '1.4rem', cursor: 'pointer', lineHeight: 1, padding: '0.25rem' }}
+                style={{ background: 'none', border: 'none', color: ivory, fontSize: '1.4rem', cursor: 'pointer', lineHeight: 1 }}
                 aria-label="Fermer le panier"
               >
                 ×
@@ -105,13 +107,17 @@ export default function CartDrawer() {
                         {/* Qty controls */}
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                           <button
+                            type="button"
+                            className="touch-target"
                             onClick={() => updateQty(item.id, item.qty - 1, item.matiere)}
-                            style={{ width: 24, height: 24, border: '1px solid rgba(201,168,76,0.3)', background: 'none', color: ivory, cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                            style={{ border: '1px solid rgba(201,168,76,0.3)', background: 'none', color: ivory, cursor: 'pointer', fontSize: '1rem', flexShrink: 0 }}
                           >−</button>
                           <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.82rem', color: ivory, minWidth: 20, textAlign: 'center' }}>{item.qty}</span>
                           <button
+                            type="button"
+                            className="touch-target"
                             onClick={() => updateQty(item.id, item.qty + 1, item.matiere)}
-                            style={{ width: 24, height: 24, border: '1px solid rgba(201,168,76,0.3)', background: 'none', color: ivory, cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                            style={{ border: '1px solid rgba(201,168,76,0.3)', background: 'none', color: ivory, cursor: 'pointer', fontSize: '1rem', flexShrink: 0 }}
                           >+</button>
                           <button
                             onClick={() => removeItem(item.id, item.matiere)}

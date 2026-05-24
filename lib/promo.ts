@@ -59,8 +59,8 @@ export function computePromoPrice(basePrice: number, input: PromoInput, now?: Da
   return { active: true, original, final };
 }
 
-export function formatPromoLabel(input: PromoInput): string | null {
-  if (!input.promo_enabled || !input.promo_type || !input.promo_value) return null;
+export function formatPromoLabel(input: PromoInput, now?: Date): string | null {
+  if (!isPromoActive(input, now)) return null;
   if (input.promo_type === 'percent') return `-${input.promo_value}%`;
   if (input.promo_type === 'amount') return `-${Number(input.promo_value).toFixed(2)} €`;
   return null;

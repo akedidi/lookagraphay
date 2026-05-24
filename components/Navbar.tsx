@@ -97,9 +97,11 @@ export default function Navbar() {
           {/* Cart icon + Mobile burger */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', zIndex: 1 }}>
           <button
+            type="button"
+            className="touch-target"
             onClick={() => openCart(true)}
             aria-label="Panier"
-            style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', padding: '0.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer' }}
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
@@ -119,7 +121,8 @@ export default function Navbar() {
             )}
           </button>
           <button
-            className="lg:hidden flex flex-col gap-1.5 p-2"
+            type="button"
+            className="lg:hidden touch-target flex flex-col gap-1.5"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Menu"
           >

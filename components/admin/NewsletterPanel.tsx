@@ -199,7 +199,7 @@ export default function NewsletterPanel({ onFlash }: { onFlash: (m: string) => v
         </span>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '2rem', alignItems: 'start' }}>
+      <div className="admin-newsletter-grid">
         {/* Composer */}
         <div style={{ background: dark, border: '1px solid rgba(201,168,76,0.2)', padding: '1.5rem' }}>
           <h3 style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: gold, marginBottom: '1.25rem' }}>
@@ -255,7 +255,7 @@ export default function NewsletterPanel({ onFlash }: { onFlash: (m: string) => v
             Abonnés
           </h3>
 
-          <form onSubmit={addSubscriber} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '1rem' }}>
+          <form onSubmit={addSubscriber} className="admin-form-grid" style={{ gap: '0.5rem', marginBottom: '1rem' }}>
             <input style={inputStyle} type="email" required placeholder="Email *" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
             <input style={inputStyle} placeholder="Prénom" value={newPrenom} onChange={(e) => setNewPrenom(e.target.value)} />
             <input style={{ ...inputStyle, gridColumn: '1 / -1' }} placeholder="Nom" value={newNom} onChange={(e) => setNewNom(e.target.value)} />

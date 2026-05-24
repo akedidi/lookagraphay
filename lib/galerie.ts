@@ -1,5 +1,7 @@
 /** Mappe une ligne store_items vers le format attendu par la page Galerie. */
 
+import { getStoreItemDisplayPrice, mapStoreItemFromRow } from '@/lib/store-item';
+
 export type GalerieOeuvre = {
   id: string;
   titre: string;
@@ -8,8 +10,12 @@ export type GalerieOeuvre = {
   dimensions?: string;
   annee?: string;
   style: string;
+  categorie?: string;
   disponible: boolean;
   prix?: number;
+  prix_promo?: number;
+  promo_active?: boolean;
+  promo_label?: string | null;
   image: string;
   images?: string[];
   extrait?: string;
@@ -18,28 +24,28 @@ export type GalerieOeuvre = {
 };
 
 export function mapStoreRowToGalerieOeuvre(row: Record<string, unknown>): GalerieOeuvre {
-  const images =
-    typeof row.images === 'string'
-      ? (JSON.parse(row.images) as string[])
-      : Array.isArray(row.images)
-        ? (row.images as string[])
-        : [];
-  const image = images[0] ?? '';
+  const item = mapStoreItemFromRow(row);
+  const display = getStoreItemDisplayPrice(item);
+  const image = item.images[0] ?? '';
 
   return {
-    id: String(row.id),
-    titre: String(row.titre ?? ''),
-    sousTitre: row.sous_titre ? String(row.sous_titre) : undefined,
-    technique: row.technique ? String(row.technique) : undefined,
-    dimensions: row.dimensions ? String(row.dimensions) : undefined,
-    annee: row.annee ? String(row.annee) : undefined,
-    style: row.style ? String(row.style) : 'Calligraphie contemporaine',
-    disponible: row.disponible === 1 || row.disponible === true,
-    prix: row.prix != null ? Number(row.prix) : undefined,
+    id: String(item.id),
+    titre: item.titre,
+    sousTitre: item.sous_titre ?? undefined,
+    technique: item.technique ?? undefined,
+    dimensions: item.dimensions ?? undefined,
+    annee: item.annee ?? undefined,
+    style: item.style ?? 'Calligraphie contemporaine',
+    categorie: item.categorie,
+    disponible: item.disponible,
+    prix: display.original > 0 ? display.original : undefined,
+    prix_promo: display.final,
+    promo_active: display.active,
+    promo_label: display.label,
     image,
-    images: images.length ? images : image ? [image] : [],
-    extrait: row.extrait ? String(row.extrait) : undefined,
-    citation: row.citation ? String(row.citation) : undefined,
-    description: row.description ? String(row.description) : undefined,
+    images: item.images.length ? item.images : image ? [image] : [],
+    extrait: item.extrait ?? undefined,
+    citation: item.citation ?? undefined,
+    description: item.description ?? undefined,
   };
 }

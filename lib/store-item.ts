@@ -1,4 +1,14 @@
-import { computePromoPrice, type PromoInput, type PromoResult } from '@/lib/promo';
+import {
+  calcBijouBasePrice,
+  isBijouCategory,
+  type Quantite,
+} from '@/lib/bijou-pricing';
+import {
+  computePromoPrice,
+  formatPromoLabel,
+  type PromoInput,
+  type PromoResult,
+} from '@/lib/promo';
 
 export type StoreItemRow = Record<string, unknown>;
 
@@ -78,6 +88,66 @@ export function mapStoreItemFromRow(row: StoreItemRow): MappedStoreItem {
 
 export function resolvePriceForBase(item: PromoInput, basePrice: number) {
   return computePromoPrice(basePrice, { ...item, prix: basePrice });
+}
+
+export type StoreDisplayPrice = {
+  original: number;
+  final: number;
+  active: boolean;
+  label: string | null;
+};
+
+export function promoInputFromStoreItem(
+  item: Pick<
+    MappedStoreItem,
+    'prix' | 'promo_enabled' | 'promo_type' | 'promo_value' | 'promo_start' | 'promo_end'
+  >
+): PromoInput {
+  return {
+    prix: item.prix,
+    promo_enabled: item.promo_enabled,
+    promo_type: item.promo_type as PromoInput['promo_type'],
+    promo_value: item.promo_value,
+    promo_start: item.promo_start,
+    promo_end: item.promo_end,
+  };
+}
+
+/** Prix catalogue par défaut en grille (bijou : argent + paire pour les boucles). */
+export function defaultBijouBasePrice(categorie: string): number {
+  const quantite: Quantite = categorie === "Boucles d'oreilles" ? 'paire' : 'paire';
+  return calcBijouBasePrice(categorie, 'argent', quantite);
+}
+
+/** Prix affiché boutique / galerie (grille + fiche sans sélecteur matière). */
+export function getStoreItemDisplayPrice(
+  item: Pick<
+    MappedStoreItem,
+    | 'prix'
+    | 'categorie'
+    | 'promo_enabled'
+    | 'promo_type'
+    | 'promo_value'
+    | 'promo_start'
+    | 'promo_end'
+  >
+): StoreDisplayPrice {
+  const promoInput = promoInputFromStoreItem(item);
+  let base = Number(item.prix) || 0;
+  if (isBijouCategory(item.categorie)) {
+    const fromTarif = defaultBijouBasePrice(item.categorie);
+    if (fromTarif > 0) base = fromTarif;
+  }
+  const priced = resolvePriceForBase(promoInput, base);
+  const label = priced.active
+    ? formatPromoLabel({ ...promoInput, prix: base })
+    : null;
+  return {
+    original: priced.original,
+    final: priced.final,
+    active: priced.active,
+    label,
+  };
 }
 
 /** Pour formulaires admin : datetime-local ← valeur MySQL */

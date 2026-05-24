@@ -1,28 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
 import { requireAdmin } from '@/lib/admin-auth';
+import { ensureStoreColumns } from '@/lib/store-schema';
 import { fromDatetimeLocalValue, mapStoreItemFromRow } from '@/lib/store-item';
 
 function promoParams(body: Record<string, unknown>) {
   const enabled = Boolean(body.promo_enabled);
   const type =
     body.promo_type === 'percent' || body.promo_type === 'amount' ? body.promo_type : null;
-  const value =
+  const raw =
     body.promo_value != null && String(body.promo_value).trim() !== ''
       ? Number(body.promo_value)
       : null;
+  const value =
+    raw != null && Number.isFinite(raw) && raw > 0 ? raw : null;
   return {
     enabled: enabled ? 1 : 0,
     type: enabled && type ? type : null,
-    value: enabled && type && value != null && !Number.isNaN(value) ? value : null,
+    value: enabled && type && value != null ? value : null,
     start: enabled ? fromDatetimeLocalValue(body.promo_start as string) : null,
     end: enabled ? fromDatetimeLocalValue(body.promo_end as string) : null,
   };
 }
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+  const conn = await pool.getConnection();
   try {
-    const [rows] = (await pool.execute('SELECT * FROM store_items WHERE id = ?', [
+    await ensureStoreColumns(conn);
+    const [rows] = (await conn.execute('SELECT * FROM store_items WHERE id = ?', [
       params.id,
     ])) as [Record<string, unknown>[], unknown];
     if (!rows.length) return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -30,6 +35,8 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : 'Erreur serveur';
     return NextResponse.json({ error: message }, { status: 500 });
+  } finally {
+    conn.release();
   }
 }
 
@@ -59,7 +66,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     } = body;
     const promo = promoParams(body);
 
-    await pool.execute(
+    const conn = await pool.getConnection();
+    try {
+      await ensureStoreColumns(conn);
+      await conn.execute(
       `UPDATE store_items SET
         titre=?,sous_titre=?,categorie=?,description=?,citation=?,technique=?,dimensions=?,annee=?,prix=?,
         images=?,disponible=?,paypal_link=?,ordre=?,style=?,extrait=?,in_galerie=?,
@@ -89,7 +99,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         promo.end,
         params.id,
       ]
-    );
+      );
+    } finally {
+      conn.release();
+    }
     return NextResponse.json({ ok: true });
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : 'Erreur serveur';

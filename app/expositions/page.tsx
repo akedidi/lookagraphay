@@ -170,10 +170,8 @@ export default function ExpositionsPage() {
                   whileInView="visible"
                   viewport={{ once: true }}
                   variants={fadeUp}
+                  className="page-article-grid-2-1"
                   style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 2fr',
-                    gap: '4rem',
                     borderTop: '1px solid rgba(61,43,31,0.12)',
                     paddingTop: '3rem',
                   }}
@@ -310,13 +308,8 @@ export default function ExpositionsPage() {
                 }}
               >
                 <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 3fr',
-                    gap: '3rem',
-                    alignItems: 'start',
-                    marginBottom: '2rem',
-                  }}
+                  className="page-article-grid-1-3"
+                  style={{ marginBottom: '2rem' }}
                 >
                   <div>
                     <p

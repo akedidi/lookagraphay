@@ -165,9 +165,10 @@ export default function CheckoutPage() {
   const deliveryCard = (type: DeliveryType, icon: string, title: string, subtitle: string) => (
     <button
       type="button"
+      className="delivery-card-btn"
       onClick={() => setDeliveryType(type)}
       style={{
-        flex: '1 1 200px', padding: '1.5rem', textAlign: 'left', cursor: 'pointer',
+        padding: '1.5rem', textAlign: 'left', cursor: 'pointer',
         border: `2px solid ${deliveryType === type ? gold : 'rgba(61,43,31,0.12)'}`,
         background: deliveryType === type ? 'rgba(201,168,76,0.05)' : '#FAF7F2',
         transition: 'all 0.2s',
@@ -181,7 +182,7 @@ export default function CheckoutPage() {
 
   return (
     <div style={{ background: sand, minHeight: '100vh', paddingTop: '80px' }}>
-      <div style={{ maxWidth: '64rem', margin: '0 auto', padding: '3rem 1.5rem 6rem' }}>
+      <div className="checkout-page-inner">
         <div style={{ marginBottom: '2.5rem' }}>
           <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', letterSpacing: '0.38em', textTransform: 'uppercase', color: gold }}>
             Finaliser votre commande
@@ -192,13 +193,13 @@ export default function CheckoutPage() {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr min(360px, 100%)', gap: '2rem', alignItems: 'start' }}>
+          <div className="checkout-layout">
 
             {/* Left col — form */}
             <div>
 
               {/* Section 1 — Cart summary */}
-              <div style={{ background: '#FAF7F2', padding: '2rem', marginBottom: '1.5rem', border: '1px solid rgba(61,43,31,0.08)' }}>
+              <div className="checkout-card">
                 {sectionTitle('Votre panier')}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', background: 'rgba(61,43,31,0.06)', marginBottom: '1rem' }}>
                   {items.map(item => (
@@ -221,7 +222,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* Section 2 — Delivery */}
-              <div style={{ background: '#FAF7F2', padding: '2rem', marginBottom: '1.5rem', border: '1px solid rgba(61,43,31,0.08)' }}>
+              <div className="checkout-card">
                 {sectionTitle('Mode de livraison')}
 
                 <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: errors.delivery ? '0.5rem' : '1.5rem' }}>
@@ -253,7 +254,7 @@ export default function CheckoutPage() {
                       </a>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1rem', marginBottom: '1rem' }}>
+                    <div className="form-grid-2" style={{ marginBottom: '1rem' }}>
                       <div style={{ gridColumn: '1/-1', marginBottom: '1rem' }}>
                         <label style={labelStyle}>Pays de livraison</label>
                         <select
@@ -312,7 +313,7 @@ export default function CheckoutPage() {
                       </p>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1rem' }}>
+                    <div className="form-grid-2">
                       <div style={{ gridColumn: '1/-1', marginBottom: '1rem' }}>
                         <label style={labelStyle}>Adresse *</label>
                         <input style={{ ...inputStyle, borderColor: errors.rue ? '#e05555' : 'rgba(61,43,31,0.2)' }} value={address.rue} onChange={e => setAddress({ ...address, rue: e.target.value })} placeholder="12 rue de la Paix" />
@@ -353,10 +354,10 @@ export default function CheckoutPage() {
 
               {/* Section 3 — Customer info (relay / domicile uniquement) */}
               {deliveryType && deliveryType !== 'international' && (
-              <div style={{ background: '#FAF7F2', padding: '2rem', marginBottom: '1.5rem', border: '1px solid rgba(61,43,31,0.08)' }}>
+              <div className="checkout-card">
                 {sectionTitle('Vos coordonnées')}
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1rem' }}>
+                <div className="form-grid-2">
 
                   {/* Prénom */}
                   <div style={{ marginBottom: '1rem' }}>
@@ -445,9 +446,9 @@ export default function CheckoutPage() {
                         checked={newsletterOptIn}
                         onChange={(e) => setNewsletterOptIn(e.target.checked)}
                         style={{
-                          width: 16,
-                          height: 16,
-                          marginTop: 3,
+                          width: 20,
+                          height: 20,
+                          marginTop: 2,
                           accentColor: gold,
                           flexShrink: 0,
                         }}
@@ -470,7 +471,7 @@ export default function CheckoutPage() {
             </div>
 
             {/* Right col — order summary */}
-            <div style={{ position: 'sticky', top: '100px' }}>
+            <div className="checkout-summary-sticky">
               <div style={{ background: dark, padding: '2rem' }}>
                 <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', letterSpacing: '0.35em', textTransform: 'uppercase', color: gold, marginBottom: '1.5rem' }}>
                   Résumé

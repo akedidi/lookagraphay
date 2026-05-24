@@ -698,13 +698,10 @@ export default function Home() {
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeUp}
+                className="page-article-grid-1-3"
                 style={{
                   borderTop: '1px solid rgba(201,168,76,0.15)',
                   padding: '2.5rem 0',
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 3fr',
-                  gap: '3rem',
-                  alignItems: 'start',
                 }}
               >
                 <div>

@@ -87,7 +87,7 @@ function Field({ label, value, onChange, type = 'text', placeholder = '' }: any)
       ) : (
         <input
           type={type}
-          value={value || ''}
+          value={value ?? ''}
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder}
           style={inputStyle}
@@ -117,6 +117,7 @@ function Toggle({ label, value, onChange }: any) {
     <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
       <label style={{ ...labelStyle, marginBottom: 0 }}>{label}</label>
       <button
+        type="button"
         onClick={() => onChange(!value)}
         style={{
           width: 44, height: 24, borderRadius: 12,
@@ -378,17 +379,53 @@ export default function AdminPage() {
   const flash = (m: string) => { setMsg(m); setTimeout(() => setMsg(''), 3000); };
 
   const saveStore = async () => {
+    if (!editStore) return;
     setSaving(true);
+
+    let promoValue: number | null = null;
+    if (editStore.promo_enabled) {
+      promoValue = parseFloat(String(editStore.promo_value ?? ''));
+      if (!Number.isFinite(promoValue) || promoValue <= 0) {
+        setSaving(false);
+        flash('❌ Indiquez un pourcentage ou un montant de réduction valide.');
+        return;
+      }
+      if (editStore.promo_type === 'percent' && promoValue > 100) {
+        setSaving(false);
+        flash('❌ Le pourcentage ne peut pas dépasser 100 %.');
+        return;
+      }
+    }
+
+    const { promo: _promo, prix_promo: _pp, promo_active: _pa, ...rest } = editStore;
     const body = {
-      ...editStore,
+      ...rest,
       prix: parseFloat(editStore.prix) || 0,
-      ordre: parseInt(editStore.ordre) || 0,
-      promo_value: editStore.promo_enabled ? (parseFloat(editStore.promo_value) || 0) : null,
+      ordre: parseInt(editStore.ordre, 10) || 0,
+      promo_enabled: Boolean(editStore.promo_enabled),
+      promo_type: editStore.promo_enabled ? editStore.promo_type || 'percent' : null,
+      promo_value: editStore.promo_enabled ? promoValue : null,
+      promo_start: editStore.promo_start || '',
+      promo_end: editStore.promo_end || '',
     };
+
     const url = isNew ? '/api/store' : `/api/store/${editStore.id}`;
     const method = isNew ? 'POST' : 'PUT';
-    await fetch(url, { method, ...adminJsonInit(body) });
-    await fetchAll(); setEditStore(null); setSaving(false); flash('✅ Article sauvegardé');
+    try {
+      const res = await fetch(url, { method, ...adminJsonInit(body) });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        flash(`❌ ${typeof data.error === 'string' ? data.error : 'Erreur lors de la sauvegarde'}`);
+        setSaving(false);
+        return;
+      }
+      await fetchAll();
+      setEditStore(null);
+      flash('✅ Article sauvegardé');
+    } catch {
+      flash('❌ Erreur réseau');
+    }
+    setSaving(false);
   };
 
   const deleteStore = async (id: number) => {
@@ -489,6 +526,8 @@ export default function AdminPage() {
         {([['store', 'Store'], ['expositions', 'Expositions'], ['evenements', 'Événements'], ['commandes', 'Commandes'], ['newsletter', 'Newsletter']] as [Tab, string][]).map(([k, label]) => (
           <button
             key={k}
+            type="button"
+            className="admin-tab-btn"
             onClick={() => setTab(k)}
             style={{
               background: 'none', border: 'none', cursor: 'pointer',
@@ -615,7 +654,7 @@ export default function AdminPage() {
                         in_galerie: item.in_galerie ?? false,
                         promo_enabled: item.promo_enabled ?? false,
                         promo_type: item.promo_type || 'percent',
-                        promo_value: item.promo_value ?? '',
+                        promo_value: item.promo_value != null ? String(item.promo_value) : '',
                         promo_start: toDatetimeLocalValue(item.promo_start),
                         promo_end: toDatetimeLocalValue(item.promo_end),
                       });
@@ -856,7 +895,7 @@ export default function AdminPage() {
                             <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: gold, marginBottom: '0.75rem', borderBottom: '1px solid rgba(201,168,76,0.1)', paddingBottom: '0.4rem' }}>
                               Coordonnées client
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem 1rem' }}>
+                            <div className="admin-two-col">
                               <div style={{ gridColumn: '1/-1' }}>
                                 <label style={labelStyle}>Nom complet</label>
                                 <input style={inputStyle} value={d.nom} onChange={e => setEditOrderDraft({ ...d, nom: e.target.value })} />
@@ -882,7 +921,7 @@ export default function AdminPage() {
                               <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: gold, marginBottom: '0.75rem', borderBottom: '1px solid rgba(201,168,76,0.1)', paddingBottom: '0.4rem' }}>
                                 📍 Point Relais Mondial Relay
                               </div>
-                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem 1rem' }}>
+                              <div className="admin-two-col">
                                 <div>
                                   <label style={labelStyle}>Pays</label>
                                   <select style={{ ...inputStyle }} value={d.pays} onChange={e => setEditOrderDraft({ ...d, pays: e.target.value })}>
@@ -921,7 +960,7 @@ export default function AdminPage() {
                               <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: gold, marginBottom: '0.75rem', borderBottom: '1px solid rgba(201,168,76,0.1)', paddingBottom: '0.4rem' }}>
                                 🏠 Adresse de livraison (domicile)
                               </div>
-                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem 1rem' }}>
+                              <div className="admin-two-col">
                                 <div style={{ gridColumn: '1/-1' }}>
                                   <label style={labelStyle}>Adresse (rue)</label>
                                   <input style={inputStyle} value={d.shipping_address.rue} onChange={e => setEditOrderDraft({ ...d, shipping_address: { ...d.shipping_address, rue: e.target.value } })} />
@@ -963,7 +1002,7 @@ export default function AdminPage() {
                             <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(245,240,232,0.45)', marginBottom: '0.85rem', lineHeight: 1.6 }}>
                               Backoffice uniquement — le client ne choisit pas. À renseigner quand vous expédiez (Mondial Relay, La Poste, Colissimo, DPD…). Affiché sur la page de suivi et dans les emails.
                             </p>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem 1rem' }}>
+                            <div className="admin-two-col">
                               <div style={{ gridColumn: '1/-1' }}>
                                 <label style={labelStyle}>Transporteur utilisé</label>
                                 <input
