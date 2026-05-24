@@ -150,13 +150,33 @@ export default function StorePage() {
   const [selectedPrix, setSelectedPrix] = useState(0);
   const [selectedMatiere, setSelectedMatiere] = useState('');
   const [selectedQuantite, setSelectedQuantite] = useState<string | undefined>(undefined);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [addedFeedback, setAddedFeedback] = useState(false);
   const { addItem } = useCart();
 
   useEffect(() => {
     fetch('/api/store')
-      .then(r => r.json())
-      .then(data => { if (Array.isArray(data)) setItems(data); })
+      .then(async (r) => {
+        const data = await r.json();
+        if (!r.ok) {
+          const msg =
+            typeof data?.error === 'string'
+              ? data.error
+              : 'Erreur serveur';
+          throw new Error(msg);
+        }
+        if (Array.isArray(data)) {
+          setItems(data);
+          setLoadError(null);
+        } else {
+          throw new Error('Réponse boutique invalide');
+        }
+      })
+      .catch(() =>
+        setLoadError(
+          'Impossible de joindre la boutique (serveur ou base MySQL). Vérifiez Hostinger : DB_HOST=localhost et testez /api/db-ping.'
+        )
+      )
       .finally(() => setLoading(false));
   }, []);
 
@@ -246,6 +266,11 @@ export default function StorePage() {
           {loading && (
             <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '4rem', fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', color: 'rgba(61,43,31,0.4)' }}>
               Chargement…
+            </div>
+          )}
+          {!loading && loadError && (
+            <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '2rem', maxWidth: '36rem', margin: '0 auto', fontFamily: 'Montserrat, sans-serif', fontSize: '0.9rem', color: '#5c4033', lineHeight: 1.6 }}>
+              {loadError}
             </div>
           )}
           <AnimatePresence>

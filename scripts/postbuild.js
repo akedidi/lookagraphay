@@ -110,7 +110,7 @@ if (!__lookaTryLock()) {
   );
   setInterval(() => {}, 1 << 30);
 } else {
-  console.log('[lookagraphy] Instance principale | Node', process.version, '| PORT', __lookaPort);
+  console.log('[lookagraphy] ${marker} | instance principale | Node', process.version, '| PORT', __lookaPort);
 
 `;
 

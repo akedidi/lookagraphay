@@ -24,8 +24,37 @@ function promoParams(body: Record<string, unknown>) {
 }
 
 export async function GET() {
-  const conn = await pool.getConnection();
+  let conn;
   try {
+    conn = await pool.getConnection();
+    await conn.execute(`
+      CREATE TABLE IF NOT EXISTS store_items (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        titre VARCHAR(500) NOT NULL,
+        sous_titre VARCHAR(500),
+        categorie VARCHAR(100) DEFAULT 'Tableau',
+        description TEXT,
+        citation TEXT,
+        technique VARCHAR(500),
+        dimensions VARCHAR(200),
+        annee VARCHAR(10),
+        prix DECIMAL(10,2),
+        images JSON,
+        disponible TINYINT(1) DEFAULT 1,
+        paypal_link VARCHAR(500),
+        ordre INT DEFAULT 0,
+        style VARCHAR(120) DEFAULT 'Calligraphie contemporaine',
+        extrait VARCHAR(255),
+        in_galerie TINYINT(1) DEFAULT 0,
+        promo_enabled TINYINT(1) DEFAULT 0,
+        promo_type ENUM('percent','amount') NULL,
+        promo_value DECIMAL(10,2) NULL,
+        promo_start DATETIME NULL,
+        promo_end DATETIME NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
     await ensureStoreColumns(conn);
     const [rows] = (await conn.execute(
       'SELECT * FROM store_items ORDER BY ordre ASC, id ASC'
@@ -33,9 +62,12 @@ export async function GET() {
     return NextResponse.json(rows.map(mapStoreItemFromRow));
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : 'Erreur serveur';
-    return NextResponse.json({ error: message }, { status: 500 });
+    const code =
+      e && typeof e === 'object' && 'code' in e ? String((e as { code: string }).code) : null;
+    console.error('[lookagraphy] GET /api/store |', message, code ?? '');
+    return NextResponse.json({ error: message, code }, { status: 500 });
   } finally {
-    conn.release();
+    conn?.release();
   }
 }
 
