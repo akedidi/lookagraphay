@@ -140,3 +140,4 @@ dist
 # Verrou déploiement Hostinger (standalone)
 .lookagraphy.lock
 .lookagraphy.lock.d
+.lookagraphy.pid.lock

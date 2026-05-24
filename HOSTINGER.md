@@ -9,7 +9,7 @@
 | **Start** | `npm start` |
 | **Node.js** | 20 |
 | **Répertoire de sortie / Output directory** | **Laisser vide** ou racine du projet — **pas** `.next` seul |
-| **Fichier d’entrée / Entry file** | `server.js` (racine) **ou** `.next/standalone/server.js` (wrapper postbuild) — les deux fonctionnent après build |
+| **Fichier d’entrée / Entry file** | `server.js` (racine) **ou** laisser vide si Start = `npm start` — **ne pas** lancer en parallèle `.next/standalone/server.js` |
 
 **Important :** l’ancien `standalone/server.js` généré par Next plante sous LiteSpeed (`listen()` appelé plusieurs fois). Le postbuild le remplace automatiquement.
 
@@ -25,7 +25,7 @@ Ne pas utiliser `npm run start -- -p $PORT` : le port est déjà fourni par la v
 
 ## Si vous voyez plusieurs `✓ Ready` ou `Une instance tourne déjà`
 
-LiteSpeed lance plusieurs workers Node. Un seul doit démarrer le serveur (dossier `.lookagraphy.lock.d` dans `standalone/`). Les autres restent en attente — c’est normal.
+LiteSpeed lance plusieurs workers Node. Un seul doit démarrer le serveur (fichier `.lookagraphy.pid.lock` dans `standalone/`). Les autres restent en attente — c’est normal.
 
 Après le dernier correctif, vous ne devriez voir **qu’un seul** `✓ Ready` par redémarrage.
 

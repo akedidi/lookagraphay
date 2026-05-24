@@ -37,7 +37,7 @@ const standaloneServer = path.join(standaloneDir, 'server.js');
 let serverSrc = fs.readFileSync(standaloneServer, 'utf8');
 
 // Retirer un ancien patch si présent (re-build incrémental sans next build)
-const marker = 'lookagraphy-lock-v3';
+const marker = 'lookagraphy-lock-v4';
 if (serverSrc.includes('Hostinger LiteSpeed') || serverSrc.includes('lookagraphy-lock-v')) {
   const end = serverSrc.indexOf('const path = require');
   if (end > 0) {
@@ -57,8 +57,7 @@ if (process.env.HOSTNAME && /lsws|extapp-sock|\\.sock/i.test(process.env.HOSTNAM
 process.env.HOSTNAME = '0.0.0.0';
 
 const __lookaPort = parseInt(process.env.PORT, 10) || 3000;
-const __lookaLockDir = require('path').join(__dirname, '.lookagraphy.lock.d');
-const __lookaPidFile = require('path').join(__lookaLockDir, 'pid');
+const __lookaLockFile = require('path').join(__dirname, '.lookagraphy.pid.lock');
 
 function __lookaPidAlive(pid) {
   if (!pid || pid <= 0) return false;
@@ -70,27 +69,39 @@ function __lookaPidAlive(pid) {
   }
 }
 
-function __lookaReleaseLock() {
-  try {
-    fs.rmSync(__lookaLockDir, { recursive: true, force: true });
-  } catch (_) {}
+function __lookaSpinWait(ms) {
+  const end = Date.now() + ms;
+  while (Date.now() < end) {}
 }
 
 function __lookaTryLock() {
-  try {
-    fs.mkdirSync(__lookaLockDir, { mode: 0o700 });
-  } catch (e) {
-    if (!e || e.code !== 'EEXIST') throw e;
+  for (let attempt = 0; attempt < 200; attempt++) {
     try {
-      const old = parseInt(fs.readFileSync(__lookaPidFile, 'utf8'), 10);
-      if (__lookaPidAlive(old)) return false;
-    } catch (_) {}
-    __lookaReleaseLock();
-    return __lookaTryLock();
+      fs.writeFileSync(__lookaLockFile, String(process.pid), { flag: 'wx' });
+      process.on('exit', () => {
+        try {
+          fs.unlinkSync(__lookaLockFile);
+        } catch (_) {}
+      });
+      return true;
+    } catch (e) {
+      if (!e || e.code !== 'EEXIST') throw e;
+    }
+    let old;
+    try {
+      old = parseInt(fs.readFileSync(__lookaLockFile, 'utf8'), 10);
+    } catch (_) {
+      __lookaSpinWait(25);
+      continue;
+    }
+    if (__lookaPidAlive(old)) return false;
+    try {
+      fs.unlinkSync(__lookaLockFile);
+    } catch (_) {
+      __lookaSpinWait(25);
+    }
   }
-  fs.writeFileSync(__lookaPidFile, String(process.pid));
-  process.on('exit', __lookaReleaseLock);
-  return true;
+  return false;
 }
 
 if (!__lookaTryLock()) {
