@@ -16,12 +16,17 @@ function adminSubject(category: AdminMailCategory, subject: string): string {
 }
 
 export type ContactEmailData = {
+  prenom: string;
   nom: string;
   email: string;
   motif: string;
   motifLabel: string;
   message: string;
 };
+
+function contactDisplayName(data: ContactEmailData): string {
+  return `${data.prenom} ${data.nom}`.trim();
+}
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -522,7 +527,8 @@ function buildContactFormHtml(data: ContactEmailData): string {
     <div style="background:rgba(61,43,31,0.03);border:1px solid rgba(61,43,31,0.08);padding:16px 20px;margin-bottom:20px;">
       <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:rgba(61,43,31,0.5);text-transform:uppercase;letter-spacing:2px;margin:0 0 8px;">Expéditeur</p>
       <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;color:#1A1209;margin:0;line-height:1.8;">
-        <strong>${esc(data.nom)}</strong><br/>
+        <strong>${esc(contactDisplayName(data))}</strong><br/>
+        <span style="font-size:13px;color:rgba(61,43,31,0.65);">${esc(data.prenom)} · ${esc(data.nom)}</span><br/>
         <a href="mailto:${esc(data.email)}" style="color:#C9A84C;">${esc(data.email)}</a>
       </p>
     </div>
@@ -538,7 +544,7 @@ function buildContactFormHtml(data: ContactEmailData): string {
     </div>
 
     <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:rgba(61,43,31,0.45);margin:24px 0 0;">
-      Répondre directement à cet email pour contacter ${esc(data.nom)}.
+      Répondre directement à cet email pour contacter ${esc(contactDisplayName(data))}.
     </p>
   `;
   return emailWrapper(content);
@@ -611,9 +617,10 @@ export async function sendOrderStatusUpdateEmail(data: StatusEmailData): Promise
 }
 
 export async function sendContactFormEmail(data: ContactEmailData): Promise<boolean> {
-  const subject = adminSubject('Contact', `${data.motifLabel} — ${data.nom}`);
+  const name = contactDisplayName(data);
+  const subject = adminSubject('Contact', `${data.motifLabel} — ${name}`);
   const html = buildContactFormHtml(data);
-  const replyTo = `${data.nom} <${data.email}>`;
+  const replyTo = `${name} <${data.email}>`;
 
   if (!isContactGmailConfigured()) {
     console.error('[EMAIL] CONTACT_GMAIL_* non configuré (compte contact.lookagraphy)');

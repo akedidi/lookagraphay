@@ -11,7 +11,8 @@ const fadeUp = {
 };
 
 export default function ContactPage() {
-  const [form, setForm] = useState({ nom: '', email: '', motif: '', message: '' });
+  const [form, setForm] = useState({ prenom: '', nom: '', email: '', motif: '', message: '' });
+  const [newsletterOptIn, setNewsletterOptIn] = useState(true);
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +30,7 @@ export default function ContactPage() {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, newsletter_opt_in: newsletterOptIn }),
       });
       const data = await res.json().catch(() => ({}));
 
@@ -270,18 +271,32 @@ export default function ContactPage() {
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '2rem' }}>
                   <div>
-                    <label style={labelStyle}>Nom & Prénom</label>
+                    <label style={labelStyle}>Prénom</label>
                     <input
                       type="text"
-                      name="nom"
+                      name="prenom"
                       required
-                      value={form.nom}
+                      autoComplete="given-name"
+                      value={form.prenom}
                       onChange={handleChange}
-                      placeholder="Votre nom"
+                      placeholder="Marie"
                       style={inputStyle}
                     />
                   </div>
                   <div>
+                    <label style={labelStyle}>Nom</label>
+                    <input
+                      type="text"
+                      name="nom"
+                      required
+                      autoComplete="family-name"
+                      value={form.nom}
+                      onChange={handleChange}
+                      placeholder="Dupont"
+                      style={inputStyle}
+                    />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
                     <label style={labelStyle}>Email</label>
                     <input
                       type="email"
@@ -332,6 +347,31 @@ export default function ContactPage() {
                     }}
                   />
                 </div>
+
+                <label
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '0.75rem',
+                    cursor: 'pointer',
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontSize: '0.78rem',
+                    fontWeight: 300,
+                    color: 'rgba(61,43,31,0.75)',
+                    lineHeight: 1.65,
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={newsletterOptIn}
+                    onChange={(e) => setNewsletterOptIn(e.target.checked)}
+                    style={{ width: 16, height: 16, marginTop: 3, accentColor: '#C9A84C', flexShrink: 0 }}
+                  />
+                  <span>
+                    Je souhaite recevoir la lettre d&apos;information LookaGraphy&nbsp;: actualités de
+                    l&apos;atelier, expositions et nouveautés. Désinscription possible à tout moment.
+                  </span>
+                </label>
 
                 {error && (
                   <p
