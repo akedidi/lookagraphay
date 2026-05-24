@@ -47,13 +47,24 @@ Pour **forcer un nouveau démarrage** après un deploy Git :
 
 ## Dossier réellement exécuté par LiteSpeed
 
-Hostinger lance souvent l’app depuis :
+Hostinger lance l’app via **Passenger** depuis :
 
 `~/domains/VOTRE-SITE.hostingersite.com/nodejs/`
 
-et non depuis `public_html/` seul. Un deploy Git peut mettre à jour `public_html/.next/standalone/` (v4) alors que `nodejs/` reste bloqué sur un ancien **flock v16** + fichier `.lookagraphy-instance.lock` vide → **503**.
+(voir `public_html/.htaccess` : `PassengerAppRoot …/nodejs`)
 
-**Correctif SSH** : synchroniser `public_html/.next/standalone/` vers `nodejs/`, supprimer `.lookagraphy-instance.lock`, retirer `server-app.js` / `load-env.js` (v16).
+Le build Git met à jour `public_html/.next/standalone/` ; il faut que **`nodejs/server.js`** soit synchronisé (deploy Hostinger ou script SSH).
+
+**Patch actuel : `lookagraphy-passenger-v5`** — pas de verrou PID (Passenger gère l’instance ; un lock provoquait 503/504).
+
+Logs attendus :
+
+```
+[lookagraphy] lookagraphy-passenger-v5 | Node v20… | PORT=3000
+✓ Ready in …ms
+```
+
+**Pas** `Gate | flock` ni `Worker secondaire — exit`.
 
 **SSH** (port `65002`, user `u376353647`) — depuis votre Mac, **avec votre mot de passe SSH** :
 
