@@ -25,7 +25,7 @@ Ne pas utiliser `npm run start -- -p $PORT` : le port est déjà fourni par la v
 
 ## Si vous voyez plusieurs `✓ Ready` ou `Une instance tourne déjà`
 
-LiteSpeed lance plusieurs workers Node. Un seul doit démarrer le serveur (fichier `.lookagraphy.lock` dans `standalone/`). Les autres restent en attente — c’est normal.
+LiteSpeed lance plusieurs workers Node. Un seul doit démarrer le serveur (dossier `.lookagraphy.lock.d` dans `standalone/`). Les autres restent en attente — c’est normal.
 
 Après le dernier correctif, vous ne devriez voir **qu’un seul** `✓ Ready` par redémarrage.
 

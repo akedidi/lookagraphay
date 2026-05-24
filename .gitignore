@@ -136,3 +136,7 @@ dist
 
 # Replit debugger
 .breakpoints
+
+# Verrou déploiement Hostinger (standalone)
+.lookagraphy.lock
+.lookagraphy.lock.d
