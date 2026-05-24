@@ -33,15 +33,17 @@ copyDir(path.join(root, 'public'), path.join(standaloneDir, 'public'));
 console.log('[postbuild] Copying .next/static/ → .next/standalone/.next/static/');
 copyDir(path.join(root, '.next', 'static'), path.join(standaloneDir, '.next', 'static'));
 
+// LiteSpeed (lsnode) : le server.js Next par défaut appelle listen() plusieurs fois → crash.
+// On le remplace par un wrapper vers notre démarrage à un seul listen().
 const standaloneServer = path.join(standaloneDir, 'server.js');
-const hostingerBootstrap =
-  "/** Hostinger LiteSpeed: forcer écoute TCP (HOSTNAME socket sinon 503). */\n" +
-  "process.env.HOSTNAME='0.0.0.0';\n";
-let serverSrc = fs.readFileSync(standaloneServer, 'utf8');
-if (!serverSrc.includes('Hostinger LiteSpeed')) {
-  serverSrc = hostingerBootstrap + serverSrc;
-  fs.writeFileSync(standaloneServer, serverSrc);
-  console.log('[postbuild] Patched standalone/server.js (HOSTNAME=0.0.0.0)');
-}
+const wrapper = `/**
+ * Généré par scripts/postbuild.js — ne pas modifier.
+ * Hostinger peut lancer ce fichier directement ; un seul listen() pour LiteSpeed.
+ */
+const path = require('path');
+require(path.resolve(__dirname, '../../scripts/start-hostinger.js'));
+`;
+fs.writeFileSync(standaloneServer, wrapper);
+console.log('[postbuild] Replaced standalone/server.js with LiteSpeed-safe wrapper');
 
 console.log('[postbuild] Done. Static assets are ready for standalone server.');

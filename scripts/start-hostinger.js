@@ -1,13 +1,14 @@
 /**
- * Démarrage production (Hostinger / LiteSpeed).
- * LiteSpeed injecte souvent HOSTNAME=…/extapp-sock/… ce qui empêche Next d’atteindre « Ready ».
+ * Hostinger / LiteSpeed (lsnode.js) : le serveur Next standalone appelle listen()
+ * plusieurs fois → crash en boucle. Un seul createServer().listen() ici.
  */
 const path = require('path');
 const fs = require('fs');
+const http = require('http');
+const { parse } = require('url');
 
 const root = path.resolve(__dirname, '..');
 const standaloneDir = path.join(root, '.next', 'standalone');
-const standaloneServer = path.join(standaloneDir, 'server.js');
 
 function fatal(message, err) {
   console.error('[lookagraphy]', message);
@@ -15,12 +16,8 @@ function fatal(message, err) {
   process.exit(1);
 }
 
-// Ne jamais laisser le socket LiteSpeed dans HOSTNAME (bind invalide → 503, jamais « Ready »).
 if (process.env.HOSTNAME && /lsws|extapp-sock|\.sock/i.test(process.env.HOSTNAME)) {
-  console.warn(
-    '[lookagraphy] HOSTNAME LiteSpeed ignoré:',
-    process.env.HOSTNAME
-  );
+  console.warn('[lookagraphy] HOSTNAME LiteSpeed ignoré:', process.env.HOSTNAME);
 }
 process.env.HOSTNAME = '0.0.0.0';
 process.env.NODE_ENV = 'production';
@@ -29,44 +26,57 @@ const port = parseInt(process.env.PORT || '3000', 10);
 if (!Number.isFinite(port) || port <= 0) {
   fatal(`PORT invalide: ${process.env.PORT}`);
 }
-process.env.PORT = String(port);
 
-if (!process.env.NODE_OPTIONS?.includes('max-old-space-size')) {
-  process.env.NODE_OPTIONS = [process.env.NODE_OPTIONS, '--max-old-space-size=512']
-    .filter(Boolean)
-    .join(' ')
-    .trim();
-}
-
-if (!fs.existsSync(standaloneServer)) {
-  fatal(`Build manquant: ${standaloneServer} — exécutez "npm run build".`);
+if (!fs.existsSync(path.join(standaloneDir, '.next'))) {
+  fatal(`Build manquant: ${standaloneDir} — lancez npm run build`);
 }
 
 const staticDir = path.join(standaloneDir, '.next', 'static');
 const publicDir = path.join(standaloneDir, 'public');
 if (!fs.existsSync(staticDir) || !fs.existsSync(publicDir)) {
-  fatal(
-    'Assets standalone incomplets (public ou .next/static). Relancez npm run build.'
-  );
+  fatal('Assets standalone incomplets — relancez npm run build (postbuild)');
 }
-
-process.on('uncaughtException', (err) => {
-  console.error('[lookagraphy] uncaughtException', err);
-  process.exit(1);
-});
-process.on('unhandledRejection', (err) => {
-  console.error('[lookagraphy] unhandledRejection', err);
-  process.exit(1);
-});
-
-console.log('[lookagraphy] Node', process.version);
-console.log('[lookagraphy] PORT=', port, 'HOSTNAME=', process.env.HOSTNAME);
-console.log('[lookagraphy] cwd →', standaloneDir);
 
 process.chdir(standaloneDir);
 
-try {
-  require(standaloneServer);
-} catch (err) {
-  fatal('Échec démarrage standalone', err);
-}
+console.log('[lookagraphy] Mode LiteSpeed — serveur HTTP unique');
+console.log('[lookagraphy] Node', process.version, '| PORT=', port, '| cwd=', process.cwd());
+
+const next = require('next');
+const app = next({ dev: false, dir: standaloneDir });
+const handle = app.getRequestHandler();
+
+let listenDone = false;
+
+app
+  .prepare()
+  .then(() => {
+    const server = http.createServer(async (req, res) => {
+      try {
+        await handle(req, res, parse(req.url, true));
+      } catch (err) {
+        console.error('[lookagraphy] request error', req.url, err);
+        if (!res.headersSent) {
+          res.statusCode = 500;
+          res.end('Internal Server Error');
+        }
+      }
+    });
+
+    if (listenDone) {
+      fatal('listen() déjà appelé — incompatible LiteSpeed');
+    }
+    listenDone = true;
+
+    server.listen(port, '0.0.0.0', () => {
+      console.log('[lookagraphy] ✓ Ready on http://0.0.0.0:' + port);
+    });
+
+    server.on('error', (err) => {
+      console.error('[lookagraphy] server error', err);
+      process.exit(1);
+    });
+  })
+  .catch((err) => {
+    fatal('next.prepare() a échoué', err);
+  });

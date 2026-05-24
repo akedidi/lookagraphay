@@ -9,13 +9,15 @@
 | **Start** | `npm start` |
 | **Node.js** | 20 |
 | **Répertoire de sortie / Output directory** | **Laisser vide** ou racine du projet — **pas** `.next` seul |
-| **Fichier d’entrée / Entry file** | **Vide** (utiliser `package.json` → `npm start`) — **pas** `.next/standalone/server.js` seul |
+| **Fichier d’entrée / Entry file** | `server.js` (racine) **ou** `.next/standalone/server.js` (wrapper postbuild) — les deux fonctionnent après build |
+
+**Important :** l’ancien `standalone/server.js` généré par Next plante sous LiteSpeed (`listen()` appelé plusieurs fois). Le postbuild le remplace automatiquement.
 
 Ne pas utiliser `npm run start -- -p $PORT` : le port est déjà fourni par la variable d’environnement `PORT`.
 
 ## Après déploiement
 
-1. Vérifier les logs : vous devez voir `[lookagraphy] PORT= …` puis **`✓ Ready`** (pas seulement `✓ Starting...`).
+1. Vérifier les logs : vous devez voir **`[lookagraphy] Mode LiteSpeed`** puis **`[lookagraphy] ✓ Ready`** (pas seulement `✓ Starting...` de Next).
 2. Tester : `https://votre-domaine/api/ping` → `{"status":"ok",...}`
 
 ## Si 503 ou boucle « Starting... »
