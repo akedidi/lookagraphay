@@ -106,9 +106,9 @@ function __lookaTryLock() {
 
 if (!__lookaTryLock()) {
   console.log(
-    '[lookagraphy] Worker LiteSpeed secondaire — instance principale déjà active'
+    '[lookagraphy] Worker LiteSpeed secondaire — exit (instance principale active)'
   );
-  setInterval(() => {}, 1 << 30);
+  process.exit(0);
 } else {
   console.log('[lookagraphy] ${marker} | instance principale | Node', process.version, '| PORT', __lookaPort);
 
