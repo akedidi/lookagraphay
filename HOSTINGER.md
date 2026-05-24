@@ -23,11 +23,17 @@ Ne pas utiliser `npm run start -- -p $PORT` : le port est déjà fourni par la v
    - Si vous voyez seulement `▲ Next.js` sans `[lookagraphy]`, le mauvais fichier est lancé ou le deploy est ancien.
 2. Tester : `https://votre-domaine/api/ping` → `{"status":"ok",...}`
 
-## Si 503 ou boucle « Starting... »
+## Si vous voyez plusieurs `✓ Ready` ou `Une instance tourne déjà`
 
-- **Redéployer** après le dernier commit (patch `HOSTNAME` LiteSpeed).
-- Dans les logs, si **Network** affiche `extapp-sock` sans ligne `[lookagraphy]`, le **Start command** n’est pas `npm start` → corriger dans hPanel.
-- **Redémarrer** l’app (bouton Restart) sans rebuild complet si le build est déjà OK.
+LiteSpeed lance plusieurs workers Node. Un seul doit démarrer le serveur (fichier `.lookagraphy.lock` dans `standalone/`). Les autres restent en attente — c’est normal.
+
+Après le dernier correctif, vous ne devriez voir **qu’un seul** `✓ Ready` par redémarrage.
+
+## Si 503 malgré `✓ Ready`
+
+1. Tester `/api/ping` — si ça répond, le souci vient du cache LiteSpeed ou des assets.
+2. **Redémarrer** l’app une fois dans hPanel.
+3. L’URL `Network: …extapp-sock…` dans les logs est **normale** chez Hostinger (proxy socket) ; ce qui compte est `✓ Ready`.
 
 ## Variables d’environnement
 
