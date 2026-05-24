@@ -9,6 +9,20 @@ const SITE_NAME = 'LookaGraphy';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://lookagraphy.fr';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? 'contact@lookagraphy.fr';
 
+type AdminMailCategory = 'Commandes' | 'Contact';
+
+function adminSubject(category: AdminMailCategory, subject: string): string {
+  return `[${category}] ${subject}`;
+}
+
+export type ContactEmailData = {
+  nom: string;
+  email: string;
+  motif: string;
+  motifLabel: string;
+  message: string;
+};
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export type EmailOrderItem = {
@@ -496,12 +510,51 @@ function buildStatusUpdateHtml(data: StatusEmailData): string {
   });
 }
 
+function buildContactFormHtml(data: ContactEmailData): string {
+  const content = `
+    <h2 style="font-family:'Georgia',serif;font-weight:300;font-size:22px;color:#1A1209;margin:0 0 8px;">
+      Nouveau message via le formulaire contact
+    </h2>
+    <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;color:rgba(61,43,31,0.55);margin:0 0 28px;letter-spacing:1px;">
+      ${SITE_NAME} · Formulaire contact
+    </p>
+
+    <div style="background:rgba(61,43,31,0.03);border:1px solid rgba(61,43,31,0.08);padding:16px 20px;margin-bottom:20px;">
+      <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:rgba(61,43,31,0.5);text-transform:uppercase;letter-spacing:2px;margin:0 0 8px;">Expéditeur</p>
+      <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;color:#1A1209;margin:0;line-height:1.8;">
+        <strong>${esc(data.nom)}</strong><br/>
+        <a href="mailto:${esc(data.email)}" style="color:#C9A84C;">${esc(data.email)}</a>
+      </p>
+    </div>
+
+    <div style="background:rgba(201,168,76,0.06);border-left:3px solid #C9A84C;padding:12px 16px;margin-bottom:20px;">
+      <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:rgba(61,43,31,0.5);margin:0 0 4px;text-transform:uppercase;letter-spacing:1px;">Motif</p>
+      <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;color:#1A1209;margin:0;">${esc(data.motifLabel)}</p>
+    </div>
+
+    <div style="background:rgba(61,43,31,0.03);border:1px solid rgba(61,43,31,0.08);padding:16px 20px;">
+      <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:rgba(61,43,31,0.5);text-transform:uppercase;letter-spacing:2px;margin:0 0 8px;">Message</p>
+      <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;color:#1A1209;margin:0;line-height:1.8;white-space:pre-wrap;">${esc(data.message)}</p>
+    </div>
+
+    <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:rgba(61,43,31,0.45);margin:24px 0 0;">
+      Répondre directement à cet email pour contacter ${esc(data.nom)}.
+    </p>
+  `;
+  return emailWrapper(content);
+}
+
 // ─── Envoi ───────────────────────────────────────────────────────────────────
 
-async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
+async function sendEmail(
+  to: string,
+  subject: string,
+  html: string,
+  options?: { replyTo?: string }
+): Promise<boolean> {
   if (isGmailConfigured()) {
     try {
-      await sendGmailMessage({ to, subject, html });
+      await sendGmailMessage({ to, subject, html, replyTo: options?.replyTo });
       console.log(`[EMAIL] Envoyé via Gmail → ${to} | ${subject}`);
       return true;
     } catch (err) {
@@ -511,6 +564,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<boo
   }
 
   console.log(`[EMAIL PREVIEW] To: ${to} | Subject: ${subject}`);
+  if (options?.replyTo) console.log(`[EMAIL PREVIEW] Reply-To: ${options.replyTo}`);
   console.log(`[EMAIL PREVIEW] HTML length: ${html.length} chars`);
   return true;
 }
@@ -527,8 +581,8 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<
 export async function sendAdminNewOrderEmail(data: OrderEmailData): Promise<boolean> {
   const paid = data.paymentConfirmed === true;
   const subject = paid
-    ? `[${SITE_NAME}] Achat confirmé ${data.orderNumber} — ${data.total.toFixed(2)} €`
-    : `[${SITE_NAME}] Commande en attente ${data.orderNumber} — ${data.total.toFixed(2)} €`;
+    ? adminSubject('Commandes', `Achat confirmé ${data.orderNumber} — ${data.total.toFixed(2)} €`)
+    : adminSubject('Commandes', `Commande en attente ${data.orderNumber} — ${data.total.toFixed(2)} €`);
   const html = buildAdminNewOrderHtml(data);
   return sendEmail(ADMIN_EMAIL, subject, html);
 }
@@ -554,4 +608,11 @@ export async function sendOrderStatusUpdateEmail(data: StatusEmailData): Promise
   const subject = `Votre commande ${data.orderNumber} : ${label} — ${SITE_NAME}`;
   const html = buildStatusUpdateHtml(data);
   return sendEmail(data.customerEmail, subject, html);
+}
+
+export async function sendContactFormEmail(data: ContactEmailData): Promise<boolean> {
+  const subject = adminSubject('Contact', `${data.motifLabel} — ${data.nom}`);
+  const html = buildContactFormHtml(data);
+  const replyTo = `${data.nom} <${data.email}>`;
+  return sendEmail(ADMIN_EMAIL, subject, html, { replyTo });
 }

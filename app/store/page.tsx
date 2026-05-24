@@ -6,6 +6,12 @@ import { useCart, getPoidsKg } from '@/lib/cart';
 import PriceDisplay from '@/components/PriceDisplay';
 import type { PromoInput } from '@/lib/promo';
 import { resolvePriceForBase, type MappedStoreItem } from '@/lib/store-item';
+import {
+  calcBijouBasePrice,
+  isBijouCategory,
+  type Matiere,
+  type Quantite,
+} from '@/lib/bijou-pricing';
 
 type StoreItem = MappedStoreItem;
 
@@ -20,25 +26,12 @@ function promoSource(item: StoreItem): PromoInput {
   };
 }
 
-type Matiere = 'argent' | 'or';
-type Quantite = 'unite' | 'paire';
-
-const TARIFS: Record<string, (m: Matiere, q?: Quantite) => number> = {
-  'Pendentif': (m) => m === 'argent' ? 70 : 80,
-  'Bague': (m) => m === 'argent' ? 80 : 90,
-  "Boucles d'oreilles": (m, q) => {
-    if (m === 'argent') return q === 'paire' ? 120 : 75;
-    return q === 'paire' ? 130 : 85;
-  },
-};
-
 function isBijou(cat: string) {
-  return ['Pendentif', 'Bague', "Boucles d'oreilles"].includes(cat);
+  return isBijouCategory(cat);
 }
 
 function calcPrix(cat: string, m: Matiere, q: Quantite): number {
-  const fn = TARIFS[cat];
-  return fn ? fn(m, q) : 0;
+  return calcBijouBasePrice(cat, m, q);
 }
 
 function matiereLabel(m: Matiere): string {
@@ -179,9 +172,8 @@ export default function StorePage() {
     setSelected(item);
     setModalImg(0);
     if (isBijou(item.categorie)) {
-      const fn = TARIFS[item.categorie];
-      const defaultQ: Quantite = "Boucles d'oreilles" === item.categorie ? 'paire' : 'paire';
-      const base = fn ? fn('argent', defaultQ) : item.prix;
+      const defaultQ: Quantite = 'paire';
+      const base = calcBijouBasePrice(item.categorie, 'argent', defaultQ) || item.prix;
       const { final } = resolvePriceForBase(promoSource(item), base);
       setSelectedPrix(final);
       setSelectedMatiere('Argent');

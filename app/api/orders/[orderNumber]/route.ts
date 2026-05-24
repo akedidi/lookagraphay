@@ -22,7 +22,11 @@ export async function GET(req: NextRequest, { params }: { params: { orderNumber:
 
     const order = rows[0];
 
-    if (email && String(order.email).toLowerCase() !== email.toLowerCase()) {
+    if (!email?.trim()) {
+      return NextResponse.json({ error: 'Email requis pour consulter cette commande' }, { status: 403 });
+    }
+
+    if (String(order.email).toLowerCase() !== email.trim().toLowerCase()) {
       return NextResponse.json({ error: 'Email incorrect' }, { status: 403 });
     }
 

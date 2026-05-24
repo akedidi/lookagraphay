@@ -6,6 +6,7 @@ import { isStripePaymentProvider } from '@/lib/stripe';
 import { createStripeCheckoutSession } from '@/lib/stripe-checkout';
 import { ensureOrderColumns } from '@/lib/orders-schema';
 import { requireAdmin } from '@/lib/admin-auth';
+import { validateOrderPricing } from '@/lib/order-pricing';
 
 async function generateOrderNumber(conn: Awaited<ReturnType<typeof pool.getConnection>>): Promise<string> {
   const now = new Date();
@@ -21,15 +22,29 @@ async function generateOrderNumber(conn: Awaited<ReturnType<typeof pool.getConne
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { nom, email, telephone, pays_residence, items, delivery_type, relay_point, shipping_address, pays, shipping_cost, total, notes } = body;
+    const { nom, email, telephone, pays_residence, items, delivery_type, relay_point, shipping_address, pays, notes } = body;
 
-    if (!nom || !email || !items || !delivery_type || total === undefined) {
+    if (!nom || !email || !items || !delivery_type) {
       return NextResponse.json({ error: 'Champs requis manquants' }, { status: 400 });
     }
 
     const conn = await pool.getConnection();
     await ensureOrderColumns(conn);
 
+    let priced;
+    try {
+      priced = await validateOrderPricing(conn, {
+        items,
+        delivery_type,
+        pays: pays ?? 'FR',
+      });
+    } catch (err: unknown) {
+      conn.release();
+      const message = err instanceof Error ? err.message : 'Panier invalide';
+      return NextResponse.json({ error: message }, { status: 400 });
+    }
+
+    const { items: validatedItems, shippingCost, total } = priced;
     const order_number = await generateOrderNumber(conn);
 
     await conn.execute(
@@ -37,10 +52,10 @@ export async function POST(req: NextRequest) {
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         order_number, nom, email, telephone ?? null, pays_residence ?? null,
-        JSON.stringify(items), delivery_type,
+        JSON.stringify(validatedItems), delivery_type,
         relay_point ? JSON.stringify(relay_point) : null,
         shipping_address ? JSON.stringify(shipping_address) : null,
-        pays ?? 'FR', shipping_cost ?? 0, total, notes ?? null,
+        pays ?? 'FR', shippingCost, total, notes ?? null,
       ]
     );
 
@@ -51,8 +66,8 @@ export async function POST(req: NextRequest) {
       const session = await createStripeCheckoutSession({
         orderNumber: order_number,
         email,
-        items,
-        shippingCost: Number(shipping_cost ?? 0),
+        items: validatedItems,
+        shippingCost,
       });
       payment_link = session.url ?? '';
       if (session.id) {
@@ -75,14 +90,14 @@ export async function POST(req: NextRequest) {
         customerName: nom,
         customerEmail: email,
         customerPhone: telephone ?? null,
-        items,
+        items: validatedItems,
         deliveryType: delivery_type as 'relay' | 'home' | 'international',
         relayPoint: relay_point ?? null,
         shippingAddress: shipping_address ?? null,
         pays: pays ?? 'FR',
         paysResidence: pays_residence ?? null,
-        shippingCost: Number(shipping_cost ?? 0),
-        total: Number(total),
+        shippingCost,
+        total,
         paymentLink: payment_link,
         notes: notes ?? null,
         paymentConfirmed: false,

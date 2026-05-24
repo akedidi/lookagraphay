@@ -3,33 +3,47 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { siteConfig } from '@/lib/data';
+import { CONTACT_MOTIFS } from '@/lib/contact-motifs';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: 'easeOut' as const } },
 };
 
-const motifs = [
-  { value: 'atelier', label: 'Inscription à un atelier' },
-  { value: 'achat', label: "Achat d'une œuvre" },
-  { value: 'commande', label: 'Commande sur mesure' },
-  { value: 'exposition', label: "Proposition d'exposition" },
-  { value: 'collaboration', label: 'Collaboration / Partenariat' },
-  { value: 'presse', label: 'Presse / Médias' },
-  { value: 'autre', label: 'Autre demande' },
-];
-
 export default function ContactPage() {
   const [form, setForm] = useState({ nom: '', email: '', motif: '', message: '' });
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        setError(typeof data.error === 'string' ? data.error : "Impossible d'envoyer le message.");
+        return;
+      }
+
+      setSent(true);
+    } catch {
+      setError('Erreur réseau. Vérifiez votre connexion et réessayez.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const inputStyle = {
@@ -294,7 +308,7 @@ export default function ContactPage() {
                     }}
                   >
                     <option value="">Choisir un motif</option>
-                    {motifs.map((m) => (
+                    {CONTACT_MOTIFS.map((m) => (
                       <option key={m.value} value={m.value}>
                         {m.label}
                       </option>
@@ -319,8 +333,27 @@ export default function ContactPage() {
                   />
                 </div>
 
-                <button type="submit" className="btn-gold btn-gold-solid" style={{ alignSelf: 'flex-start' }}>
-                  Envoyer le message
+                {error && (
+                  <p
+                    style={{
+                      fontFamily: 'Montserrat, sans-serif',
+                      fontSize: '0.875rem',
+                      fontWeight: 300,
+                      color: '#8B3A3A',
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {error}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  className="btn-gold btn-gold-solid"
+                  style={{ alignSelf: 'flex-start' }}
+                  disabled={loading}
+                >
+                  {loading ? 'Envoi en cours…' : 'Envoyer le message'}
                 </button>
               </form>
             )}

@@ -44,6 +44,7 @@ export async function sendGmailMessage(options: {
   to: string;
   subject: string;
   html: string;
+  replyTo?: string;
 }): Promise<void> {
   if (!isGmailConfigured()) {
     throw new Error('Gmail API non configurée (variables GMAIL_* manquantes)');
@@ -63,6 +64,7 @@ export async function sendGmailMessage(options: {
   const rawMessage = [
     `From: ${siteName} <${sender}>`,
     `To: ${options.to}`,
+    ...(options.replyTo ? [`Reply-To: ${options.replyTo}`] : []),
     `Subject: ${subjectEncoded}`,
     'MIME-Version: 1.0',
     'Content-Type: text/html; charset=UTF-8',

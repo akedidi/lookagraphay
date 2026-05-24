@@ -1,6 +1,9 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
+import { calcShipping, getPoidsKg } from '@/lib/shipping';
+
+export { calcShipping, getPoidsKg };
 
 export type CartItem = {
   id: number;
@@ -34,17 +37,6 @@ const CartContext = createContext<CartContextType | null>(null);
 
 function itemKey(id: number, matiere?: string) {
   return `${id}-${matiere ?? ''}`;
-}
-
-export const POIDS_KG: Record<string, number> = {
-  'Tableau': 2.5,
-  'Bague': 0.15,
-  'Pendentif': 0.1,
-  "Boucles d'oreilles": 0.2,
-};
-
-export function getPoidsKg(categorie: string): number {
-  return POIDS_KG[categorie] ?? 0.5;
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -113,20 +105,4 @@ export function useCart() {
   const ctx = useContext(CartContext);
   if (!ctx) throw new Error('useCart must be used within CartProvider');
   return ctx;
-}
-
-export function calcShipping(totalWeight: number, deliveryType: 'relay' | 'home' | 'international', pays: string): number | null {
-  const freeRelayCountries = ['FR', 'BE', 'LU', 'ES', 'PT', 'DE'];
-  if (deliveryType === 'relay') {
-    if (freeRelayCountries.includes(pays)) return 0;
-    return null;
-  }
-  if (deliveryType === 'home' && pays === 'FR') {
-    if (totalWeight <= 1) return 10;
-    if (totalWeight <= 5) return 15;
-    if (totalWeight <= 10) return 25;
-    if (totalWeight <= 30) return 40;
-    return null;
-  }
-  return null;
 }
