@@ -2,47 +2,51 @@ const path = require('path');
 const fs = require('fs');
 
 const port = parseInt(process.env.PORT || '3000', 10);
-const standaloneServer = path.join(__dirname, '.next', 'standalone', 'server.js');
+const standaloneDir = path.join(__dirname, '.next', 'standalone');
+const standaloneServer = path.join(standaloneDir, 'server.js');
 
-// Production Hostinger : utiliser le serveur standalone (léger, postbuild OK)
-if (fs.existsSync(standaloneServer)) {
-  process.env.HOSTNAME = process.env.HOSTNAME || '0.0.0.0';
-  process.env.PORT = String(port);
-  console.log(`> Starting standalone server on http://0.0.0.0:${port}`);
+function fatal(message, err) {
+  console.error('[lookagraphy]', message);
+  if (err) console.error(err);
+  process.exit(1);
+}
+
+// Hostinger / Docker définissent souvent HOSTNAME=nom-du-conteneur → le serveur
+// n’écoute pas sur l’interface attendue par le proxy (503). Toujours 0.0.0.0.
+process.env.HOSTNAME = '0.0.0.0';
+process.env.NODE_ENV = 'production';
+process.env.PORT = String(port);
+
+if (!fs.existsSync(standaloneServer)) {
+  fatal(
+    `Build standalone manquant (${standaloneServer}). Lancez "npm run build" sur le serveur.`
+  );
+}
+
+const staticDir = path.join(standaloneDir, '.next', 'static');
+const publicDir = path.join(standaloneDir, 'public');
+if (!fs.existsSync(staticDir) || !fs.existsSync(publicDir)) {
+  console.warn(
+    '[lookagraphy] WARN: assets static/public absents dans standalone — vérifiez scripts/postbuild.js'
+  );
+}
+
+process.on('uncaughtException', (err) => {
+  console.error('[lookagraphy] uncaughtException', err);
+  process.exit(1);
+});
+process.on('unhandledRejection', (err) => {
+  console.error('[lookagraphy] unhandledRejection', err);
+  process.exit(1);
+});
+
+console.log(`[lookagraphy] Starting standalone on http://0.0.0.0:${port}`);
+console.log(`[lookagraphy] cwd → ${standaloneDir}`);
+
+process.chdir(standaloneDir);
+
+try {
   require(standaloneServer);
-} else {
-  // Fallback local si pas de build standalone
-  const { createServer } = require('http');
-  const { parse } = require('url');
-  const next = require('next');
-
-  const nextDir = path.join(__dirname, '.next');
-  if (!fs.existsSync(nextDir)) {
-    console.error('FATAL: .next directory not found. Run "npm run build" first.');
-    process.exit(1);
-  }
-
-  const app = next({ dev: false, dir: __dirname });
-  const handle = app.getRequestHandler();
-
-  app.prepare()
-    .then(() => {
-      createServer(async (req, res) => {
-        try {
-          const parsedUrl = parse(req.url, true);
-          await handle(req, res, parsedUrl);
-        } catch (err) {
-          console.error('Request error:', req.url, err);
-          res.statusCode = 500;
-          res.end('internal server error');
-        }
-      }).listen(port, '0.0.0.0', (err) => {
-        if (err) throw err;
-        console.log(`> Ready on http://0.0.0.0:${port}`);
-      });
-    })
-    .catch((err) => {
-      console.error('Failed to start Next.js:', err);
-      process.exit(1);
-    });
+} catch (err) {
+  fatal('Impossible de démarrer le serveur standalone', err);
 }
