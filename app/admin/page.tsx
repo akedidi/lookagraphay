@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { CARRIER_SUGGESTIONS } from '@/lib/carriers';
 import { adminFetchInit, adminJsonInit } from '@/lib/admin-fetch';
 import { toDatetimeLocalValue } from '@/lib/store-item';
@@ -509,6 +510,9 @@ export default function AdminPage() {
           {!initDone && storeItems.length === 0 && (
             <button onClick={initDb} style={btnGold}>⚙ Init DB</button>
           )}
+          <Link href="/" style={{ ...btnOutline, textDecoration: 'none', display: 'inline-block' }}>
+            ← Site
+          </Link>
           <button onClick={logout} style={btnOutline}>Déconnexion</button>
         </div>
       </div>
