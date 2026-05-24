@@ -17,7 +17,10 @@ Ne pas utiliser `npm run start -- -p $PORT` : le port est déjà fourni par la v
 
 ## Après déploiement
 
-1. Vérifier les logs : vous devez voir **`[lookagraphy] Mode LiteSpeed`** puis **`[lookagraphy] ✓ Ready`** (pas seulement `✓ Starting...` de Next).
+1. Vérifier les logs **au démarrage** (pas seulement le build) :
+   - `[lookagraphy] Next standalone | Node …`
+   - puis `✓ Starting...` puis **`✓ Ready in …ms`**
+   - Si vous voyez seulement `▲ Next.js` sans `[lookagraphy]`, le mauvais fichier est lancé ou le deploy est ancien.
 2. Tester : `https://votre-domaine/api/ping` → `{"status":"ok",...}`
 
 ## Si 503 ou boucle « Starting... »
