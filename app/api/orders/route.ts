@@ -7,6 +7,7 @@ import { createStripeCheckoutSession } from '@/lib/stripe-checkout';
 import { ensureOrderColumns } from '@/lib/orders-schema';
 import { requireAdmin } from '@/lib/admin-auth';
 import { validateOrderPricing } from '@/lib/order-pricing';
+import { upsertNewsletterSubscriber } from '@/lib/newsletter';
 
 async function generateOrderNumber(conn: Awaited<ReturnType<typeof pool.getConnection>>): Promise<string> {
   const now = new Date();
@@ -22,7 +23,21 @@ async function generateOrderNumber(conn: Awaited<ReturnType<typeof pool.getConne
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { nom, email, telephone, pays_residence, items, delivery_type, relay_point, shipping_address, pays, notes } = body;
+    const {
+      nom,
+      email,
+      telephone,
+      pays_residence,
+      items,
+      delivery_type,
+      relay_point,
+      shipping_address,
+      pays,
+      notes,
+      prenom,
+      nom_famille,
+      newsletter_opt_in,
+    } = body;
 
     if (!nom || !email || !items || !delivery_type) {
       return NextResponse.json({ error: 'Champs requis manquants' }, { status: 400 });
@@ -58,6 +73,19 @@ export async function POST(req: NextRequest) {
         pays ?? 'FR', shippingCost, total, notes ?? null,
       ]
     );
+
+    if (newsletter_opt_in === true) {
+      const prenomVal = typeof prenom === 'string' ? prenom.trim() : '';
+      const nomVal = typeof nom_famille === 'string' ? nom_famille.trim() : '';
+      const parts = String(nom).trim().split(/\s+/);
+      await upsertNewsletterSubscriber(conn, {
+        email,
+        prenom: prenomVal || parts[0] || null,
+        nom: nomVal || (parts.length > 1 ? parts.slice(1).join(' ') : null),
+        source: 'checkout',
+        active: true,
+      });
+    }
 
     let payment_link = '';
     let payment_provider = process.env.PAYMENT_PROVIDER ?? 'paypal';

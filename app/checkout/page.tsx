@@ -55,6 +55,7 @@ export default function CheckoutPage() {
   const [address, setAddress] = useState({ rue: '', complement: '', code_postal: '', ville: '' });
   const [customer, setCustomer] = useState({ prenom: '', nom: '', email: '', telephone: '', pays_residence: 'France' });
   const [notes, setNotes] = useState('');
+  const [newsletterOptIn, setNewsletterOptIn] = useState(true);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [mounted, setMounted] = useState(false);
@@ -132,6 +133,9 @@ export default function CheckoutPage() {
         shipping_cost: shippingCost ?? 0,
         total: orderTotal,
         notes: notes || null,
+        prenom: customer.prenom.trim(),
+        nom_famille: customer.nom.trim(),
+        newsletter_opt_in: newsletterOptIn,
       };
       const res = await fetch('/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       const data = await res.json();
@@ -420,6 +424,39 @@ export default function CheckoutPage() {
                       onChange={e => setNotes(e.target.value)}
                       placeholder="Dédicace souhaitée, instructions particulières pour l'emballage, message pour l'artiste…"
                     />
+                  </div>
+
+                  <div style={{ gridColumn: '1/-1', marginTop: '0.25rem' }}>
+                    <label
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '0.75rem',
+                        cursor: 'pointer',
+                        fontFamily: 'Montserrat, sans-serif',
+                        fontSize: '0.78rem',
+                        fontWeight: 300,
+                        color: 'rgba(61,43,31,0.75)',
+                        lineHeight: 1.65,
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={newsletterOptIn}
+                        onChange={(e) => setNewsletterOptIn(e.target.checked)}
+                        style={{
+                          width: 16,
+                          height: 16,
+                          marginTop: 3,
+                          accentColor: gold,
+                          flexShrink: 0,
+                        }}
+                      />
+                      <span>
+                        Je souhaite recevoir la lettre d&apos;information LookaGraphy&nbsp;: actualités de l&apos;atelier,
+                        expositions et nouveautés. Désinscription possible à tout moment.
+                      </span>
+                    </label>
                   </div>
 
                 </div>

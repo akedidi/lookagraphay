@@ -17,43 +17,90 @@ export function getGmailRedirectUri(): string {
   return `${base.replace(/\/$/, '')}/auth/google/callback`;
 }
 
-function getOAuth2Client() {
+function getOAuth2Client(forContact = false) {
+  const useContactClient =
+    forContact &&
+    process.env.CONTACT_GMAIL_CLIENT_ID &&
+    process.env.CONTACT_GMAIL_CLIENT_SECRET;
+
   return new OAuth2Client(
-    process.env.GMAIL_CLIENT_ID,
-    process.env.GMAIL_CLIENT_SECRET,
+    useContactClient ? process.env.CONTACT_GMAIL_CLIENT_ID : process.env.GMAIL_CLIENT_ID,
+    useContactClient ? process.env.CONTACT_GMAIL_CLIENT_SECRET : process.env.GMAIL_CLIENT_SECRET,
     getGmailRedirectUri()
   );
 }
 
-export function getGmailAuthUrl(): string {
-  const client = getOAuth2Client();
+export function getGmailAuthUrl(forContact = false): string {
+  const client = getOAuth2Client(forContact);
   return client.generateAuthUrl({
     access_type: 'offline',
     prompt: 'consent',
     scope: SCOPES,
+    ...(forContact ? { state: 'contact' } : {}),
   });
 }
 
-export async function exchangeGmailCode(code: string): Promise<{ refresh_token?: string | null }> {
-  const client = getOAuth2Client();
+export async function exchangeGmailCode(
+  code: string,
+  forContact = false
+): Promise<{ refresh_token?: string | null }> {
+  const client = getOAuth2Client(forContact);
   const { tokens } = await client.getToken(code);
   return { refresh_token: tokens.refresh_token };
 }
 
-export async function sendGmailMessage(options: {
+/** Compte lookagraphy.order — commandes uniquement */
+export type GmailOrdersAccount = 'orders';
+/** Compte contact.lookagraphy — formulaire contact + newsletter */
+export type GmailContactAccount = 'contact';
+
+export type GmailSendOptions = {
   to: string;
   subject: string;
   html: string;
   replyTo?: string;
-}): Promise<void> {
-  if (!isGmailConfigured()) {
-    throw new Error('Gmail API non configurée (variables GMAIL_* manquantes)');
+  listUnsubscribe?: string;
+  /** `orders` = GMAIL_* (lookagraphy.order) · `contact` = CONTACT_GMAIL_* (contact.lookagraphy) */
+  account: GmailOrdersAccount | GmailContactAccount;
+  fromSender?: string;
+  fromName?: string;
+  refreshToken?: string;
+};
+
+export function isContactGmailConfigured(): boolean {
+  return Boolean(
+    process.env.CONTACT_GMAIL_CLIENT_ID &&
+      process.env.CONTACT_GMAIL_CLIENT_SECRET &&
+      process.env.CONTACT_GMAIL_REFRESH_TOKEN &&
+      process.env.CONTACT_GMAIL_SENDER
+  );
+}
+
+export async function sendGmailMessage(options: GmailSendOptions): Promise<void> {
+  const useContact = options.account === 'contact';
+
+  const refreshToken =
+    options.refreshToken ??
+    (useContact ? process.env.CONTACT_GMAIL_REFRESH_TOKEN : process.env.GMAIL_REFRESH_TOKEN);
+  const sender =
+    options.fromSender ??
+    (useContact ? process.env.CONTACT_GMAIL_SENDER : process.env.GMAIL_SENDER || process.env.GMAIL_USER);
+
+  const clientId = useContact ? process.env.CONTACT_GMAIL_CLIENT_ID : process.env.GMAIL_CLIENT_ID;
+  const clientSecret = useContact
+    ? process.env.CONTACT_GMAIL_CLIENT_SECRET
+    : process.env.GMAIL_CLIENT_SECRET;
+
+  if (!clientId || !clientSecret || !refreshToken || !sender) {
+    const label = useContact ? 'CONTACT_GMAIL_* (contact.lookagraphy)' : 'GMAIL_* (lookagraphy.order)';
+    throw new Error(`Gmail API non configurée — ${label}`);
   }
 
-  const sender = (process.env.GMAIL_SENDER || process.env.GMAIL_USER)!;
-  const siteName = process.env.GMAIL_FROM_NAME ?? 'LookaGraphy';
-  const client = getOAuth2Client();
-  client.setCredentials({ refresh_token: process.env.GMAIL_REFRESH_TOKEN });
+  const siteName = useContact
+    ? (options.fromName ?? process.env.CONTACT_GMAIL_FROM_NAME ?? 'LookaGraphy')
+    : (options.fromName ?? process.env.GMAIL_FROM_NAME ?? 'LookaGraphy');
+  const client = getOAuth2Client(useContact);
+  client.setCredentials({ refresh_token: refreshToken });
 
   const accessToken = await client.getAccessToken();
   const token = accessToken.token;
@@ -65,6 +112,7 @@ export async function sendGmailMessage(options: {
     `From: ${siteName} <${sender}>`,
     `To: ${options.to}`,
     ...(options.replyTo ? [`Reply-To: ${options.replyTo}`] : []),
+    ...(options.listUnsubscribe ? [`List-Unsubscribe: <${options.listUnsubscribe}>`] : []),
     `Subject: ${subjectEncoded}`,
     'MIME-Version: 1.0',
     'Content-Type: text/html; charset=UTF-8',

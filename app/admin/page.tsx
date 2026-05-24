@@ -4,12 +4,13 @@ import { CARRIER_SUGGESTIONS } from '@/lib/carriers';
 import { adminFetchInit, adminJsonInit } from '@/lib/admin-fetch';
 import { toDatetimeLocalValue } from '@/lib/store-item';
 import { formatPromoLabel } from '@/lib/promo';
+import NewsletterPanel from '@/components/admin/NewsletterPanel';
 
 const gold = '#C9A84C';
 const dark = '#1A1209';
 const light = '#F5F0E8';
 
-type Tab = 'store' | 'expositions' | 'evenements' | 'commandes';
+type Tab = 'store' | 'expositions' | 'evenements' | 'commandes' | 'newsletter';
 
 const inputStyle = {
   width: '100%',
@@ -485,7 +486,7 @@ export default function AdminPage() {
 
       {/* Tabs */}
       <div className="admin-tabs" style={{ background: dark, gap: 0, borderBottom: `1px solid rgba(201,168,76,0.15)` }}>
-        {([['store', 'Store'], ['expositions', 'Expositions'], ['evenements', 'Événements'], ['commandes', 'Commandes']] as [Tab, string][]).map(([k, label]) => (
+        {([['store', 'Store'], ['expositions', 'Expositions'], ['evenements', 'Événements'], ['commandes', 'Commandes'], ['newsletter', 'Newsletter']] as [Tab, string][]).map(([k, label]) => (
           <button
             key={k}
             onClick={() => setTab(k)}
@@ -1046,6 +1047,10 @@ export default function AdminPage() {
               </div>
             )}
           </div>
+        )}
+
+        {tab === 'newsletter' && (
+          <NewsletterPanel onFlash={flash} />
         )}
 
       </div>

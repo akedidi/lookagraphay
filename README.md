@@ -43,7 +43,8 @@ Première utilisation : ouvrir `/admin`, se connecter avec `ADMIN_PASSWORD`, cli
 | `PAYMENT_PROVIDER` | oui | `stripe` ou `paypal` |
 | `STRIPE_SECRET_KEY` | si Stripe | Clé secrète Stripe |
 | `STRIPE_WEBHOOK_SECRET` | si Stripe | Secret endpoint webhook |
-| `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `GMAIL_REFRESH_TOKEN`, `GMAIL_SENDER` | emails | Gmail API |
+| `GMAIL_*` | emails commandes | Compte **lookagraphy.order** — client + admin `[Commandes]` |
+| `CONTACT_GMAIL_*` | contact + newsletter | Compte **contact.lookagraphy** — formulaire `[Contact]` + newsletter |
 | `HEALTH_CHECK_SECRET` | prod | Protège `/api/health` |
 
 Voir `.env.example` pour Gmail OAuth et PayPal.
@@ -129,12 +130,15 @@ HEALTH_CHECK_SECRET=<généré>
 
 Alias : `/api/webhooks/stripe` (même handler).
 
-### 5. Gmail (emails commande)
+### 5. Gmail (2 comptes)
 
-1. Google Cloud → activer **Gmail API**
-2. OAuth client **Application Web** → redirection : `{NEXT_PUBLIC_SITE_URL}/auth/google/callback`
-3. Une fois : `https://VOTRE-DOMAINE/api/auth/gmail?key=VOTRE_GMAIL_OAUTH_SETUP_KEY`
-4. Copier `GMAIL_REFRESH_TOKEN`, puis retirer `GMAIL_OAUTH_SETUP_KEY`
+Même redirect URI pour les deux clients OAuth : `{NEXT_PUBLIC_SITE_URL}/auth/google/callback`
+
+**lookagraphy.order** (commandes) : `GMAIL_OAUTH_SETUP_KEY` + `GMAIL_*`  
+→ `https://VOTRE-DOMAINE/api/auth/gmail?key=VOTRE_GMAIL_OAUTH_SETUP_KEY` → `GMAIL_REFRESH_TOKEN`
+
+**contact.lookagraphy** (contact + newsletter) : `CONTACT_GMAIL_OAUTH_SETUP_KEY` + `CONTACT_GMAIL_*`  
+→ `https://VOTRE-DOMAINE/api/auth/gmail?key=VOTRE_CONTACT_GMAIL_OAUTH_SETUP_KEY&contact=1` → `CONTACT_GMAIL_REFRESH_TOKEN`
 
 ### 6. Santé
 

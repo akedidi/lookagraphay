@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
 import { ensureOrderColumns } from '@/lib/orders-schema';
+import { ensureNewsletterTables } from '@/lib/newsletter-schema';
 import { ensureStoreColumns } from '@/lib/store-schema';
 import { requireAdmin } from '@/lib/admin-auth';
 
@@ -155,6 +156,7 @@ export async function POST(req: NextRequest) {
     `);
 
     await ensureOrderColumns(conn);
+    await ensureNewsletterTables(conn);
 
     conn.release();
     return NextResponse.json({ ok: true, message: 'DB initialisée et données migrées' });

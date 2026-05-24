@@ -16,20 +16,25 @@ export async function GET(req: NextRequest) {
     return htmlResponse('<h1>Code manquant</h1><p>Relancez la connexion Gmail.</p>', 400);
   }
 
+  const state = new URL(req.url).searchParams.get('state');
+  const forContact = state === 'contact' || state === 'newsletter';
+
   try {
-    const { refresh_token } = await exchangeGmailCode(code);
+    const { refresh_token } = await exchangeGmailCode(code, forContact);
 
     if (!refresh_token) {
       return htmlResponse(
         `<h1>Pas de refresh token</h1>
-        <p>Révoquez l'accès dans <a href="https://myaccount.google.com/permissions">votre compte Google</a>, puis reconnectez-vous via <code>/api/auth/gmail</code> (consent forcé).</p>`,
+        <p>Révoquez l'accès dans <a href="https://myaccount.google.com/permissions">votre compte Google</a>, puis reconnectez-vous via <code>/api/auth/gmail${forContact ? '?contact=1' : ''}</code> (consent forcé).</p>`,
         400
       );
     }
 
+    const envKey = forContact ? 'CONTACT_GMAIL_REFRESH_TOKEN' : 'GMAIL_REFRESH_TOKEN';
+
     return htmlResponse(
-      `<h1>Gmail connecté</h1>
-      <p>Copiez cette valeur dans <strong>GMAIL_REFRESH_TOKEN</strong> sur Hostinger (et <code>.env.local</code>) :</p>
+      `<h1>Gmail connecté${forContact ? ' — contact.lookagraphy' : ' — lookagraphy.order'}</h1>
+      <p>Copiez cette valeur dans <strong>${envKey}</strong> sur Hostinger (et <code>.env.local</code>) :</p>
       <pre style="background:#1A1209;color:#C9A84C;padding:1rem;overflow:auto;word-break:break-all;">${refresh_token}</pre>
       <p style="margin-top:1.5rem;font-size:0.9rem;color:#666;">Ne partagez pas ce token. Supprimez cette page de l'historique après copie.</p>`,
       200

@@ -2,7 +2,7 @@
  * Emails transactionnels LookaGraphy — envoi via Gmail API si configuré.
  */
 
-import { isGmailConfigured, sendGmailMessage } from '@/lib/gmail';
+import { isGmailConfigured, isContactGmailConfigured, sendGmailMessage } from '@/lib/gmail';
 import { trackingPageUrl } from '@/lib/tracking-url';
 
 const SITE_NAME = 'LookaGraphy';
@@ -554,7 +554,7 @@ async function sendEmail(
 ): Promise<boolean> {
   if (isGmailConfigured()) {
     try {
-      await sendGmailMessage({ to, subject, html, replyTo: options?.replyTo });
+      await sendGmailMessage({ to, subject, html, replyTo: options?.replyTo, account: 'orders' });
       console.log(`[EMAIL] Envoyé via Gmail → ${to} | ${subject}`);
       return true;
     } catch (err) {
@@ -614,5 +614,24 @@ export async function sendContactFormEmail(data: ContactEmailData): Promise<bool
   const subject = adminSubject('Contact', `${data.motifLabel} — ${data.nom}`);
   const html = buildContactFormHtml(data);
   const replyTo = `${data.nom} <${data.email}>`;
-  return sendEmail(ADMIN_EMAIL, subject, html, { replyTo });
+
+  if (!isContactGmailConfigured()) {
+    console.error('[EMAIL] CONTACT_GMAIL_* non configuré (compte contact.lookagraphy)');
+    return false;
+  }
+
+  try {
+    await sendGmailMessage({
+      to: ADMIN_EMAIL,
+      subject,
+      html,
+      replyTo,
+      account: 'contact',
+    });
+    console.log(`[EMAIL] Contact (contact.lookagraphy) → ${ADMIN_EMAIL} | ${subject}`);
+    return true;
+  } catch (err) {
+    console.error('[EMAIL] Erreur Gmail contact:', err);
+    return false;
+  }
 }
