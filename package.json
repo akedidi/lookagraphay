@@ -2,10 +2,13 @@
   "name": "lucagraphy",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "next dev -p 5000",
     "build": "next build && node scripts/postbuild.js",
-    "start": "HOSTNAME=0.0.0.0 node server.js",
+    "start": "node scripts/start-hostinger.js",
     "check-secrets": "sh scripts/check-secrets.sh"
   },
   "dependencies": {
