@@ -53,7 +53,11 @@ Hostinger lance l’app via **Passenger** depuis :
 
 (voir `public_html/.htaccess` : `PassengerAppRoot …/nodejs`)
 
-À chaque **`npm run build`**, le **postbuild** copie automatiquement `.next/standalone/` vers le dossier **`nodejs/`** (runtime Passenger) et écrit `nodejs/tmp/restart.txt` pour relancer l’app.
+À chaque **`npm run build`**, le **postbuild** :
+1. Prépare `public_html/.next/standalone/` (serveur Next patché v5)
+2. Installe dans **`nodejs/server.js`** un **lanceur** qui exécute ce standalone (plus de copie du build dans `nodejs/` → fini les assets désynchronisés)
+3. Recopie `.next/static/` vers `public_html/.next/static/` (fichiers CSS/JS servis par LiteSpeed)
+4. Écrit `nodejs/tmp/restart.txt` pour relancer Passenger
 
 Dans les **logs de build** Hostinger, vous devez voir :
 

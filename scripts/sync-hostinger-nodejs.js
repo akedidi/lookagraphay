@@ -6,7 +6,13 @@ const fs = require('fs');
 const path = require('path');
 
 const PROJECT_NAME = 'lucagraphy';
-const LEGACY_FILES = ['server-app.js', 'load-env.js', '.lookagraphy-instance.lock', '.lookagraphy.pid.lock'];
+const LEGACY_FILES = [
+  'server-app.js',
+  'load-env.js',
+  '.lookagraphy-instance.lock',
+  '.lookagraphy.pid.lock',
+];
+const STALE_NODEJS_DIRS = ['.next', 'node_modules', 'public'];
 
 function copyDir(src, dest) {
   fs.mkdirSync(dest, { recursive: true });
@@ -125,8 +131,12 @@ function logBuildAssets(projectRoot, label) {
   console.log(`[postbuild] ${label} BUILD_ID=${buildId} CSS=${css.join(', ') || '(aucun)'}`);
 }
 
-function syncStandaloneToNodejs(standaloneDir, nodejsDir) {
-  console.log('[postbuild] Sync standalone →', nodejsDir);
+/** Passenger lit nodejs/server.js — on installe un lanceur vers public_html/.next/standalone (pas de copie du build). */
+function installPassengerLauncher(nodejsDir, projectRoot) {
+  const launcherSrc = path.join(__dirname, 'hostinger-launcher.js');
+  const launcherDest = path.join(nodejsDir, 'server.js');
+
+  console.log('[postbuild] Install Passenger launcher →', nodejsDir);
 
   for (const legacy of LEGACY_FILES) {
     try {
@@ -134,18 +144,26 @@ function syncStandaloneToNodejs(standaloneDir, nodejsDir) {
     } catch (_) {}
   }
 
-  for (const name of fs.readdirSync(standaloneDir)) {
-    if (LEGACY_FILES.includes(name)) continue;
-    const src = path.join(standaloneDir, name);
-    const dest = path.join(nodejsDir, name);
-    fs.rmSync(dest, { recursive: true, force: true });
-    if (fs.statSync(src).isDirectory()) {
-      copyDir(src, dest);
-    } else {
-      fs.mkdirSync(path.dirname(dest), { recursive: true });
-      fs.copyFileSync(src, dest);
+  for (const stale of STALE_NODEJS_DIRS) {
+    const p = path.join(nodejsDir, stale);
+    if (fs.existsSync(p)) {
+      fs.rmSync(p, { recursive: true, force: true });
+      console.log('[postbuild]   supprimé nodejs/' + stale + ' (copie obsolète)');
     }
-    console.log('[postbuild]   → nodejs/' + name);
+  }
+
+  fs.copyFileSync(launcherSrc, launcherDest);
+  console.log('[postbuild]   → nodejs/server.js (pointe vers public_html/.next/standalone)');
+
+  const publicHtml =
+    projectRoot === path.dirname(nodejsDir) && path.basename(projectRoot) === 'public_html'
+      ? projectRoot
+      : path.join(path.dirname(nodejsDir), 'public_html');
+  const standaloneServer = path.join(publicHtml, '.next', 'standalone', 'server.js');
+  if (!fs.existsSync(standaloneServer)) {
+    console.warn('[postbuild] Attention: standalone pas encore présent dans', publicHtml);
+  } else {
+    console.log('[postbuild]   cible runtime:', standaloneServer);
   }
 
   const restartDir = path.join(nodejsDir, 'tmp');
@@ -199,9 +217,9 @@ function runSync(projectRoot) {
 
   for (const nodejsDir of nodejsTargets) {
     try {
-      syncStandaloneToNodejs(standaloneDir, nodejsDir);
+      installPassengerLauncher(nodejsDir, projectRoot);
     } catch (err) {
-      console.error('[postbuild] Échec sync vers', nodejsDir, err.message);
+      console.error('[postbuild] Échec launcher vers', nodejsDir, err.message);
       process.exit(1);
     }
   }
@@ -227,4 +245,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { findNodejsTargets, runSync, syncStandaloneToNodejs, syncStaticToPublicHtml };
+module.exports = { findNodejsTargets, runSync, installPassengerLauncher, syncStaticToPublicHtml };

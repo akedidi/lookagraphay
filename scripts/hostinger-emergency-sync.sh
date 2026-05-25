@@ -17,16 +17,11 @@ if [ ! -d "$NODEJS" ]; then
   exit 1
 fi
 
-echo "=== Sync $SITE_ROOT/.next/standalone → $NODEJS ==="
+echo "=== Install launcher + purge copies obsolètes dans nodejs/ ==="
 rm -f "$NODEJS"/server-app.js "$NODEJS"/load-env.js "$NODEJS"/.lookagraphy-instance.lock "$NODEJS"/.lookagraphy.pid.lock 2>/dev/null || true
-
-for item in server.js package.json public node_modules .next; do
-  if [ -e ".next/standalone/$item" ]; then
-    rm -rf "$NODEJS/$item"
-    cp -a ".next/standalone/$item" "$NODEJS/"
-    echo "  → nodejs/$item"
-  fi
-done
+rm -rf "$NODEJS/.next" "$NODEJS/node_modules" "$NODEJS/public" 2>/dev/null || true
+cp "$SITE_ROOT/scripts/hostinger-launcher.js" "$NODEJS/server.js"
+echo "  → nodejs/server.js (launcher → public_html/.next/standalone)"
 
 mkdir -p "$NODEJS/tmp"
 date +%s > "$NODEJS/tmp/restart.txt"
