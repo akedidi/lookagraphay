@@ -349,6 +349,28 @@ h1, h2, h3, h4, h5, h6 {
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
 }
 
+/* Association — 6 piliers en grille 3×2 (pas auto-fit → 4 colonnes / cases vides) */
+.association-pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5px;
+  max-width: 72rem;
+  margin: 0 auto;
+  background: rgba(201, 168, 76, 0.15);
+}
+
+@media (max-width: 960px) {
+  .association-pillars-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .association-pillars-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .checkout-layout {
   display: grid;
   grid-template-columns: 1fr min(360px, 100%);

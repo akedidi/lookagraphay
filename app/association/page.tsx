@@ -241,16 +241,7 @@ export default function AssociationPage() {
           </h2>
         </motion.div>
 
-        <div
-          style={{
-            maxWidth: '72rem',
-            margin: '0 auto',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
-            gap: '1.5px',
-            background: 'rgba(201,168,76,0.15)',
-          }}
-        >
+        <div className="association-pillars-grid">
           {pillars.map((pillar, i) => (
             <motion.div
               key={i}
