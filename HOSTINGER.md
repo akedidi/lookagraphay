@@ -53,7 +53,24 @@ Hostinger lance l’app via **Passenger** depuis :
 
 (voir `public_html/.htaccess` : `PassengerAppRoot …/nodejs`)
 
-Le build Git met à jour `public_html/.next/standalone/` ; il faut que **`nodejs/server.js`** soit synchronisé (deploy Hostinger ou script SSH).
+À chaque **`npm run build`**, le **postbuild** copie automatiquement `.next/standalone/` vers le dossier **`nodejs/`** (runtime Passenger) et écrit `nodejs/tmp/restart.txt` pour relancer l’app.
+
+Dans les **logs de build** Hostinger, vous devez voir :
+
+```
+[postbuild] Sync standalone → /home/…/domains/…/nodejs
+[postbuild]   → nodejs/server.js
+[postbuild]   → nodejs/.next
+[postbuild]   → nodejs/tmp/restart.txt (redémarrage Passenger)
+```
+
+Si la sync est absente, le build tourne peut‑être hors de `public_html/` : ajoutez dans hPanel une variable d’environnement :
+
+`HOSTINGER_NODEJS_DIR` = `/home/u376353647/domains/VOTRE-SITE.hostingersite.com/nodejs`
+
+(ajustez le chemin exact affiché dans File Manager).
+
+Sync manuelle après build (SSH) : `npm run sync:nodejs` depuis `public_html/`.
 
 **Patch actuel : `lookagraphy-passenger-v5`** — pas de verrou PID (Passenger gère l’instance ; un lock provoquait 503/504).
 
