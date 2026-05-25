@@ -19,6 +19,10 @@ const montserrat = Montserrat({
   variable: '--font-montserrat',
 });
 
+/** Évite HTML statique mis en cache CDN avec d’anciens hashes /_next/static (home cassée au 1er chargement). */
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export const viewport = {
   width: 'device-width',
   initialScale: 1,

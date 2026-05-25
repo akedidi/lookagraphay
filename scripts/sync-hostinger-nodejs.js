@@ -172,6 +172,20 @@ function installPassengerLauncher(nodejsDir, projectRoot) {
   console.log('[postbuild]   → nodejs/tmp/restart.txt (redémarrage Passenger)');
 }
 
+/** Fusionne les fichiers (ne supprime pas les anciens chunks/CSS) pour les visites encore servies par le CDN. */
+function mergeCopyDir(src, dest) {
+  fs.mkdirSync(dest, { recursive: true });
+  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+    if (entry.isDirectory()) {
+      mergeCopyDir(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
+}
+
 /** LiteSpeed sert souvent /_next/static depuis public_html — doit matcher le BUILD_ID du serveur. */
 function syncStaticToPublicHtml(projectRoot, publicHtmlDir) {
   const staticSrc = path.join(projectRoot, '.next', 'static');
@@ -181,10 +195,39 @@ function syncStaticToPublicHtml(projectRoot, publicHtmlDir) {
   const nextDir = path.join(publicHtmlDir, '.next');
   const destStatic = path.join(nextDir, 'static');
   fs.mkdirSync(nextDir, { recursive: true });
-  fs.rmSync(destStatic, { recursive: true, force: true });
-  copyDir(staticSrc, destStatic);
+  mergeCopyDir(staticSrc, destStatic);
   fs.copyFileSync(buildIdSrc, path.join(nextDir, 'BUILD_ID'));
-  console.log('[postbuild] Sync .next/static →', publicHtmlDir);
+  aliasStaleStaticAssets(projectRoot, destStatic);
+  console.log('[postbuild] Merge .next/static →', publicHtmlDir, '(anciens fichiers conservés)');
+}
+
+/** Duplique le CSS courant sous d’anciens noms encore référencés par du HTML en cache CDN. */
+function aliasStaleStaticAssets(projectRoot, destStaticDir) {
+  const manifestPath = path.join(projectRoot, '.hostinger-stale-assets.json');
+  if (!fs.existsSync(manifestPath)) return;
+
+  let manifest;
+  try {
+    manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  } catch {
+    console.warn('[postbuild] .hostinger-stale-assets.json invalide — ignoré');
+    return;
+  }
+
+  const cssDir = path.join(destStaticDir, 'css');
+  if (!fs.existsSync(cssDir) || !Array.isArray(manifest.css) || manifest.css.length === 0) return;
+
+  const currentCss = fs.readdirSync(cssDir).filter((f) => f.endsWith('.css'));
+  if (currentCss.length === 0) return;
+  const latest = path.join(cssDir, currentCss[currentCss.length - 1]);
+
+  for (const staleName of manifest.css) {
+    if (typeof staleName !== 'string' || !staleName.endsWith('.css')) continue;
+    const dest = path.join(cssDir, staleName);
+    if (fs.existsSync(dest)) continue;
+    fs.copyFileSync(latest, dest);
+    console.log('[postbuild]   alias CSS', staleName, '←', path.basename(latest));
+  }
 }
 
 function runSync(projectRoot) {

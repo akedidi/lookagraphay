@@ -77,6 +77,18 @@ Dans les **logs de build** Hostinger, vous devez voir :
 
 Sans cette variable, le build met à jour `public_html/` mais **pas** `nodejs/` → HTML ancien + CSS **404** → site « disloqué ».
 
+### Home cassée au premier chargement, OK après navigation
+
+Symptôme typique : [l’accueil](https://blue-squirrel-716769.hostingersite.com/) sans styles / blocs vides, puis correct après avoir visité une autre page et être revenu.
+
+Cause : le **CDN Hostinger (hcdn)** garde un **vieux HTML** (`x-hcdn-cache-status: HIT`) qui pointe vers d’anciens fichiers `/_next/static/…` **supprimés** au dernier deploy. La navigation client (Next.js) recharge du HTML frais depuis Node (`DYNAMIC`).
+
+Actions après chaque deploy important :
+
+1. **Purger le cache CDN** dans hPanel (Websites → Performance / CDN → Purge).
+2. Vérifier que le build log contient `Merge .next/static` (ne plus `rm -rf .next/static` en SSH).
+3. Optionnel : lister les anciens CSS encore en cache dans `.hostinger-stale-assets.json` (alias automatique au postbuild).
+
 Sync manuelle après build (SSH) : `npm run sync:nodejs` depuis `public_html/`.
 
 ### CSS / mise en page cassée après deploy

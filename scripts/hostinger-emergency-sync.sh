@@ -26,9 +26,9 @@ echo "  → nodejs/server.js (launcher → public_html/.next/standalone)"
 mkdir -p "$NODEJS/tmp"
 date +%s > "$NODEJS/tmp/restart.txt"
 
-echo "=== Sync .next/static → public_html ==="
-rm -rf .next/static
-cp -a .next/standalone/.next/static .next/static
+echo "=== Merge .next/static → public_html (conserve anciens CSS/JS pour HTML CDN en cache) ==="
+mkdir -p .next/static
+cp -a .next/standalone/.next/static/. .next/static/
 cp .next/BUILD_ID .next/BUILD_ID 2>/dev/null || cp .next/standalone/.next/BUILD_ID .next/BUILD_ID
 
 echo "BUILD_ID=$(cat .next/BUILD_ID)"
