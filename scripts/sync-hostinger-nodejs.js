@@ -198,6 +198,17 @@ function syncStaticToPublicHtml(projectRoot, publicHtmlDir) {
   mergeCopyDir(staticSrc, destStatic);
   fs.copyFileSync(buildIdSrc, path.join(nextDir, 'BUILD_ID'));
   aliasStaleStaticAssets(projectRoot, destStatic);
+
+  const standaloneStatic = path.join(publicHtmlDir, '.next', 'standalone', '.next', 'static');
+  if (fs.existsSync(path.join(publicHtmlDir, '.next', 'standalone', 'server.js'))) {
+    mergeCopyDir(destStatic, standaloneStatic);
+    fs.copyFileSync(
+      path.join(publicHtmlDir, '.next', 'BUILD_ID'),
+      path.join(publicHtmlDir, '.next', 'standalone', '.next', 'BUILD_ID')
+    );
+    console.log('[postbuild] Merge static → standalone/.next/static (Passenger sert ce dossier)');
+  }
+
   console.log('[postbuild] Merge .next/static →', publicHtmlDir, '(anciens fichiers conservés)');
 }
 
