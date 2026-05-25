@@ -5,10 +5,7 @@ import { motion } from 'framer-motion';
 import { siteConfig } from '@/lib/data';
 import { CONTACT_MOTIFS } from '@/lib/contact-motifs';
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 28 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: 'easeOut' as const } },
-};
+import { fadeUp, motionViewport } from '@/lib/motion-variants';
 
 export default function ContactPage() {
   const [form, setForm] = useState({ prenom: '', nom: '', email: '', motif: '', message: '' });

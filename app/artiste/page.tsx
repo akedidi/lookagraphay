@@ -3,11 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { artistData } from '@/lib/data';
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 28 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: 'easeOut' as const } },
-};
+import { fadeUp, motionViewport } from '@/lib/motion-variants';
 
 export default function ArtistePage() {
   return (

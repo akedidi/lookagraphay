@@ -1,11 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 32 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' as const } },
-};
+import { fadeUp, motionViewport } from '@/lib/motion-variants';
 
 const pillars = [
   {
@@ -147,7 +143,7 @@ export default function AssociationPage() {
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
+          viewport={motionViewport}
           variants={fadeUp}
           style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}
         >
@@ -210,7 +206,7 @@ export default function AssociationPage() {
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
+          viewport={motionViewport}
           variants={fadeUp}
           style={{ textAlign: 'center', marginBottom: '4rem' }}
         >
@@ -263,9 +259,9 @@ export default function AssociationPage() {
               key={i}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, margin: '-40px' }}
+              viewport={motionViewport}
               variants={{
-                hidden: { opacity: 0, y: 24 },
+                hidden: { opacity: 1, y: 24 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.7, delay: (i % 3) * 0.1, ease: 'easeOut' as const } },
               }}
               style={{
@@ -342,7 +338,7 @@ export default function AssociationPage() {
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
+          viewport={motionViewport}
           variants={fadeUp}
         >
           <span

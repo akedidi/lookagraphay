@@ -10,10 +10,7 @@ import { galerieData } from '@/lib/data';
 
 type Oeuvre = GalerieOeuvre;
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 28 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: 'easeOut' as const } },
-};
+import { fadeUp, motionViewport } from '@/lib/motion-variants';
 
 const arabicLetters = ['ب', 'ل', 'ن', 'م', 'ح', 'ع'];
 

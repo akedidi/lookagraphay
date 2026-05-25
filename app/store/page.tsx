@@ -18,6 +18,7 @@ import {
   type Matiere,
   type Quantite,
 } from '@/lib/bijou-pricing';
+import { fadeUp, motionViewport } from '@/lib/motion-variants';
 
 type StoreItem = MappedStoreItem;
 
@@ -134,10 +135,6 @@ function PrixSelector({
   );
 }
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 28 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: 'easeOut' as const } },
-};
 
 const arabicLetters = ['ب', 'ل', 'ن', 'م', 'ح', 'ع'];
 

@@ -4,15 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { artistData, ateliersData, expositionsData, evenementsData, galerieData } from '@/lib/data';
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 32 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: 'easeOut' as const } },
-};
-
-const stagger = {
-  visible: { transition: { staggerChildren: 0.15 } },
-};
+import { fadeUp, fadeUpStagger as stagger, motionViewport } from '@/lib/motion-variants';
 
 export default function Home() {
   const [muted, setMuted] = useState(true);
@@ -251,7 +243,7 @@ export default function Home() {
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
+          viewport={motionViewport}
           variants={fadeUp}
         >
           <div className="ornament mb-6" style={{ fontSize: '1.5rem' }}>
@@ -287,7 +279,7 @@ export default function Home() {
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: '-80px' }}
+            viewport={motionViewport}
             variants={fadeUp}
             className="max-w-xl mx-auto lg:max-w-none lg:mx-0"
           >
@@ -337,9 +329,9 @@ export default function Home() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
+            initial={{ opacity: 1, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
+            viewport={motionViewport}
             transition={{ duration: 1, ease: 'easeOut' as const }}
             className="img-zoom"
             style={{
@@ -392,7 +384,7 @@ export default function Home() {
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: '-80px' }}
+            viewport={motionViewport}
             variants={fadeUp}
             className="text-center mb-16"
           >
@@ -439,7 +431,7 @@ export default function Home() {
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: '-60px' }}
+            viewport={motionViewport}
             variants={stagger}
             style={{
               maxWidth: '48rem',
@@ -550,7 +542,7 @@ export default function Home() {
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: '-80px' }}
+            viewport={motionViewport}
             variants={fadeUp}
             className="text-center mb-16"
           >
@@ -584,7 +576,7 @@ export default function Home() {
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: '-60px' }}
+            viewport={motionViewport}
             variants={stagger}
             className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-12"
           >
@@ -658,7 +650,7 @@ export default function Home() {
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: '-80px' }}
+            viewport={motionViewport}
             variants={fadeUp}
             className="text-center mb-16"
           >
@@ -696,7 +688,7 @@ export default function Home() {
                 key={expo.id}
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true }}
+                viewport={motionViewport}
                 variants={fadeUp}
                 className="page-article-grid-1-3"
                 style={{
@@ -802,7 +794,7 @@ export default function Home() {
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
+          viewport={motionViewport}
           variants={fadeUp}
           style={{ zIndex: 1, position: 'relative' }}
         >

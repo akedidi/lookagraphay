@@ -14,10 +14,7 @@ type Exposition = {
   images?: string[];
 };
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 28 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: 'easeOut' as const } },
-};
+import { fadeUp, motionViewport } from '@/lib/motion-variants';
 
 export default function ExpositionsPage() {
   const [expositions, setExpositions] = useState<Exposition[]>([]);

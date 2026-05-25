@@ -6,7 +6,8 @@
     "node": ">=20"
   },
   "scripts": {
-    "dev": "next dev -p 5000",
+    "dev": "next dev -p 5001",
+    "dev:clean": "rm -rf .next && next dev -p 5001",
     "build": "next build && node scripts/postbuild.js",
     "sync:nodejs": "node scripts/sync-hostinger-nodejs.js",
     "start": "node scripts/start-hostinger.js",

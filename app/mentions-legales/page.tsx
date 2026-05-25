@@ -2,10 +2,7 @@
 
 import { motion } from 'framer-motion';
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.7 } },
-};
+import { fadeUp, motionViewport } from '@/lib/motion-variants';
 
 export default function MentionsLegalesPage() {
   return (
