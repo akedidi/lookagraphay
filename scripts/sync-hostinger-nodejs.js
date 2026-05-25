@@ -1,13 +1,12 @@
 /**
- * Copie .next/standalone → dossier nodejs/ (runtime Passenger Hostinger).
- * Appelé automatiquement par scripts/postbuild.js après chaque build.
+ * Copie .next/standalone → nodejs/ (Passenger) + .next/static → public_html/ (LiteSpeed).
+ * Appelé par scripts/postbuild.js après chaque build.
  */
 const fs = require('fs');
 const path = require('path');
 
 const PROJECT_NAME = 'lucagraphy';
 const LEGACY_FILES = ['server-app.js', 'load-env.js', '.lookagraphy-instance.lock', '.lookagraphy.pid.lock'];
-const SYNC_ITEMS = ['server.js', 'package.json', 'public', 'node_modules', '.next'];
 
 function copyDir(src, dest) {
   fs.mkdirSync(dest, { recursive: true });
@@ -31,7 +30,16 @@ function readPackageName(dir) {
   }
 }
 
-/** Dossiers nodejs/ candidats (ordre = priorité). */
+function isOurProject(dir) {
+  return fs.existsSync(path.join(dir, 'package.json')) && readPackageName(dir) === PROJECT_NAME;
+}
+
+function isHostingerPath(p) {
+  const lower = p.toLowerCase();
+  return lower.includes('hostingersite.com') || lower.includes(`${path.sep}domains${path.sep}`);
+}
+
+/** Dossiers nodejs/ (runtime Passenger). */
 function findNodejsTargets(projectRoot) {
   const seen = new Set();
   const targets = [];
@@ -56,8 +64,7 @@ function findNodejsTargets(projectRoot) {
       for (const site of fs.readdirSync(domainsDir)) {
         const publicHtml = path.join(domainsDir, site, 'public_html');
         const nodejs = path.join(domainsDir, site, 'nodejs');
-        if (!fs.existsSync(publicHtml) || !fs.existsSync(nodejs)) continue;
-        if (readPackageName(publicHtml) === PROJECT_NAME) {
+        if (fs.existsSync(publicHtml) && fs.existsSync(nodejs) && isOurProject(publicHtml)) {
           add(nodejs);
         }
       }
@@ -67,13 +74,55 @@ function findNodejsTargets(projectRoot) {
   return targets;
 }
 
+/** Dossiers public_html/ (fichiers statiques /_next/static servis par LiteSpeed). */
+function findPublicHtmlTargets(projectRoot, nodejsTargets) {
+  const seen = new Set();
+  const targets = [];
+
+  function add(p) {
+    const resolved = path.resolve(p);
+    if (seen.has(resolved) || !fs.existsSync(resolved) || !isOurProject(resolved)) return;
+    seen.add(resolved);
+    targets.push(resolved);
+  }
+
+  if (isOurProject(projectRoot)) {
+    add(projectRoot);
+  }
+
+  add(path.join(projectRoot, '..', 'public_html'));
+
+  for (const nodejsDir of nodejsTargets) {
+    add(path.join(path.dirname(nodejsDir), 'public_html'));
+  }
+
+  const home = process.env.HOME;
+  if (home) {
+    const domainsDir = path.join(home, 'domains');
+    if (fs.existsSync(domainsDir)) {
+      for (const site of fs.readdirSync(domainsDir)) {
+        add(path.join(domainsDir, site, 'public_html'));
+      }
+    }
+  }
+
+  return targets;
+}
+
 function isHostingerBuildEnvironment(projectRoot) {
   if (process.env.HOSTINGER === '1' || process.env.HOSTINGER_NODEJS_DIR) return true;
-  const home = process.env.HOME;
-  if (!home) return false;
-  const domainsDir = path.join(home, 'domains');
-  if (!fs.existsSync(domainsDir)) return false;
+  if (isHostingerPath(projectRoot) || isHostingerPath(process.cwd())) return true;
   return findNodejsTargets(projectRoot).length > 0;
+}
+
+function logBuildAssets(projectRoot, label) {
+  const buildIdPath = path.join(projectRoot, '.next', 'BUILD_ID');
+  const staticCssDir = path.join(projectRoot, '.next', 'static', 'css');
+  if (!fs.existsSync(buildIdPath)) return;
+  const buildId = fs.readFileSync(buildIdPath, 'utf8').trim();
+  const css =
+    fs.existsSync(staticCssDir) ? fs.readdirSync(staticCssDir).filter((f) => f.endsWith('.css')) : [];
+  console.log(`[postbuild] ${label} BUILD_ID=${buildId} CSS=${css.join(', ') || '(aucun)'}`);
 }
 
 function syncStandaloneToNodejs(standaloneDir, nodejsDir) {
@@ -85,10 +134,10 @@ function syncStandaloneToNodejs(standaloneDir, nodejsDir) {
     } catch (_) {}
   }
 
-  for (const item of SYNC_ITEMS) {
-    const src = path.join(standaloneDir, item);
-    const dest = path.join(nodejsDir, item);
-    if (!fs.existsSync(src)) continue;
+  for (const name of fs.readdirSync(standaloneDir)) {
+    if (LEGACY_FILES.includes(name)) continue;
+    const src = path.join(standaloneDir, name);
+    const dest = path.join(nodejsDir, name);
     fs.rmSync(dest, { recursive: true, force: true });
     if (fs.statSync(src).isDirectory()) {
       copyDir(src, dest);
@@ -96,13 +145,28 @@ function syncStandaloneToNodejs(standaloneDir, nodejsDir) {
       fs.mkdirSync(path.dirname(dest), { recursive: true });
       fs.copyFileSync(src, dest);
     }
-    console.log('[postbuild]   → nodejs/' + item);
+    console.log('[postbuild]   → nodejs/' + name);
   }
 
   const restartDir = path.join(nodejsDir, 'tmp');
   fs.mkdirSync(restartDir, { recursive: true });
   fs.writeFileSync(path.join(restartDir, 'restart.txt'), String(Date.now()));
   console.log('[postbuild]   → nodejs/tmp/restart.txt (redémarrage Passenger)');
+}
+
+/** LiteSpeed sert souvent /_next/static depuis public_html — doit matcher le BUILD_ID du serveur. */
+function syncStaticToPublicHtml(projectRoot, publicHtmlDir) {
+  const staticSrc = path.join(projectRoot, '.next', 'static');
+  const buildIdSrc = path.join(projectRoot, '.next', 'BUILD_ID');
+  if (!fs.existsSync(staticSrc) || !fs.existsSync(buildIdSrc)) return;
+
+  const nextDir = path.join(publicHtmlDir, '.next');
+  const destStatic = path.join(nextDir, 'static');
+  fs.mkdirSync(nextDir, { recursive: true });
+  fs.rmSync(destStatic, { recursive: true, force: true });
+  copyDir(staticSrc, destStatic);
+  fs.copyFileSync(buildIdSrc, path.join(nextDir, 'BUILD_ID'));
+  console.log('[postbuild] Sync .next/static →', publicHtmlDir);
 }
 
 function runSync(projectRoot) {
@@ -112,24 +176,28 @@ function runSync(projectRoot) {
     return { synced: 0, skipped: true };
   }
 
-  const targets = findNodejsTargets(projectRoot);
-  if (targets.length === 0) {
-    const onHostinger = isHostingerBuildEnvironment(projectRoot);
+  logBuildAssets(projectRoot, 'Build');
+
+  const nodejsTargets = findNodejsTargets(projectRoot);
+  const onHostinger = isHostingerBuildEnvironment(projectRoot);
+
+  if (nodejsTargets.length === 0) {
     if (onHostinger) {
       console.error(
-        '[postbuild] ERREUR Hostinger : dossier nodejs/ introuvable.\n' +
-          '  Définissez HOSTINGER_NODEJS_DIR dans hPanel (ex. ~/domains/VOTRE-SITE.hostingersite.com/nodejs)'
+        '[postbuild] ERREUR Hostinger : nodejs/ introuvable pendant le build.\n' +
+          '  Ajoutez dans hPanel la variable HOSTINGER_NODEJS_DIR avec le chemin absolu vers nodejs/\n' +
+          '  (ex. /home/u376353647/domains/blue-squirrel-716769.hostingersite.com/nodejs)'
       );
       process.exit(1);
     }
     console.log(
       '[postbuild] Sync nodejs/ ignoré (pas de ../nodejs — normal en local).\n' +
-        '  Sur Hostinger, le build depuis public_html/ synchronise automatiquement.'
+        '  Sur Hostinger : définir HOSTINGER_NODEJS_DIR dans hPanel.'
     );
     return { synced: 0, skipped: true };
   }
 
-  for (const nodejsDir of targets) {
+  for (const nodejsDir of nodejsTargets) {
     try {
       syncStandaloneToNodejs(standaloneDir, nodejsDir);
     } catch (err) {
@@ -138,15 +206,25 @@ function runSync(projectRoot) {
     }
   }
 
-  return { synced: targets.length, skipped: false };
+  const publicHtmlTargets = findPublicHtmlTargets(projectRoot, nodejsTargets);
+  for (const publicHtmlDir of publicHtmlTargets) {
+    try {
+      syncStaticToPublicHtml(projectRoot, publicHtmlDir);
+    } catch (err) {
+      console.error('[postbuild] Échec sync static vers', publicHtmlDir, err.message);
+      process.exit(1);
+    }
+  }
+
+  return { synced: nodejsTargets.length, skipped: false };
 }
 
 if (require.main === module) {
   const root = path.resolve(__dirname, '..');
   const result = runSync(root);
   if (!result.skipped) {
-    console.log('[postbuild] Sync terminé (' + result.synced + ' cible(s)).');
+    console.log('[postbuild] Sync terminé (' + result.synced + ' cible(s) nodejs).');
   }
 }
 
-module.exports = { findNodejsTargets, runSync, syncStandaloneToNodejs };
+module.exports = { findNodejsTargets, runSync, syncStandaloneToNodejs, syncStaticToPublicHtml };

@@ -64,13 +64,24 @@ Dans les **logs de build** Hostinger, vous devez voir :
 [postbuild]   → nodejs/tmp/restart.txt (redémarrage Passenger)
 ```
 
-Si la sync est absente, le build tourne peut‑être hors de `public_html/` : ajoutez dans hPanel une variable d’environnement :
+**Variable obligatoire** (hPanel → Node.js → Environment variables) si le build Git ne voit pas `../nodejs` :
 
-`HOSTINGER_NODEJS_DIR` = `/home/u376353647/domains/VOTRE-SITE.hostingersite.com/nodejs`
+| Variable | Valeur |
+|----------|--------|
+| `HOSTINGER_NODEJS_DIR` | `/home/u376353647/domains/blue-squirrel-716769.hostingersite.com/nodejs` |
+| `HOSTINGER` | `1` (optionnel, force la sync + échec du build si `nodejs/` manquant) |
 
-(ajustez le chemin exact affiché dans File Manager).
+Sans cette variable, le build met à jour `public_html/` mais **pas** `nodejs/` → HTML ancien + CSS **404** → site « disloqué ».
 
 Sync manuelle après build (SSH) : `npm run sync:nodejs` depuis `public_html/`.
+
+### CSS / mise en page cassée après deploy
+
+Symptôme : page sans styles, mise en page brisée.
+
+1. Ouvrir les outils développeur → **Réseau** : le fichier `/_next/static/css/….css` doit être **200**, pas 404.
+2. Si 404 : le HTML (serveur `nodejs/`) et les fichiers statiques (`public_html/.next/static/`) ne sont **pas du même build**. Redeploy avec `HOSTINGER_NODEJS_DIR` défini ; vérifier dans les logs build : `BUILD_ID=…` et le même nom de fichier `.css`.
+3. Rafraîchissement forcé : `Cmd+Shift+R` (Mac) ou navigation privée.
 
 **Patch actuel : `lookagraphy-passenger-v5`** — pas de verrou PID (Passenger gère l’instance ; un lock provoquait 503/504).
 
