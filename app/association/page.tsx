@@ -241,6 +241,22 @@ export default function AssociationPage() {
           </h2>
         </motion.div>
 
+        <style>{`
+          .association-pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5px;
+            max-width: 72rem;
+            margin: 0 auto;
+            background: rgba(201, 168, 76, 0.15);
+          }
+          @media (max-width: 960px) {
+            .association-pillars-grid { grid-template-columns: repeat(2, 1fr); }
+          }
+          @media (max-width: 560px) {
+            .association-pillars-grid { grid-template-columns: 1fr; }
+          }
+        `}</style>
         <div className="association-pillars-grid">
           {pillars.map((pillar, i) => (
             <motion.div
