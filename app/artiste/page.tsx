@@ -110,7 +110,7 @@ export default function ArtistePage() {
 
           {/* Biographie */}
           <motion.div
-            initial="hidden"
+            initial="visible"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}
@@ -202,7 +202,7 @@ export default function ArtistePage() {
       {/* Citation centrale */}
       <section className="py-24 section-pad text-center" style={{ background: '#2A2520' }}>
         <motion.div
-          initial="hidden"
+          initial="visible"
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeUp}
@@ -242,7 +242,7 @@ export default function ArtistePage() {
       <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
         <div style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '4rem' }}>
           <motion.div
-            initial="hidden"
+            initial="visible"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}
@@ -290,7 +290,7 @@ export default function ArtistePage() {
 
           {/* Inspirations */}
           <motion.div
-            initial="hidden"
+            initial="visible"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}
@@ -355,7 +355,7 @@ export default function ArtistePage() {
       {/* CTA */}
       <section className="py-20 section-pad text-center" style={{ background: '#3D2B1F' }}>
         <motion.div
-          initial="hidden"
+          initial="visible"
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeUp}

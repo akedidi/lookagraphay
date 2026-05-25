@@ -113,7 +113,7 @@ export default function ContactPage() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-16" style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto' }}>
           {/* Sidebar */}
           <motion.div
-            initial="hidden"
+            initial="visible"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}
@@ -228,7 +228,7 @@ export default function ContactPage() {
 
           {/* Formulaire */}
           <motion.div
-            initial="hidden"
+            initial="visible"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}

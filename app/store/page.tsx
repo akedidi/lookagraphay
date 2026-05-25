@@ -561,7 +561,7 @@ export default function StorePage() {
 
       {/* Note commande sur mesure */}
       <section style={{ padding: '5rem 1.5rem', textAlign: 'center', background: '#1A1209' }}>
-        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} style={{ maxWidth: 560, margin: '0 auto' }}>
+        <motion.div initial="visible" whileInView="visible" viewport={{ once: true }} variants={fadeUp} style={{ maxWidth: 560, margin: '0 auto' }}>
           <div className="ornament mb-6" style={{ fontSize: '1rem' }}>◆</div>
           <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: '1.6rem', color: '#F5F0E8', marginBottom: '1rem' }}>
             Commande sur mesure

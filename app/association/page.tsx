@@ -77,7 +77,7 @@ export default function AssociationPage() {
         {/* Gold ornament line top */}
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg, transparent, #C9A84C, transparent)' }} />
 
-        <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+        <motion.div initial="visible" animate="visible" variants={fadeUp}>
           {/* Gold ornament */}
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1.5rem', marginBottom: '2.5rem' }}>
             <div style={{ width: 60, height: 1, background: 'linear-gradient(to right, transparent, #C9A84C)' }} />
@@ -141,7 +141,7 @@ export default function AssociationPage() {
       {/* ── Mission ─────────────────────────────────────────── */}
       <section style={{ background: '#F5F0E8', padding: '5rem 1.5rem' }}>
         <motion.div
-          initial="hidden"
+          initial="visible"
           whileInView="visible"
           viewport={motionViewport}
           variants={fadeUp}
@@ -204,7 +204,7 @@ export default function AssociationPage() {
       {/* ── 6 Pillars ────────────────────────────────────────── */}
       <section style={{ background: '#100C06', padding: '5rem 1.5rem 6rem' }}>
         <motion.div
-          initial="hidden"
+          initial="visible"
           whileInView="visible"
           viewport={motionViewport}
           variants={fadeUp}
@@ -257,11 +257,11 @@ export default function AssociationPage() {
           {pillars.map((pillar, i) => (
             <motion.div
               key={i}
-              initial="hidden"
+              initial="visible"
               whileInView="visible"
               viewport={motionViewport}
               variants={{
-                hidden: { opacity: 1, y: 24 },
+                hidden: { opacity: 0, y: 24 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.7, delay: (i % 3) * 0.1, ease: 'easeOut' as const } },
               }}
               style={{
@@ -336,7 +336,7 @@ export default function AssociationPage() {
         }}
       >
         <motion.div
-          initial="hidden"
+          initial="visible"
           whileInView="visible"
           viewport={motionViewport}
           variants={fadeUp}

@@ -81,7 +81,7 @@ export default function EvenementsPage() {
       <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
         <div style={{ maxWidth: '56rem', marginLeft: 'auto', marginRight: 'auto' }}>
           <motion.div
-            initial="hidden"
+            initial="visible"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}
@@ -118,7 +118,7 @@ export default function EvenementsPage() {
             {aVenir.map((evt) => (
               <motion.article
                 key={evt.id}
-                initial="hidden"
+                initial="visible"
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeUp}
@@ -230,7 +230,7 @@ export default function EvenementsPage() {
       <section className="py-20 section-pad" style={{ background: '#2A2520' }}>
         <div style={{ maxWidth: '56rem', marginLeft: 'auto', marginRight: 'auto' }}>
           <motion.div
-            initial="hidden"
+            initial="visible"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}

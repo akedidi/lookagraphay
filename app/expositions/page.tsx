@@ -126,7 +126,7 @@ export default function ExpositionsPage() {
         <section style={{ background: '#F5F0E8', padding: '6rem 1.5rem' }}>
           <div style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto' }}>
             <motion.div
-              initial="hidden"
+              initial="visible"
               whileInView="visible"
               viewport={{ once: true }}
               variants={fadeUp}
@@ -163,7 +163,7 @@ export default function ExpositionsPage() {
               {aVenir.map((expo, i) => (
                 <motion.article
                   key={expo.id}
-                  initial="hidden"
+                  initial="visible"
                   whileInView="visible"
                   viewport={{ once: true }}
                   variants={fadeUp}
@@ -258,7 +258,7 @@ export default function ExpositionsPage() {
       <section style={{ background: '#2A2520', padding: '6rem 1.5rem' }}>
         <div style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto' }}>
           <motion.div
-            initial="hidden"
+            initial="visible"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}

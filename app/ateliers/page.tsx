@@ -166,7 +166,7 @@ export default function AteliersPage() {
       <section className="py-28 section-pad" style={{ background: '#F5F0E8' }}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center" style={{ maxWidth: '56rem', marginLeft: 'auto', marginRight: 'auto' }}>
           <motion.div
-            initial="hidden"
+            initial="visible"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}
@@ -301,7 +301,7 @@ export default function AteliersPage() {
       <section className="py-24 section-pad" style={{ background: '#1A1209' }}>
         <div style={{ maxWidth: "56rem", marginLeft: "auto", marginRight: "auto" }}>
           <motion.div
-            initial="hidden"
+            initial="visible"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}
@@ -381,7 +381,7 @@ export default function AteliersPage() {
       <section id="inscription" className="py-28 section-pad" style={{ background: '#FAF7F2', scrollMarginTop: '80px' }}>
         <div style={{ maxWidth: "56rem", marginLeft: "auto", marginRight: "auto" }}>
           <motion.div
-            initial="hidden"
+            initial="visible"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}
@@ -417,7 +417,7 @@ export default function AteliersPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Infos pratiques */}
             <motion.div
-              initial="hidden"
+              initial="visible"
               whileInView="visible"
               viewport={{ once: true }}
               variants={fadeUp}
@@ -517,7 +517,7 @@ export default function AteliersPage() {
 
             {/* Contact */}
             <motion.div
-              initial="hidden"
+              initial="visible"
               whileInView="visible"
               viewport={{ once: true }}
               variants={fadeUp}
@@ -622,7 +622,7 @@ export default function AteliersPage() {
       <section className="py-20 section-pad" style={{ background: '#2A2520' }}>
         <div style={{ maxWidth: '48rem', marginLeft: 'auto', marginRight: 'auto' }}>
           <motion.div
-            initial="hidden"
+            initial="visible"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}

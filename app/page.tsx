@@ -241,7 +241,7 @@ export default function Home() {
       {/* ── INTRO PHRASE ── */}
       <section className="py-24 section-pad text-center" style={{ background: '#1A1209' }}>
         <motion.div
-          initial="hidden"
+          initial="visible"
           whileInView="visible"
           viewport={motionViewport}
           variants={fadeUp}
@@ -277,7 +277,7 @@ export default function Home() {
       <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center" style={{ maxWidth: '72rem', marginLeft: 'auto', marginRight: 'auto' }}>
           <motion.div
-            initial="hidden"
+            initial="visible"
             whileInView="visible"
             viewport={motionViewport}
             variants={fadeUp}
@@ -382,7 +382,7 @@ export default function Home() {
       <section className="py-24 section-pad" style={{ background: '#2A2520' }}>
         <div style={{ maxWidth: "72rem", marginLeft: "auto", marginRight: "auto" }}>
           <motion.div
-            initial="hidden"
+            initial="visible"
             whileInView="visible"
             viewport={motionViewport}
             variants={fadeUp}
@@ -429,7 +429,7 @@ export default function Home() {
           </motion.div>
 
           <motion.div
-            initial="hidden"
+            initial="visible"
             whileInView="visible"
             viewport={motionViewport}
             variants={stagger}
@@ -540,7 +540,7 @@ export default function Home() {
       <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
         <div style={{ maxWidth: "72rem", marginLeft: "auto", marginRight: "auto" }}>
           <motion.div
-            initial="hidden"
+            initial="visible"
             whileInView="visible"
             viewport={motionViewport}
             variants={fadeUp}
@@ -574,7 +574,7 @@ export default function Home() {
           </motion.div>
 
           <motion.div
-            initial="hidden"
+            initial="visible"
             whileInView="visible"
             viewport={motionViewport}
             variants={stagger}
@@ -648,7 +648,7 @@ export default function Home() {
       <section className="py-24 section-pad" style={{ background: '#1A1209' }}>
         <div style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto' }}>
           <motion.div
-            initial="hidden"
+            initial="visible"
             whileInView="visible"
             viewport={motionViewport}
             variants={fadeUp}
@@ -686,7 +686,7 @@ export default function Home() {
             .map((expo, i) => (
               <motion.div
                 key={expo.id}
-                initial="hidden"
+                initial="visible"
                 whileInView="visible"
                 viewport={motionViewport}
                 variants={fadeUp}
@@ -792,7 +792,7 @@ export default function Home() {
           </div>
         </div>
         <motion.div
-          initial="hidden"
+          initial="visible"
           whileInView="visible"
           viewport={motionViewport}
           variants={fadeUp}

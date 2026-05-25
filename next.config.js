@@ -30,10 +30,6 @@ const nextConfig = {
           { key: 'Surrogate-Control', value: 'no-store' },
           { key: 'X-LiteSpeed-Cache-Control', value: 'no-cache' },
           { key: 'Vary', value: 'Accept-Encoding' },
-          // En dev : force le navigateur à vider son cache (invalide les anciens chunks immutable)
-          ...(process.env.NODE_ENV !== 'production'
-            ? [{ key: 'Clear-Site-Data', value: '"cache"' }]
-            : []),
         ],
       },
       // Fichiers JS/CSS statiques Next.js — no-store en dev (pas de hash), immutable en prod

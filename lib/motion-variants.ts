@@ -1,10 +1,10 @@
-/** Animations visibles même si whileInView ne se déclenche pas (hydratation / headless / CDN). */
+/** Variantes Framer Motion — contenu toujours visible au chargement (SSR + hydratation). */
 export const fadeUp = {
-  hidden: { opacity: 1, y: 28 },
+  hidden: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.9, ease: 'easeOut' as const },
+    transition: { duration: 0.85, ease: 'easeOut' as const },
   },
 };
 
@@ -12,4 +12,12 @@ export const fadeUpStagger = {
   visible: { transition: { staggerChildren: 0.15 } },
 };
 
-export const motionViewport = { once: true, amount: 0.12 as const };
+export const motionViewport = { once: true, amount: 0.08 as const };
+
+/** Évite opacity:0 / translateY bloqués si whileInView ne part pas. */
+export const motionFadeUp = {
+  initial: 'visible' as const,
+  whileInView: 'visible' as const,
+  viewport: motionViewport,
+  variants: fadeUp,
+};
