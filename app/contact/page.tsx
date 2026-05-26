@@ -23,6 +23,7 @@ export default function ContactPage() {
   };
 
   const handleNewsletterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (newsletterSent) setNewsletterSent(false);
     setNewsletterForm({ ...newsletterForm, [e.target.name]: e.target.value });
   };
 
@@ -45,6 +46,7 @@ export default function ContactPage() {
       }
 
       setNewsletterSent(true);
+      setNewsletterForm({ prenom: '', nom: '', email: '' });
     } catch {
       setNewsletterError('Erreur réseau. Vérifiez votre connexion et réessayez.');
     } finally {
@@ -287,83 +289,83 @@ export default function ContactPage() {
                 Recevez les actualités de l&apos;atelier, expositions et nouveautés. Désinscription possible à tout moment.
               </p>
 
-              {newsletterSent ? (
+              {newsletterSent && (
                 <p
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
-                    fontWeight: 300,
+                    fontWeight: 500,
                     fontSize: '0.85rem',
-                    color: '#3D2B1F',
+                    color: '#0E6B3E',
                     lineHeight: 1.7,
+                    marginBottom: '1rem',
                   }}
                 >
                   Merci. Votre inscription est confirmée.
                 </p>
-              ) : (
-                <form onSubmit={handleNewsletterSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                  <div>
-                    <label style={{ ...labelStyle, fontSize: '0.75rem' }}>Prénom</label>
-                    <input
-                      type="text"
-                      name="prenom"
-                      required
-                      autoComplete="given-name"
-                      value={newsletterForm.prenom}
-                      onChange={handleNewsletterChange}
-                      placeholder="Marie"
-                      style={{ ...inputStyle, padding: '0.6rem 0', fontSize: '0.85rem' }}
-                    />
-                  </div>
-                  <div>
-                    <label style={{ ...labelStyle, fontSize: '0.75rem' }}>Nom</label>
-                    <input
-                      type="text"
-                      name="nom"
-                      required
-                      autoComplete="family-name"
-                      value={newsletterForm.nom}
-                      onChange={handleNewsletterChange}
-                      placeholder="Dupont"
-                      style={{ ...inputStyle, padding: '0.6rem 0', fontSize: '0.85rem' }}
-                    />
-                  </div>
-                  <div>
-                    <label style={{ ...labelStyle, fontSize: '0.75rem' }}>Email</label>
-                    <input
-                      type="email"
-                      name="email"
-                      required
-                      value={newsletterForm.email}
-                      onChange={handleNewsletterChange}
-                      placeholder="votre@email.fr"
-                      style={{ ...inputStyle, padding: '0.6rem 0', fontSize: '0.85rem' }}
-                    />
-                  </div>
-
-                  {newsletterError && (
-                    <p
-                      style={{
-                        fontFamily: 'Montserrat, sans-serif',
-                        fontSize: '0.85rem',
-                        fontWeight: 300,
-                        color: '#8B3A3A',
-                        lineHeight: 1.6,
-                      }}
-                    >
-                      {newsletterError}
-                    </p>
-                  )}
-
-                  <button
-                    type="submit"
-                    className="btn-gold btn-gold-solid"
-                    style={{ alignSelf: 'flex-start', padding: '0.7rem 1.1rem', fontSize: '0.8rem' }}
-                    disabled={newsletterLoading}
-                  >
-                    {newsletterLoading ? 'Inscription…' : "S'inscrire"}
-                  </button>
-                </form>
               )}
+              <form onSubmit={handleNewsletterSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                <div>
+                  <label style={{ ...labelStyle, fontSize: '0.75rem' }}>Prénom</label>
+                  <input
+                    type="text"
+                    name="prenom"
+                    required
+                    autoComplete="given-name"
+                    value={newsletterForm.prenom}
+                    onChange={handleNewsletterChange}
+                    placeholder="Marie"
+                    style={{ ...inputStyle, padding: '0.6rem 0', fontSize: '0.85rem' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ ...labelStyle, fontSize: '0.75rem' }}>Nom</label>
+                  <input
+                    type="text"
+                    name="nom"
+                    required
+                    autoComplete="family-name"
+                    value={newsletterForm.nom}
+                    onChange={handleNewsletterChange}
+                    placeholder="Dupont"
+                    style={{ ...inputStyle, padding: '0.6rem 0', fontSize: '0.85rem' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ ...labelStyle, fontSize: '0.75rem' }}>Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    value={newsletterForm.email}
+                    onChange={handleNewsletterChange}
+                    placeholder="votre@email.fr"
+                    style={{ ...inputStyle, padding: '0.6rem 0', fontSize: '0.85rem' }}
+                  />
+                </div>
+
+                {newsletterError && (
+                  <p
+                    style={{
+                      fontFamily: 'Montserrat, sans-serif',
+                      fontSize: '0.85rem',
+                      fontWeight: 300,
+                      color: '#8B3A3A',
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {newsletterError}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  className="btn-gold btn-gold-solid"
+                  style={{ alignSelf: 'flex-start', padding: '0.7rem 1.1rem', fontSize: '0.8rem' }}
+                  disabled={newsletterLoading}
+                >
+                  {newsletterLoading ? 'Inscription…' : "S'inscrire"}
+                </button>
+              </form>
             </div>
           </motion.div>
 
