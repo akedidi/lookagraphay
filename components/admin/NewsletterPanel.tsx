@@ -131,6 +131,22 @@ export default function NewsletterPanel({ onFlash }: { onFlash: (m: string) => v
     }
   }
 
+  async function deleteSubscriber(id: number, email: string) {
+    const ok = confirm(`Supprimer définitivement cet abonné ?\n\n${email}`);
+    if (!ok) return;
+    const res = await fetch(`/api/admin/newsletter/subscribers/${id}`, {
+      method: 'DELETE',
+      ...adminFetchInit,
+    });
+    if (res.ok) {
+      setSubscribers((prev) => prev.filter((s) => s.id !== id));
+      onFlash('🗑️ Abonné supprimé');
+    } else {
+      const data = await res.json().catch(() => ({}));
+      onFlash('❌ ' + (data.error || 'Erreur suppression'));
+    }
+  }
+
   async function addSubscriber(e: React.FormEvent) {
     e.preventDefault();
     const res = await fetch('/api/admin/newsletter/subscribers', {
@@ -188,6 +204,22 @@ export default function NewsletterPanel({ onFlash }: { onFlash: (m: string) => v
     setSending(false);
   }
 
+  async function deleteCampaign(id: number) {
+    const ok = confirm('Supprimer cette newsletter (historique d’envoi) ?');
+    if (!ok) return;
+    const res = await fetch(`/api/admin/newsletter/campaigns/${id}`, {
+      method: 'DELETE',
+      ...adminFetchInit,
+    });
+    if (res.ok) {
+      setCampaigns((prev) => prev.filter((c) => c.id !== id));
+      onFlash('🗑️ Newsletter supprimée');
+    } else {
+      const data = await res.json().catch(() => ({}));
+      onFlash('❌ ' + (data.error || 'Erreur suppression'));
+    }
+  }
+
   return (
     <div>
       <div className="admin-section-head" style={{ marginBottom: '1.5rem' }}>
@@ -239,9 +271,37 @@ export default function NewsletterPanel({ onFlash }: { onFlash: (m: string) => v
               <p style={{ ...labelStyle, marginBottom: '0.75rem' }}>Derniers envois</p>
               <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                 {campaigns.slice(0, 5).map((c) => (
-                  <li key={c.id} style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.75rem', color: 'rgba(245,240,232,0.6)', marginBottom: '0.5rem' }}>
-                    {c.subject} — {c.sent_count} envoyés
-                    {c.failed_count > 0 ? ` (${c.failed_count} échecs)` : ''}
+                  <li
+                    key={c.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      justifyContent: 'space-between',
+                      gap: '0.75rem',
+                      fontFamily: 'Montserrat, sans-serif',
+                      fontSize: '0.75rem',
+                      color: 'rgba(245,240,232,0.6)',
+                      marginBottom: '0.65rem',
+                    }}
+                  >
+                    <span style={{ minWidth: 0 }}>
+                      {c.subject} — {c.sent_count} envoyés
+                      {c.failed_count > 0 ? ` (${c.failed_count} échecs)` : ''}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => deleteCampaign(c.id)}
+                      style={{
+                        ...btnOutline,
+                        flexShrink: 0,
+                        padding: '0.35rem 0.7rem',
+                        fontSize: '0.62rem',
+                        borderColor: 'rgba(224,85,85,0.7)',
+                        color: '#e05555',
+                      }}
+                    >
+                      Supprimer
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -293,19 +353,33 @@ export default function NewsletterPanel({ onFlash }: { onFlash: (m: string) => v
                       {[s.prenom, s.nom].filter(Boolean).join(' ') || '—'} · {s.source}
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => toggleActive(s.id, !s.active)}
-                    style={{
-                      ...btnOutline,
-                      flexShrink: 0,
-                      fontSize: '0.65rem',
-                      color: s.active ? '#6fcf97' : 'rgba(245,240,232,0.4)',
-                      borderColor: s.active ? '#6fcf97' : 'rgba(245,240,232,0.25)',
-                    }}
-                  >
-                    {s.active ? 'Actif' : 'Inactif'}
-                  </button>
+                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexShrink: 0 }}>
+                    <button
+                      type="button"
+                      onClick={() => toggleActive(s.id, !s.active)}
+                      style={{
+                        ...btnOutline,
+                        fontSize: '0.65rem',
+                        color: s.active ? '#6fcf97' : 'rgba(245,240,232,0.4)',
+                        borderColor: s.active ? '#6fcf97' : 'rgba(245,240,232,0.25)',
+                      }}
+                    >
+                      {s.active ? 'Actif' : 'Inactif'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteSubscriber(s.id, s.email)}
+                      style={{
+                        ...btnOutline,
+                        padding: '0.35rem 0.7rem',
+                        fontSize: '0.62rem',
+                        borderColor: 'rgba(224,85,85,0.7)',
+                        color: '#e05555',
+                      }}
+                    >
+                      Supprimer
+                    </button>
+                  </div>
                 </div>
               ))}
               {filtered.length === 0 && (
