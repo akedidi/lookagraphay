@@ -13,9 +13,43 @@ export default function ContactPage() {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [newsletterForm, setNewsletterForm] = useState({ prenom: '', nom: '', email: '' });
+  const [newsletterSent, setNewsletterSent] = useState(false);
+  const [newsletterLoading, setNewsletterLoading] = useState(false);
+  const [newsletterError, setNewsletterError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleNewsletterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewsletterForm({ ...newsletterForm, [e.target.name]: e.target.value });
+  };
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setNewsletterLoading(true);
+    setNewsletterError(null);
+
+    try {
+      const res = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newsletterForm),
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        setNewsletterError(typeof data.error === 'string' ? data.error : "Impossible de s'inscrire.");
+        return;
+      }
+
+      setNewsletterSent(true);
+    } catch {
+      setNewsletterError('Erreur réseau. Vérifiez votre connexion et réessayez.');
+    } finally {
+      setNewsletterLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -223,6 +257,113 @@ export default function ContactPage() {
               }}
             >
               ح
+            </div>
+
+            {/* Newsletter (bas colonne gauche) */}
+            <div className="mt-10" style={{ maxWidth: 420 }}>
+              <span
+                style={{
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontSize: '0.75rem',
+                  letterSpacing: '0.4em',
+                  textTransform: 'uppercase',
+                  color: '#C9A84C',
+                  display: 'block',
+                  marginBottom: '1rem',
+                }}
+              >
+                Newsletter
+              </span>
+              <p
+                style={{
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontWeight: 300,
+                  fontSize: '0.82rem',
+                  lineHeight: 1.8,
+                  color: '#3D2B1F',
+                  marginBottom: '1.25rem',
+                }}
+              >
+                Recevez les actualités de l&apos;atelier, expositions et nouveautés. Désinscription possible à tout moment.
+              </p>
+
+              {newsletterSent ? (
+                <p
+                  style={{
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontWeight: 300,
+                    fontSize: '0.85rem',
+                    color: '#3D2B1F',
+                    lineHeight: 1.7,
+                  }}
+                >
+                  Merci. Votre inscription est confirmée.
+                </p>
+              ) : (
+                <form onSubmit={handleNewsletterSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  <div>
+                    <label style={{ ...labelStyle, fontSize: '0.75rem' }}>Prénom</label>
+                    <input
+                      type="text"
+                      name="prenom"
+                      required
+                      autoComplete="given-name"
+                      value={newsletterForm.prenom}
+                      onChange={handleNewsletterChange}
+                      placeholder="Marie"
+                      style={{ ...inputStyle, padding: '0.6rem 0', fontSize: '0.85rem' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ ...labelStyle, fontSize: '0.75rem' }}>Nom</label>
+                    <input
+                      type="text"
+                      name="nom"
+                      required
+                      autoComplete="family-name"
+                      value={newsletterForm.nom}
+                      onChange={handleNewsletterChange}
+                      placeholder="Dupont"
+                      style={{ ...inputStyle, padding: '0.6rem 0', fontSize: '0.85rem' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ ...labelStyle, fontSize: '0.75rem' }}>Email</label>
+                    <input
+                      type="email"
+                      name="email"
+                      required
+                      value={newsletterForm.email}
+                      onChange={handleNewsletterChange}
+                      placeholder="votre@email.fr"
+                      style={{ ...inputStyle, padding: '0.6rem 0', fontSize: '0.85rem' }}
+                    />
+                  </div>
+
+                  {newsletterError && (
+                    <p
+                      style={{
+                        fontFamily: 'Montserrat, sans-serif',
+                        fontSize: '0.85rem',
+                        fontWeight: 300,
+                        color: '#8B3A3A',
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      {newsletterError}
+                    </p>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="btn-gold btn-gold-solid"
+                    style={{ alignSelf: 'flex-start', padding: '0.7rem 1.1rem', fontSize: '0.8rem' }}
+                    disabled={newsletterLoading}
+                  >
+                    {newsletterLoading ? 'Inscription…' : "S'inscrire"}
+                  </button>
+                </form>
+              )}
             </div>
           </motion.div>
 
