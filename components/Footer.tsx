@@ -101,6 +101,21 @@ export default function Footer() {
                 {siteConfig.email}
               </a>
               <a
+                href={`tel:${siteConfig.phoneCalligraphyTel}`}
+                style={{
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontSize: '0.82rem',
+                  fontWeight: 300,
+                  color: 'rgba(245,240,232,0.82)',
+                  textDecoration: 'none',
+                  transition: 'color 0.3s',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#C9A84C')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(245,240,232,0.82)')}
+              >
+                {siteConfig.phoneCalligraphy}
+              </a>
+              <a
                 href="https://www.instagram.com/looka.graphy"
                 target="_blank"
                 rel="noopener noreferrer"

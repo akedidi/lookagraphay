@@ -2,7 +2,7 @@
 
 import { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ateliersData } from '@/lib/data';
+import { ateliersData, siteConfig } from '@/lib/data';
 
 import { fadeUp, motionViewport } from '@/lib/motion-variants';
 
@@ -558,14 +558,42 @@ export default function AteliersPage() {
                   Écrivez directement à Looka ou remplissez le formulaire d'inscription correspondant à votre type de cours.
                 </p>
 
-                {/* Email */}
-                <a
-                  href={`mailto:${cours.contact}`}
-                  className="btn-gold btn-gold-solid"
-                  style={{ display: 'inline-block', marginBottom: '2rem' }}
-                >
-                  {cours.contact}
-                </a>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
+                  <a
+                    href={`mailto:${cours.contact}`}
+                    className="btn-gold btn-gold-solid"
+                    style={{ display: 'inline-block', alignSelf: 'flex-start' }}
+                  >
+                    {cours.contact}
+                  </a>
+                  <div>
+                    <p
+                      style={{
+                        fontFamily: 'Montserrat, sans-serif',
+                        fontSize: '0.68rem',
+                        letterSpacing: '0.32em',
+                        textTransform: 'uppercase',
+                        color: '#C9A84C',
+                        marginBottom: '0.35rem',
+                      }}
+                    >
+                      Téléphone — calligraphie
+                    </p>
+                    <a
+                      href={`tel:${siteConfig.phoneCalligraphyTel}`}
+                      style={{
+                        fontFamily: 'Montserrat, sans-serif',
+                        fontSize: '0.95rem',
+                        fontWeight: 300,
+                        color: 'rgba(245,240,232,0.9)',
+                        textDecoration: 'none',
+                        letterSpacing: '0.04em',
+                      }}
+                    >
+                      {siteConfig.phoneCalligraphy}
+                    </a>
+                  </div>
+                </div>
 
                 {/* Deux formulaires */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -602,7 +630,7 @@ export default function AteliersPage() {
                       Pour s'engager sur la durée et progresser en profondeur.
                     </p>
                     <a
-                      href="https://forms.gle/yJ7FgXfKRSsjA1V27"
+                      href="https://forms.gle/iSXYjQezwsoMUMZ56"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-gold"

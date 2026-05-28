@@ -4,6 +4,9 @@ export const siteConfig = {
   description:
     "LookaGraphy est l'univers calligraphique de Looka — artiste parisienne qui fusionne calligraphie arabe et japonaise en un style distinctif, célébrant la beauté et l'universalité humaine.",
   email: "looka.graphy@gmail.com",
+  /** Téléphone professionnel dédié calligraphie / ateliers */
+  phoneCalligraphy: "+33 6 11 48 93 43",
+  phoneCalligraphyTel: "+33611489343",
   instagram: "https://instagram.com/lookagraphy",
   paypalEmail: "looka.graphy@gmail.com",
 };

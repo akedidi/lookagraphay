@@ -215,6 +215,22 @@ export default function ContactPage() {
                 </a>
               </div>
               <div>
+                <span style={labelStyle}>Téléphone — calligraphie</span>
+                <a
+                  href={`tel:${siteConfig.phoneCalligraphyTel}`}
+                  style={{
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontSize: '0.875rem',
+                    fontWeight: 300,
+                    color: '#3D2B1F',
+                    textDecoration: 'none',
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  {siteConfig.phoneCalligraphy}
+                </a>
+              </div>
+              <div>
                 <span style={labelStyle}>Instagram</span>
                 <a
                   href={siteConfig.instagram}
