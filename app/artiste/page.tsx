@@ -59,7 +59,7 @@ export default function ArtistePage() {
 
       {/* Bio + portrait */}
       <section className="py-24 section-pad" style={{ background: '#F5F0E8' }}>
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-16 items-start" style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-16 items-stretch" style={{ maxWidth: '64rem', marginLeft: 'auto', marginRight: 'auto' }}>
           {/* Portrait */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -70,6 +70,7 @@ export default function ArtistePage() {
             style={{
               position: 'relative',
               overflow: 'hidden',
+              minHeight: 'clamp(520px, 52vw, 680px)',
             }}
           >
             <img
@@ -186,9 +187,7 @@ export default function ArtistePage() {
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            objectPosition: 'center 38%',
-            transform: 'scale(1.14)',
-            transformOrigin: 'center 42%',
+            objectPosition: 'center 45%',
             display: 'block',
           }}
         />
