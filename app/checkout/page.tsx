@@ -225,8 +225,22 @@ export default function CheckoutPage() {
               <div className="checkout-card">
                 {sectionTitle('Mode de livraison')}
 
+                <p
+                  style={{
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontSize: '0.72rem',
+                    fontWeight: 300,
+                    color: 'rgba(61,43,31,0.65)',
+                    lineHeight: 1.65,
+                    marginBottom: '1rem',
+                  }}
+                >
+                  <strong style={{ fontWeight: 500, color: gold }}>Frais de livraison gratuits</strong> pour Mondial Relay
+                  (point relais ou locker) — France, Belgique, Luxembourg, Espagne, Portugal, Allemagne.
+                </p>
+
                 <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: errors.delivery ? '0.5rem' : '1.5rem' }}>
-                  {deliveryCard('relay', '📍', 'Point Relais / Locker Mondial Relay', 'Gratuit — retrait en point relais ou locker (pas de livraison à domicile MR)')}
+                  {deliveryCard('relay', '📍', 'Point Relais / Locker Mondial Relay', 'Frais de livraison gratuits — retrait en point relais ou locker (pas de livraison à domicile MR)')}
                   {deliveryCard('home', '🏠', 'Livraison à domicile', 'France — frais selon le poids, expédition par Looka')}
                   {deliveryCard('international', '🌍', 'International', 'Devis personnalisé sur demande')}
                 </div>
@@ -237,7 +251,7 @@ export default function CheckoutPage() {
                   <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
                     <div style={{ padding: '1.5rem', background: 'rgba(201,168,76,0.04)', border: '1px solid rgba(201,168,76,0.15)', marginBottom: '1.25rem' }}>
                       <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', fontWeight: 300, color: 'rgba(61,43,31,0.65)', lineHeight: 1.7, marginBottom: '0.75rem' }}>
-                        <strong style={{ fontWeight: 500 }}>Point relais ou locker uniquement</strong> — pas de livraison à domicile via Mondial Relay. Livraison offerte dans les pays éligibles.
+                        <strong style={{ fontWeight: 500 }}>Frais de livraison gratuits</strong> — point relais ou locker Mondial Relay uniquement (pas de livraison à domicile MR), dans les pays éligibles.
                       </p>
                       <ol style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', fontWeight: 300, color: 'rgba(61,43,31,0.6)', lineHeight: 1.75, margin: '0 0 1rem 1.1rem', padding: 0 }}>
                         <li>Choisissez votre pays de livraison</li>
