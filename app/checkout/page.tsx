@@ -162,7 +162,24 @@ export default function CheckoutPage() {
     </div>
   );
 
-  const deliveryCard = (type: DeliveryType, icon: string, title: string, subtitle: string) => (
+  const freeShippingBadgeStyle = {
+    fontFamily: 'Montserrat, sans-serif',
+    fontSize: '0.78rem',
+    fontWeight: 700,
+    color: gold,
+    letterSpacing: '0.04em',
+    lineHeight: 1.4,
+    marginBottom: '0.5rem',
+    display: 'block',
+  } as const;
+
+  const deliveryCard = (
+    type: DeliveryType,
+    icon: string,
+    title: string,
+    subtitle: string,
+    freeShippingHighlight?: boolean
+  ) => (
     <button
       type="button"
       className="delivery-card-btn"
@@ -175,7 +192,10 @@ export default function CheckoutPage() {
       }}
     >
       <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{icon}</div>
-      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', color: dark, marginBottom: '0.25rem' }}>{title}</div>
+      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', color: dark, marginBottom: '0.35rem' }}>{title}</div>
+      {freeShippingHighlight && (
+        <strong style={freeShippingBadgeStyle}>Frais de livraison gratuits</strong>
+      )}
       <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', fontWeight: 300, color: 'rgba(61,43,31,0.55)', lineHeight: 1.5 }}>{subtitle}</div>
     </button>
   );
@@ -240,7 +260,13 @@ export default function CheckoutPage() {
                 </p>
 
                 <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: errors.delivery ? '0.5rem' : '1.5rem' }}>
-                  {deliveryCard('relay', '📍', 'Point Relais / Locker Mondial Relay', 'Frais de livraison gratuits — retrait en point relais ou locker (pas de livraison à domicile MR)')}
+                  {deliveryCard(
+                    'relay',
+                    '📍',
+                    'Point Relais / Locker Mondial Relay',
+                    'Retrait en point relais ou locker (pas de livraison à domicile MR)',
+                    true
+                  )}
                   {deliveryCard('home', '🏠', 'Livraison à domicile', 'France — frais selon le poids, expédition par Looka')}
                   {deliveryCard('international', '🌍', 'International', 'Devis personnalisé sur demande')}
                 </div>
@@ -250,8 +276,20 @@ export default function CheckoutPage() {
                 {deliveryType === 'relay' && (
                   <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
                     <div style={{ padding: '1.5rem', background: 'rgba(201,168,76,0.04)', border: '1px solid rgba(201,168,76,0.15)', marginBottom: '1.25rem' }}>
+                      <p
+                        style={{
+                          ...freeShippingBadgeStyle,
+                          fontSize: '0.85rem',
+                          marginBottom: '0.65rem',
+                          padding: '0.5rem 0.75rem',
+                          background: 'rgba(201,168,76,0.12)',
+                          border: '1px solid rgba(201,168,76,0.35)',
+                        }}
+                      >
+                        Frais de livraison gratuits
+                      </p>
                       <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', fontWeight: 300, color: 'rgba(61,43,31,0.65)', lineHeight: 1.7, marginBottom: '0.75rem' }}>
-                        <strong style={{ fontWeight: 500 }}>Frais de livraison gratuits</strong> — point relais ou locker Mondial Relay uniquement (pas de livraison à domicile MR), dans les pays éligibles.
+                        Point relais ou locker Mondial Relay uniquement (pas de livraison à domicile MR), dans les pays éligibles.
                       </p>
                       <ol style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', fontWeight: 300, color: 'rgba(61,43,31,0.6)', lineHeight: 1.75, margin: '0 0 1rem 1.1rem', padding: 0 }}>
                         <li>Choisissez votre pays de livraison</li>
