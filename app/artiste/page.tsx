@@ -186,7 +186,9 @@ export default function ArtistePage() {
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            objectPosition: 'center 45%',
+            objectPosition: 'center 38%',
+            transform: 'scale(1.14)',
+            transformOrigin: 'center 42%',
             display: 'block',
           }}
         />
