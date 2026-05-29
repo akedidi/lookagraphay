@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useState, useEffect, useLayoutEffect, useRef, useCallback, type RefObject } from 'react';
+import { useState, useEffect, useRef, useCallback, type RefObject } from 'react';
 import { artistData, ateliersData, expositionsData, evenementsData, galerieData } from '@/lib/data';
 import { fadeUp, fadeUpStagger as stagger, motionViewport } from '@/lib/motion-variants';
 import { heroVideoLog, isHeroVideoDebugEnabled, snapshotVideo } from '@/lib/hero-video-debug';
@@ -21,20 +21,26 @@ function getActiveHeroVideos(
   );
 }
 
-function readPreferHeroSound() {
+function readPreferHeroSoundFromStorage(): boolean {
+  if (typeof window === 'undefined') return true;
   try {
-    return localStorage.getItem('hero-sound') !== 'off';
+    const v = localStorage.getItem('hero-sound');
+    if (v === null) return true;
+    return v !== 'off';
   } catch {
     return true;
   }
 }
 
 export default function Home() {
-  const [soundOn, setSoundOn] = useState(() => readPreferHeroSound());
+  const [soundOn, setSoundOn] = useState(false);
   const [tagline, setTagline] = useState('');
   const [galeriePreview, setGaleriePreview] = useState(galerieData.slice(0, 6));
   const videoDesktopRef = useRef<HTMLVideoElement>(null);
   const videoMobileRef = useRef<HTMLVideoElement>(null);
+  /** Évite lecture localStorage au SSR + reflète la préférence après hydratation. */
+  const preferSoundRef = useRef(true);
+  const heroBootedRef = useRef(false);
 
   const syncSoundUi = useCallback(() => {
     const active = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
@@ -44,10 +50,15 @@ export default function Home() {
   const playOneHeroVideo = useCallback(
     async (video: HTMLVideoElement, trigger: string) => {
       const label = video === videoDesktopRef.current ? 'desktop' : 'mobile';
-      const preferSound = readPreferHeroSound();
+      const preferSound = preferSoundRef.current;
 
-      if (!video.paused && (!preferSound || !video.muted)) {
-        heroVideoLog('play:skip-already', { trigger, ...snapshotVideo(video, label) });
+      if (!video.paused && !video.muted) {
+        heroVideoLog('play:skip-already-with-sound', { trigger, ...snapshotVideo(video, label) });
+        return;
+      }
+
+      if (!video.paused && video.muted && !preferSound) {
+        heroVideoLog('play:skip-muted-by-user-pref', { trigger, ...snapshotVideo(video, label) });
         return;
       }
 
@@ -61,7 +72,7 @@ export default function Home() {
           heroVideoLog('play:sound-blocked-by-browser', {
             trigger,
             err: err instanceof Error ? err.message : String(err),
-            note: 'Politique autoplay — repli en muet pour garder la vidéo visible',
+            note: 'Politique autoplay — repli en muet (ne pas enregistrer off automatiquement)',
             ...snapshotVideo(video, label),
           });
         }
@@ -87,7 +98,9 @@ export default function Home() {
       const videos = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
       heroVideoLog('play:start', {
         trigger,
-        preferSound: readPreferHeroSound(),
+        preferSound: preferSoundRef.current,
+        heroSoundStorage:
+          typeof window !== 'undefined' ? localStorage.getItem('hero-sound') : null,
         activeCount: videos.length,
       });
       if (videos.length === 0) {
@@ -100,15 +113,12 @@ export default function Home() {
     [playOneHeroVideo, syncSoundUi]
   );
 
-  const bindHeroVideoRef = useCallback(
-    (which: 'desktop' | 'mobile') => (el: HTMLVideoElement | null) => {
-      if (which === 'desktop') videoDesktopRef.current = el;
-      else videoMobileRef.current = el;
-      heroVideoLog(`ref:${which}`, { attached: !!el, snapshot: el ? snapshotVideo(el, which) : null });
-      if (el && isHeroVideoVisible(el)) void playHeroVideos(`ref-${which}`);
-    },
-    [playHeroVideos]
-  );
+  const bootHeroVideo = useCallback(() => {
+    if (heroBootedRef.current) return;
+    heroBootedRef.current = true;
+    void playHeroVideos('boot');
+    window.setTimeout(() => void playHeroVideos('boot-retry'), 500);
+  }, [playHeroVideos]);
 
   useEffect(() => {
     setTagline("Une calligraphie métissée, portant la liberté et l\u2019humanité dans ses traits, ouverte au monde, inclusive et respectueuse de la planète.");
@@ -125,14 +135,23 @@ export default function Home() {
       .catch(() => {});
   }, []);
 
-  useLayoutEffect(() => {
-    heroVideoLog('mount:layoutEffect', {
-      href: typeof window !== 'undefined' ? window.location.href : '',
+  useEffect(() => {
+    const stored = localStorage.getItem('hero-sound');
+    preferSoundRef.current = readPreferHeroSoundFromStorage();
+    heroVideoLog('pref:localStorage', {
+      stored,
+      preferSound: preferSoundRef.current,
+      hint:
+        stored === 'off'
+          ? 'Son désactivé par un clic précédent — bouton 🔊 ou localStorage.removeItem("hero-sound")'
+          : undefined,
     });
-    void playHeroVideos('layoutEffect');
-    const t = window.setTimeout(() => void playHeroVideos('retry-400ms'), 400);
+    bootHeroVideo();
+  }, [bootHeroVideo]);
 
+  useEffect(() => {
     const resume = (source: string) => {
+      heroBootedRef.current = false;
       const videos = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
       if (videos.length === 0 || videos.some((v) => v.paused)) void playHeroVideos(`resume-${source}`);
     };
@@ -141,7 +160,6 @@ export default function Home() {
       if (document.visibilityState === 'visible') resume('visibility');
     });
     window.addEventListener('pageshow', () => resume('pageshow'));
-    return () => window.clearTimeout(t);
   }, [playHeroVideos]);
 
   async function toggleSound() {
@@ -169,14 +187,10 @@ export default function Home() {
     setSoundOn(nextSound);
   }
 
-  function onHeroVideoEvent(video: HTMLVideoElement, eventName: string) {
-    const label = video === videoDesktopRef.current ? 'desktop' : 'mobile';
-    heroVideoLog(`event:${eventName}`, snapshotVideo(video, label));
-    if (!isHeroVideoVisible(video)) {
-      heroVideoLog(`event:${eventName}:hidden`, { label });
-      return;
-    }
-    void playHeroVideos(eventName);
+  function onHeroCanPlay(video: HTMLVideoElement) {
+    if (!isHeroVideoVisible(video)) return;
+    if (!heroBootedRef.current) bootHeroVideo();
+    else void playHeroVideos('canplay');
   }
 
   return (
@@ -195,7 +209,7 @@ export default function Home() {
       >
         {/* Desktop video */}
         <video
-          ref={bindHeroVideoRef('desktop')}
+          ref={videoDesktopRef}
           className="hero-video-desktop"
           autoPlay
           loop
@@ -203,7 +217,7 @@ export default function Home() {
           preload="auto"
           poster="/images/hero-poster.jpg"
           style={{ zIndex: 0 }}
-          onCanPlay={(e) => onHeroVideoEvent(e.currentTarget, 'canplay')}
+          onCanPlay={(e) => onHeroCanPlay(e.currentTarget)}
           onPause={(e) => heroVideoLog('event:pause', snapshotVideo(e.currentTarget, 'desktop'))}
           onError={(e) =>
             heroVideoLog('event:error', {
@@ -216,7 +230,7 @@ export default function Home() {
         </video>
         {/* Mobile video */}
         <video
-          ref={bindHeroVideoRef('mobile')}
+          ref={videoMobileRef}
           className="hero-video-mobile"
           autoPlay
           loop
@@ -224,7 +238,7 @@ export default function Home() {
           preload="auto"
           poster="/images/hero-poster.jpg"
           style={{ zIndex: 0 }}
-          onCanPlay={(e) => onHeroVideoEvent(e.currentTarget, 'canplay')}
+          onCanPlay={(e) => onHeroCanPlay(e.currentTarget)}
           onPause={(e) => heroVideoLog('event:pause', snapshotVideo(e.currentTarget, 'mobile'))}
           onError={(e) =>
             heroVideoLog('event:error', {
