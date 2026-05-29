@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useState, useEffect, useRef, useCallback, type RefObject } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, useCallback, type RefObject } from 'react';
 import { artistData, ateliersData, expositionsData, evenementsData, galerieData } from '@/lib/data';
 import { fadeUp, fadeUpStagger as stagger, motionViewport } from '@/lib/motion-variants';
+import { heroVideoLog, isHeroVideoDebugEnabled, snapshotVideo } from '@/lib/hero-video-debug';
 
 function isHeroVideoVisible(video: HTMLVideoElement) {
   const style = window.getComputedStyle(video);
@@ -37,43 +38,98 @@ export default function Home() {
   const videoMobileRef = useRef<HTMLVideoElement>(null);
   const playLockRef = useRef(false);
 
-  const tryEnableSound = useCallback((video: HTMLVideoElement) => {
-    if (!readPreferHeroSound() || !video.muted) return;
+  const tryEnableSound = useCallback((video: HTMLVideoElement, reason: string) => {
+    if (!readPreferHeroSound() || !video.muted) {
+      heroVideoLog('tryEnableSound:skip', { reason, ...snapshotVideo(video, 'target') });
+      return;
+    }
+    heroVideoLog('tryEnableSound:start', { reason, ...snapshotVideo(video, 'target') });
     video.muted = false;
-    video.play()
-      .then(() => setSoundOn(true))
-      .catch(() => {
+    video
+      .play()
+      .then(() => {
+        heroVideoLog('tryEnableSound:ok', { reason, ...snapshotVideo(video, 'target') });
+        setSoundOn(true);
+      })
+      .catch((err: unknown) => {
         video.muted = true;
         setSoundOn(false);
+        heroVideoLog('tryEnableSound:fail', {
+          reason,
+          err: err instanceof Error ? err.message : String(err),
+          ...snapshotVideo(video, 'target'),
+        });
       });
   }, []);
 
-  const playHeroVideos = useCallback(async () => {
-    if (playLockRef.current) return;
+  const playHeroVideos = useCallback(async (trigger: string) => {
+    if (playLockRef.current) {
+      heroVideoLog('play:locked', { trigger });
+      return;
+    }
     playLockRef.current = true;
     const preferSound = readPreferHeroSound();
     const videos = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
 
+    heroVideoLog('play:start', {
+      trigger,
+      preferSound,
+      debug: isHeroVideoDebugEnabled(),
+      desktopRef: !!videoDesktopRef.current,
+      mobileRef: !!videoMobileRef.current,
+      activeCount: videos.length,
+      desktop: videoDesktopRef.current ? snapshotVideo(videoDesktopRef.current, 'desktop') : null,
+      mobile: videoMobileRef.current ? snapshotVideo(videoMobileRef.current, 'mobile') : null,
+    });
+
     try {
+      if (videos.length === 0) {
+        heroVideoLog('play:no-active-video', { trigger });
+        return;
+      }
+
       for (const video of videos) {
+        const label = video === videoDesktopRef.current ? 'desktop' : 'mobile';
         video.muted = true;
         if (!video.paused) {
-          if (preferSound) tryEnableSound(video);
+          heroVideoLog('play:already-playing', { trigger, ...snapshotVideo(video, label) });
+          if (preferSound) tryEnableSound(video, `${trigger}-already-playing`);
           continue;
         }
         try {
           await video.play();
-        } catch {
+          heroVideoLog('play:ok', { trigger, ...snapshotVideo(video, label) });
+        } catch (err: unknown) {
+          heroVideoLog('play:fail', {
+            trigger,
+            err: err instanceof Error ? err.message : String(err),
+            ...snapshotVideo(video, label),
+          });
           continue;
         }
-        if (preferSound) tryEnableSound(video);
+        if (preferSound) tryEnableSound(video, `${trigger}-after-play`);
       }
       const active = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
       setSoundOn(preferSound && active.some((v) => !v.muted));
+      heroVideoLog('play:done', {
+        trigger,
+        soundOnUi: preferSound && active.some((v) => !v.muted),
+        active: active.map((v) => snapshotVideo(v, v === videoDesktopRef.current ? 'desktop' : 'mobile')),
+      });
     } finally {
       playLockRef.current = false;
     }
   }, [tryEnableSound]);
+
+  const bindHeroVideoRef = useCallback(
+    (which: 'desktop' | 'mobile') => (el: HTMLVideoElement | null) => {
+      if (which === 'desktop') videoDesktopRef.current = el;
+      else videoMobileRef.current = el;
+      heroVideoLog(`ref:${which}`, { attached: !!el, snapshot: el ? snapshotVideo(el, which) : null });
+      if (el && isHeroVideoVisible(el)) void playHeroVideos(`ref-${which}`);
+    },
+    [playHeroVideos]
+  );
 
   useEffect(() => {
     setTagline("Une calligraphie métissée, portant la liberté et l\u2019humanité dans ses traits, ouverte au monde, inclusive et respectueuse de la planète.");
@@ -90,25 +146,36 @@ export default function Home() {
       .catch(() => {});
   }, []);
 
-  useEffect(() => {
-    void playHeroVideos();
-    const t = window.setTimeout(() => void playHeroVideos(), 300);
+  useLayoutEffect(() => {
+    heroVideoLog('mount:layoutEffect', {
+      href: typeof window !== 'undefined' ? window.location.href : '',
+      visibility: typeof document !== 'undefined' ? document.visibilityState : '',
+    });
+    void playHeroVideos('layoutEffect');
 
-    const resume = () => {
+    const delays = [100, 300, 800, 2000];
+    const timers = delays.map((ms) =>
+      window.setTimeout(() => void playHeroVideos(`retry-${ms}ms`), ms)
+    );
+
+    const resume = (source: string) => {
       const videos = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
-      if (videos.length === 0 || videos.some((v) => v.paused)) void playHeroVideos();
+      heroVideoLog(`resume:${source}`, {
+        count: videos.length,
+        paused: videos.map((v) => v.paused),
+      });
+      if (videos.length === 0 || videos.some((v) => v.paused)) void playHeroVideos(`resume-${source}`);
     };
 
     const onVisibility = () => {
-      if (document.visibilityState === 'visible') resume();
+      if (document.visibilityState === 'visible') resume('visibility');
     };
 
     document.addEventListener('visibilitychange', onVisibility);
-    window.addEventListener('pageshow', resume);
+    window.addEventListener('pageshow', () => resume('pageshow'));
     return () => {
-      window.clearTimeout(t);
+      timers.forEach((t) => window.clearTimeout(t));
       document.removeEventListener('visibilitychange', onVisibility);
-      window.removeEventListener('pageshow', resume);
     };
   }, [playHeroVideos]);
 
@@ -137,9 +204,14 @@ export default function Home() {
     setSoundOn(nextSound);
   }
 
-  function onHeroVideoEvent(video: HTMLVideoElement) {
-    if (!isHeroVideoVisible(video)) return;
-    void playHeroVideos();
+  function onHeroVideoEvent(video: HTMLVideoElement, eventName: string) {
+    const label = video === videoDesktopRef.current ? 'desktop' : 'mobile';
+    heroVideoLog(`event:${eventName}`, snapshotVideo(video, label));
+    if (!isHeroVideoVisible(video)) {
+      heroVideoLog(`event:${eventName}:hidden`, { label });
+      return;
+    }
+    void playHeroVideos(eventName);
   }
 
   return (
@@ -158,7 +230,7 @@ export default function Home() {
       >
         {/* Desktop video */}
         <video
-          ref={videoDesktopRef}
+          ref={bindHeroVideoRef('desktop')}
           className="hero-video-desktop"
           autoPlay
           muted
@@ -167,18 +239,28 @@ export default function Home() {
           preload="auto"
           poster="/images/hero-poster.jpg"
           style={{ zIndex: 0 }}
-          onLoadedData={(e) => onHeroVideoEvent(e.currentTarget)}
-          onCanPlay={(e) => onHeroVideoEvent(e.currentTarget)}
+          onLoadStart={(e) => onHeroVideoEvent(e.currentTarget, 'loadstart')}
+          onLoadedMetadata={(e) => onHeroVideoEvent(e.currentTarget, 'loadedmetadata')}
+          onLoadedData={(e) => onHeroVideoEvent(e.currentTarget, 'loadeddata')}
+          onCanPlay={(e) => onHeroVideoEvent(e.currentTarget, 'canplay')}
           onPlaying={(e) => {
             const v = e.currentTarget;
-            if (isHeroVideoVisible(v) && readPreferHeroSound()) tryEnableSound(v);
+            heroVideoLog('event:playing', snapshotVideo(v, 'desktop'));
+            if (isHeroVideoVisible(v) && readPreferHeroSound()) tryEnableSound(v, 'onPlaying');
           }}
+          onPause={(e) => heroVideoLog('event:pause', snapshotVideo(e.currentTarget, 'desktop'))}
+          onError={(e) =>
+            heroVideoLog('event:error', {
+              ...snapshotVideo(e.currentTarget, 'desktop'),
+              code: e.currentTarget.error?.code,
+            })
+          }
         >
           <source src="/videos/video-hero-wide.mp4" type="video/mp4" />
         </video>
         {/* Mobile video */}
         <video
-          ref={videoMobileRef}
+          ref={bindHeroVideoRef('mobile')}
           className="hero-video-mobile"
           autoPlay
           muted
@@ -187,12 +269,22 @@ export default function Home() {
           preload="auto"
           poster="/images/hero-poster.jpg"
           style={{ zIndex: 0 }}
-          onLoadedData={(e) => onHeroVideoEvent(e.currentTarget)}
-          onCanPlay={(e) => onHeroVideoEvent(e.currentTarget)}
+          onLoadStart={(e) => onHeroVideoEvent(e.currentTarget, 'loadstart')}
+          onLoadedMetadata={(e) => onHeroVideoEvent(e.currentTarget, 'loadedmetadata')}
+          onLoadedData={(e) => onHeroVideoEvent(e.currentTarget, 'loadeddata')}
+          onCanPlay={(e) => onHeroVideoEvent(e.currentTarget, 'canplay')}
           onPlaying={(e) => {
             const v = e.currentTarget;
-            if (isHeroVideoVisible(v) && readPreferHeroSound()) tryEnableSound(v);
+            heroVideoLog('event:playing', snapshotVideo(v, 'mobile'));
+            if (isHeroVideoVisible(v) && readPreferHeroSound()) tryEnableSound(v, 'onPlaying');
           }}
+          onPause={(e) => heroVideoLog('event:pause', snapshotVideo(e.currentTarget, 'mobile'))}
+          onError={(e) =>
+            heroVideoLog('event:error', {
+              ...snapshotVideo(e.currentTarget, 'mobile'),
+              code: e.currentTarget.error?.code,
+            })
+          }
         >
           <source src="/videos/video-hero-vertical.mp4" type="video/mp4" />
         </video>
