@@ -2,23 +2,60 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, type RefObject } from 'react';
 import { artistData, ateliersData, expositionsData, evenementsData, galerieData } from '@/lib/data';
 import { fadeUp, fadeUpStagger as stagger, motionViewport } from '@/lib/motion-variants';
 
+function isHeroVideoVisible(video: HTMLVideoElement) {
+  const style = window.getComputedStyle(video);
+  return style.display !== 'none' && style.visibility !== 'hidden';
+}
+
+function getActiveHeroVideos(
+  desktopRef: RefObject<HTMLVideoElement | null>,
+  mobileRef: RefObject<HTMLVideoElement | null>
+) {
+  return [desktopRef.current, mobileRef.current].filter(
+    (v): v is HTMLVideoElement => !!v && isHeroVideoVisible(v)
+  );
+}
+
 export default function Home() {
-  const [muted, setMuted] = useState(false);
+  /** Démarre muet pour l’autoplay navigateur ; son activé après play() si préféré. */
+  const [muted, setMuted] = useState(true);
   const [tagline, setTagline] = useState('');
   const [galeriePreview, setGaleriePreview] = useState(galerieData.slice(0, 6));
   const videoDesktopRef = useRef<HTMLVideoElement>(null);
   const videoMobileRef = useRef<HTMLVideoElement>(null);
 
+  const playHeroVideos = useCallback(async (preferSound: boolean) => {
+    const videos = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
+    let soundOn = false;
+
+    for (const video of videos) {
+      video.muted = true;
+      try {
+        await video.play();
+      } catch {
+        continue;
+      }
+      if (preferSound) {
+        video.muted = false;
+        try {
+          await video.play();
+          soundOn = true;
+        } catch {
+          video.muted = true;
+        }
+      }
+    }
+
+    setMuted(!soundOn);
+    return soundOn;
+  }, []);
+
   useEffect(() => {
     setTagline("Une calligraphie métissée, portant la liberté et l\u2019humanité dans ses traits, ouverte au monde, inclusive et respectueuse de la planète.");
-    try {
-      const saved = localStorage.getItem('hero-sound');
-      if (saved === 'off') setMuted(true);
-    } catch (_) {}
   }, []);
 
   useEffect(() => {
@@ -33,16 +70,65 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (videoDesktopRef.current) videoDesktopRef.current.muted = muted;
-    if (videoMobileRef.current) videoMobileRef.current.muted = muted;
-  }, [muted]);
+    let preferSound = true;
+    try {
+      if (localStorage.getItem('hero-sound') === 'off') preferSound = false;
+    } catch (_) {}
 
-  function toggleSound() {
+    void playHeroVideos(preferSound);
+
+    const resumeIfPaused = () => {
+      let prefer = true;
+      try {
+        if (localStorage.getItem('hero-sound') === 'off') prefer = false;
+      } catch (_) {}
+      const videos = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
+      if (videos.some((v) => v.paused)) void playHeroVideos(prefer);
+    };
+
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') resumeIfPaused();
+    };
+
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('pageshow', resumeIfPaused);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('pageshow', resumeIfPaused);
+    };
+  }, [playHeroVideos]);
+
+  async function toggleSound() {
     const next = !muted;
     setMuted(next);
     try {
       localStorage.setItem('hero-sound', next ? 'off' : 'on');
     } catch (_) {}
+
+    const videos = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
+    for (const video of videos) {
+      video.muted = next;
+      if (!next) {
+        try {
+          await video.play();
+        } catch {
+          video.muted = true;
+          setMuted(true);
+          try {
+            localStorage.setItem('hero-sound', 'off');
+          } catch (_) {}
+        }
+      }
+    }
+  }
+
+  function handleHeroVideoReady(video: HTMLVideoElement) {
+    if (!video.paused) return;
+    let preferSound = true;
+    try {
+      if (localStorage.getItem('hero-sound') === 'off') preferSound = false;
+    } catch (_) {}
+    void playHeroVideos(preferSound);
   }
 
   return (
@@ -70,6 +156,8 @@ export default function Home() {
           preload="auto"
           poster="/images/hero-poster.jpg"
           style={{ zIndex: 0 }}
+          onLoadedData={(e) => handleHeroVideoReady(e.currentTarget)}
+          onCanPlay={(e) => handleHeroVideoReady(e.currentTarget)}
         >
           <source src="/videos/video-hero-wide.mp4" type="video/mp4" />
         </video>
@@ -84,6 +172,8 @@ export default function Home() {
           preload="auto"
           poster="/images/hero-poster.jpg"
           style={{ zIndex: 0 }}
+          onLoadedData={(e) => handleHeroVideoReady(e.currentTarget)}
+          onCanPlay={(e) => handleHeroVideoReady(e.currentTarget)}
         >
           <source src="/videos/video-hero-vertical.mp4" type="video/mp4" />
         </video>

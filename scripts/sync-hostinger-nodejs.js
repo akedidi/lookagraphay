@@ -126,15 +126,27 @@ function isHostingerBuildEnvironment(projectRoot) {
   return findNodejsTargets(projectRoot).length > 0;
 }
 
-/** Évite 503 après redeploy : anciens workers Next encore liés au port / Passenger. */
-function killZombieNextWorkers() {
+/**
+ * Évite 503 après redeploy : anciens workers Next / lsnode encore actifs.
+ * Appelé une seule fois avant restart.txt (pas dans la boucle nodejs/).
+ */
+function killZombieNextWorkers(projectRoot) {
   try {
     const { execSync } = require('child_process');
-    execSync("pkill -9 -u $(whoami) -f 'next-server' 2>/dev/null || true", {
-      shell: '/bin/sh',
-      stdio: 'pipe',
-    });
-    console.log('[postbuild]   workers next-server arrêtés (avant restart Passenger)');
+    const markers = ['next-server'];
+    const domain = process.env.HOSTINGER_NODEJS_DIR || projectRoot;
+    if (isHostingerPath(domain)) {
+      const site = domain.split(`${path.sep}domains${path.sep}`)[1]?.split(path.sep)[0];
+      if (site) markers.push(site);
+    }
+    for (const marker of markers) {
+      execSync(`pkill -9 -u $(whoami) -f '${marker}' 2>/dev/null || true`, {
+        shell: '/bin/sh',
+        stdio: 'pipe',
+      });
+    }
+    execSync('sleep 2', { shell: '/bin/sh', stdio: 'pipe' });
+    console.log('[postbuild]   workers zombies arrêtés (next-server' + (markers.length > 1 ? ', ' + markers[1] : '') + ')');
   } catch (_) {}
 }
 
@@ -191,11 +203,6 @@ function installPassengerLauncher(nodejsDir, projectRoot) {
     console.warn('[postbuild] Attention: standalone pas encore présent dans', publicHtml);
   } else {
     console.log('[postbuild]   cible runtime:', standaloneServer);
-  }
-
-  if (isHostingerPath(nodejsDir) || isHostingerPath(publicHtml)) {
-    clearStaleStandaloneLocks(publicHtml);
-    killZombieNextWorkers();
   }
 
   const restartDir = path.join(nodejsDir, 'tmp');
@@ -301,6 +308,14 @@ function runSync(projectRoot) {
     return { synced: 0, skipped: true };
   }
 
+  if (onHostinger) {
+    const publicHtmlTargets = findPublicHtmlTargets(projectRoot, nodejsTargets);
+    for (const publicHtmlDir of publicHtmlTargets) {
+      clearStaleStandaloneLocks(publicHtmlDir);
+    }
+    killZombieNextWorkers(projectRoot);
+  }
+
   for (const nodejsDir of nodejsTargets) {
     try {
       installPassengerLauncher(nodejsDir, projectRoot);
@@ -331,4 +346,11 @@ if (require.main === module) {
   }
 }
 
-module.exports = { findNodejsTargets, runSync, installPassengerLauncher, syncStaticToPublicHtml };
+module.exports = {
+  findNodejsTargets,
+  runSync,
+  installPassengerLauncher,
+  syncStaticToPublicHtml,
+  killZombieNextWorkers,
+  clearStaleStandaloneLocks,
+};
