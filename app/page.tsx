@@ -20,39 +20,60 @@ function getActiveHeroVideos(
   );
 }
 
+function readPreferHeroSound() {
+  try {
+    return localStorage.getItem('hero-sound') !== 'off';
+  } catch {
+    return true;
+  }
+}
+
 export default function Home() {
-  /** Démarre muet pour l’autoplay navigateur ; son activé après play() si préféré. */
-  const [muted, setMuted] = useState(true);
+  /** UI du bouton son (la balise <video> reste `muted` pour l’autoplay, son via .muted en JS). */
+  const [soundOn, setSoundOn] = useState(false);
   const [tagline, setTagline] = useState('');
   const [galeriePreview, setGaleriePreview] = useState(galerieData.slice(0, 6));
   const videoDesktopRef = useRef<HTMLVideoElement>(null);
   const videoMobileRef = useRef<HTMLVideoElement>(null);
+  const playLockRef = useRef(false);
 
-  const playHeroVideos = useCallback(async (preferSound: boolean) => {
+  const tryEnableSound = useCallback((video: HTMLVideoElement) => {
+    if (!readPreferHeroSound() || !video.muted) return;
+    video.muted = false;
+    video.play()
+      .then(() => setSoundOn(true))
+      .catch(() => {
+        video.muted = true;
+        setSoundOn(false);
+      });
+  }, []);
+
+  const playHeroVideos = useCallback(async () => {
+    if (playLockRef.current) return;
+    playLockRef.current = true;
+    const preferSound = readPreferHeroSound();
     const videos = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
-    let soundOn = false;
 
-    for (const video of videos) {
-      video.muted = true;
-      try {
-        await video.play();
-      } catch {
-        continue;
-      }
-      if (preferSound) {
-        video.muted = false;
+    try {
+      for (const video of videos) {
+        video.muted = true;
+        if (!video.paused) {
+          if (preferSound) tryEnableSound(video);
+          continue;
+        }
         try {
           await video.play();
-          soundOn = true;
         } catch {
-          video.muted = true;
+          continue;
         }
+        if (preferSound) tryEnableSound(video);
       }
+      const active = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
+      setSoundOn(preferSound && active.some((v) => !v.muted));
+    } finally {
+      playLockRef.current = false;
     }
-
-    setMuted(!soundOn);
-    return soundOn;
-  }, []);
+  }, [tryEnableSound]);
 
   useEffect(() => {
     setTagline("Une calligraphie métissée, portant la liberté et l\u2019humanité dans ses traits, ouverte au monde, inclusive et respectueuse de la planète.");
@@ -70,65 +91,55 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    let preferSound = true;
-    try {
-      if (localStorage.getItem('hero-sound') === 'off') preferSound = false;
-    } catch (_) {}
+    void playHeroVideos();
+    const t = window.setTimeout(() => void playHeroVideos(), 300);
 
-    void playHeroVideos(preferSound);
-
-    const resumeIfPaused = () => {
-      let prefer = true;
-      try {
-        if (localStorage.getItem('hero-sound') === 'off') prefer = false;
-      } catch (_) {}
+    const resume = () => {
       const videos = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
-      if (videos.some((v) => v.paused)) void playHeroVideos(prefer);
+      if (videos.length === 0 || videos.some((v) => v.paused)) void playHeroVideos();
     };
 
     const onVisibility = () => {
-      if (document.visibilityState === 'visible') resumeIfPaused();
+      if (document.visibilityState === 'visible') resume();
     };
 
     document.addEventListener('visibilitychange', onVisibility);
-    window.addEventListener('pageshow', resumeIfPaused);
+    window.addEventListener('pageshow', resume);
     return () => {
+      window.clearTimeout(t);
       document.removeEventListener('visibilitychange', onVisibility);
-      window.removeEventListener('pageshow', resumeIfPaused);
+      window.removeEventListener('pageshow', resume);
     };
   }, [playHeroVideos]);
 
   async function toggleSound() {
-    const next = !muted;
-    setMuted(next);
+    const nextSound = !soundOn;
     try {
-      localStorage.setItem('hero-sound', next ? 'off' : 'on');
+      localStorage.setItem('hero-sound', nextSound ? 'on' : 'off');
     } catch (_) {}
 
     const videos = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
     for (const video of videos) {
-      video.muted = next;
-      if (!next) {
+      video.muted = !nextSound;
+      if (video.paused) {
         try {
           await video.play();
         } catch {
           video.muted = true;
-          setMuted(true);
+          setSoundOn(false);
           try {
             localStorage.setItem('hero-sound', 'off');
           } catch (_) {}
+          return;
         }
       }
     }
+    setSoundOn(nextSound);
   }
 
-  function handleHeroVideoReady(video: HTMLVideoElement) {
-    if (!video.paused) return;
-    let preferSound = true;
-    try {
-      if (localStorage.getItem('hero-sound') === 'off') preferSound = false;
-    } catch (_) {}
-    void playHeroVideos(preferSound);
+  function onHeroVideoEvent(video: HTMLVideoElement) {
+    if (!isHeroVideoVisible(video)) return;
+    void playHeroVideos();
   }
 
   return (
@@ -150,14 +161,18 @@ export default function Home() {
           ref={videoDesktopRef}
           className="hero-video-desktop"
           autoPlay
-          muted={muted}
+          muted
           loop
           playsInline
           preload="auto"
           poster="/images/hero-poster.jpg"
           style={{ zIndex: 0 }}
-          onLoadedData={(e) => handleHeroVideoReady(e.currentTarget)}
-          onCanPlay={(e) => handleHeroVideoReady(e.currentTarget)}
+          onLoadedData={(e) => onHeroVideoEvent(e.currentTarget)}
+          onCanPlay={(e) => onHeroVideoEvent(e.currentTarget)}
+          onPlaying={(e) => {
+            const v = e.currentTarget;
+            if (isHeroVideoVisible(v) && readPreferHeroSound()) tryEnableSound(v);
+          }}
         >
           <source src="/videos/video-hero-wide.mp4" type="video/mp4" />
         </video>
@@ -166,14 +181,18 @@ export default function Home() {
           ref={videoMobileRef}
           className="hero-video-mobile"
           autoPlay
-          muted={muted}
+          muted
           loop
           playsInline
           preload="auto"
           poster="/images/hero-poster.jpg"
           style={{ zIndex: 0 }}
-          onLoadedData={(e) => handleHeroVideoReady(e.currentTarget)}
-          onCanPlay={(e) => handleHeroVideoReady(e.currentTarget)}
+          onLoadedData={(e) => onHeroVideoEvent(e.currentTarget)}
+          onCanPlay={(e) => onHeroVideoEvent(e.currentTarget)}
+          onPlaying={(e) => {
+            const v = e.currentTarget;
+            if (isHeroVideoVisible(v) && readPreferHeroSound()) tryEnableSound(v);
+          }}
         >
           <source src="/videos/video-hero-vertical.mp4" type="video/mp4" />
         </video>
@@ -181,7 +200,7 @@ export default function Home() {
         {/* Bouton son */}
         <button
           onClick={toggleSound}
-          title={muted ? 'Activer le son' : 'Couper le son'}
+          title={soundOn ? 'Couper le son' : 'Activer le son'}
           style={{
             position: 'absolute',
             top: '7rem',
@@ -209,7 +228,7 @@ export default function Home() {
             (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(201,168,76,0.3)';
           }}
         >
-          {muted ? (
+          {!soundOn ? (
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
               <line x1="23" y1="9" x2="17" y2="15"/>
