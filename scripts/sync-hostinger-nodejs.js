@@ -12,6 +12,11 @@ const LEGACY_FILES = [
   '.lookagraphy-instance.lock',
   '.lookagraphy.pid.lock',
 ];
+const STANDALONE_LOCK_DIRS = [
+  '.lookagraphy.lock.d',
+  '.lookagraphy-instance.lock',
+  '.lookagraphy.pid.lock',
+];
 const STALE_NODEJS_DIRS = ['.next', 'node_modules', 'public'];
 
 function copyDir(src, dest) {
@@ -121,6 +126,28 @@ function isHostingerBuildEnvironment(projectRoot) {
   return findNodejsTargets(projectRoot).length > 0;
 }
 
+/** Évite 503 après redeploy : anciens workers Next encore liés au port / Passenger. */
+function killZombieNextWorkers() {
+  try {
+    const { execSync } = require('child_process');
+    execSync("pkill -9 -u $(whoami) -f 'next-server' 2>/dev/null || true", {
+      shell: '/bin/sh',
+      stdio: 'pipe',
+    });
+    console.log('[postbuild]   workers next-server arrêtés (avant restart Passenger)');
+  } catch (_) {}
+}
+
+function clearStaleStandaloneLocks(publicHtml) {
+  const stand = path.join(publicHtml, '.next', 'standalone');
+  if (!fs.existsSync(stand)) return;
+  for (const name of STANDALONE_LOCK_DIRS) {
+    try {
+      fs.rmSync(path.join(stand, name), { recursive: true, force: true });
+    } catch (_) {}
+  }
+}
+
 function logBuildAssets(projectRoot, label) {
   const buildIdPath = path.join(projectRoot, '.next', 'BUILD_ID');
   const staticCssDir = path.join(projectRoot, '.next', 'static', 'css');
@@ -164,6 +191,11 @@ function installPassengerLauncher(nodejsDir, projectRoot) {
     console.warn('[postbuild] Attention: standalone pas encore présent dans', publicHtml);
   } else {
     console.log('[postbuild]   cible runtime:', standaloneServer);
+  }
+
+  if (isHostingerPath(nodejsDir) || isHostingerPath(publicHtml)) {
+    clearStaleStandaloneLocks(publicHtml);
+    killZombieNextWorkers();
   }
 
   const restartDir = path.join(nodejsDir, 'tmp');
