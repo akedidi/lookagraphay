@@ -30,96 +30,75 @@ function readPreferHeroSound() {
 }
 
 export default function Home() {
-  /** UI du bouton son (la balise <video> reste `muted` pour l’autoplay, son via .muted en JS). */
-  const [soundOn, setSoundOn] = useState(false);
+  const [soundOn, setSoundOn] = useState(() => readPreferHeroSound());
   const [tagline, setTagline] = useState('');
   const [galeriePreview, setGaleriePreview] = useState(galerieData.slice(0, 6));
   const videoDesktopRef = useRef<HTMLVideoElement>(null);
   const videoMobileRef = useRef<HTMLVideoElement>(null);
-  const playLockRef = useRef(false);
 
-  const tryEnableSound = useCallback((video: HTMLVideoElement, reason: string) => {
-    if (!readPreferHeroSound() || !video.muted) {
-      heroVideoLog('tryEnableSound:skip', { reason, ...snapshotVideo(video, 'target') });
-      return;
-    }
-    heroVideoLog('tryEnableSound:start', { reason, ...snapshotVideo(video, 'target') });
-    video.muted = false;
-    video
-      .play()
-      .then(() => {
-        heroVideoLog('tryEnableSound:ok', { reason, ...snapshotVideo(video, 'target') });
-        setSoundOn(true);
-      })
-      .catch((err: unknown) => {
-        video.muted = true;
-        setSoundOn(false);
-        heroVideoLog('tryEnableSound:fail', {
-          reason,
-          err: err instanceof Error ? err.message : String(err),
-          ...snapshotVideo(video, 'target'),
-        });
-      });
+  const syncSoundUi = useCallback(() => {
+    const active = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
+    setSoundOn(active.length > 0 && active.some((v) => !v.muted && !v.paused));
   }, []);
 
-  const playHeroVideos = useCallback(async (trigger: string) => {
-    if (playLockRef.current) {
-      heroVideoLog('play:locked', { trigger });
-      return;
-    }
-    playLockRef.current = true;
-    const preferSound = readPreferHeroSound();
-    const videos = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
+  const playOneHeroVideo = useCallback(
+    async (video: HTMLVideoElement, trigger: string) => {
+      const label = video === videoDesktopRef.current ? 'desktop' : 'mobile';
+      const preferSound = readPreferHeroSound();
 
-    heroVideoLog('play:start', {
-      trigger,
-      preferSound,
-      debug: isHeroVideoDebugEnabled(),
-      desktopRef: !!videoDesktopRef.current,
-      mobileRef: !!videoMobileRef.current,
-      activeCount: videos.length,
-      desktop: videoDesktopRef.current ? snapshotVideo(videoDesktopRef.current, 'desktop') : null,
-      mobile: videoMobileRef.current ? snapshotVideo(videoMobileRef.current, 'mobile') : null,
-    });
+      if (!video.paused && (!preferSound || !video.muted)) {
+        heroVideoLog('play:skip-already', { trigger, ...snapshotVideo(video, label) });
+        return;
+      }
 
-    try {
+      if (preferSound) {
+        video.muted = false;
+        try {
+          await video.play();
+          heroVideoLog('play:ok-with-sound', { trigger, ...snapshotVideo(video, label) });
+          return;
+        } catch (err: unknown) {
+          heroVideoLog('play:sound-blocked-by-browser', {
+            trigger,
+            err: err instanceof Error ? err.message : String(err),
+            note: 'Politique autoplay — repli en muet pour garder la vidéo visible',
+            ...snapshotVideo(video, label),
+          });
+        }
+      }
+
+      video.muted = true;
+      try {
+        await video.play();
+        heroVideoLog('play:ok-muted-fallback', { trigger, ...snapshotVideo(video, label) });
+      } catch (err: unknown) {
+        heroVideoLog('play:fail', {
+          trigger,
+          err: err instanceof Error ? err.message : String(err),
+          ...snapshotVideo(video, label),
+        });
+      }
+    },
+    []
+  );
+
+  const playHeroVideos = useCallback(
+    async (trigger: string) => {
+      const videos = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
+      heroVideoLog('play:start', {
+        trigger,
+        preferSound: readPreferHeroSound(),
+        activeCount: videos.length,
+      });
       if (videos.length === 0) {
         heroVideoLog('play:no-active-video', { trigger });
         return;
       }
-
-      for (const video of videos) {
-        const label = video === videoDesktopRef.current ? 'desktop' : 'mobile';
-        video.muted = true;
-        if (!video.paused) {
-          heroVideoLog('play:already-playing', { trigger, ...snapshotVideo(video, label) });
-          if (preferSound) tryEnableSound(video, `${trigger}-already-playing`);
-          continue;
-        }
-        try {
-          await video.play();
-          heroVideoLog('play:ok', { trigger, ...snapshotVideo(video, label) });
-        } catch (err: unknown) {
-          heroVideoLog('play:fail', {
-            trigger,
-            err: err instanceof Error ? err.message : String(err),
-            ...snapshotVideo(video, label),
-          });
-          continue;
-        }
-        if (preferSound) tryEnableSound(video, `${trigger}-after-play`);
-      }
-      const active = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
-      setSoundOn(preferSound && active.some((v) => !v.muted));
-      heroVideoLog('play:done', {
-        trigger,
-        soundOnUi: preferSound && active.some((v) => !v.muted),
-        active: active.map((v) => snapshotVideo(v, v === videoDesktopRef.current ? 'desktop' : 'mobile')),
-      });
-    } finally {
-      playLockRef.current = false;
-    }
-  }, [tryEnableSound]);
+      await Promise.all(videos.map((v) => playOneHeroVideo(v, trigger)));
+      syncSoundUi();
+    },
+    [playOneHeroVideo, syncSoundUi]
+  );
 
   const bindHeroVideoRef = useCallback(
     (which: 'desktop' | 'mobile') => (el: HTMLVideoElement | null) => {
@@ -149,34 +128,20 @@ export default function Home() {
   useLayoutEffect(() => {
     heroVideoLog('mount:layoutEffect', {
       href: typeof window !== 'undefined' ? window.location.href : '',
-      visibility: typeof document !== 'undefined' ? document.visibilityState : '',
     });
     void playHeroVideos('layoutEffect');
-
-    const delays = [100, 300, 800, 2000];
-    const timers = delays.map((ms) =>
-      window.setTimeout(() => void playHeroVideos(`retry-${ms}ms`), ms)
-    );
+    const t = window.setTimeout(() => void playHeroVideos('retry-400ms'), 400);
 
     const resume = (source: string) => {
       const videos = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
-      heroVideoLog(`resume:${source}`, {
-        count: videos.length,
-        paused: videos.map((v) => v.paused),
-      });
       if (videos.length === 0 || videos.some((v) => v.paused)) void playHeroVideos(`resume-${source}`);
     };
 
-    const onVisibility = () => {
+    document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') resume('visibility');
-    };
-
-    document.addEventListener('visibilitychange', onVisibility);
+    });
     window.addEventListener('pageshow', () => resume('pageshow'));
-    return () => {
-      timers.forEach((t) => window.clearTimeout(t));
-      document.removeEventListener('visibilitychange', onVisibility);
-    };
+    return () => window.clearTimeout(t);
   }, [playHeroVideos]);
 
   async function toggleSound() {
@@ -233,21 +198,12 @@ export default function Home() {
           ref={bindHeroVideoRef('desktop')}
           className="hero-video-desktop"
           autoPlay
-          muted
           loop
           playsInline
           preload="auto"
           poster="/images/hero-poster.jpg"
           style={{ zIndex: 0 }}
-          onLoadStart={(e) => onHeroVideoEvent(e.currentTarget, 'loadstart')}
-          onLoadedMetadata={(e) => onHeroVideoEvent(e.currentTarget, 'loadedmetadata')}
-          onLoadedData={(e) => onHeroVideoEvent(e.currentTarget, 'loadeddata')}
           onCanPlay={(e) => onHeroVideoEvent(e.currentTarget, 'canplay')}
-          onPlaying={(e) => {
-            const v = e.currentTarget;
-            heroVideoLog('event:playing', snapshotVideo(v, 'desktop'));
-            if (isHeroVideoVisible(v) && readPreferHeroSound()) tryEnableSound(v, 'onPlaying');
-          }}
           onPause={(e) => heroVideoLog('event:pause', snapshotVideo(e.currentTarget, 'desktop'))}
           onError={(e) =>
             heroVideoLog('event:error', {
@@ -263,21 +219,12 @@ export default function Home() {
           ref={bindHeroVideoRef('mobile')}
           className="hero-video-mobile"
           autoPlay
-          muted
           loop
           playsInline
           preload="auto"
           poster="/images/hero-poster.jpg"
           style={{ zIndex: 0 }}
-          onLoadStart={(e) => onHeroVideoEvent(e.currentTarget, 'loadstart')}
-          onLoadedMetadata={(e) => onHeroVideoEvent(e.currentTarget, 'loadedmetadata')}
-          onLoadedData={(e) => onHeroVideoEvent(e.currentTarget, 'loadeddata')}
           onCanPlay={(e) => onHeroVideoEvent(e.currentTarget, 'canplay')}
-          onPlaying={(e) => {
-            const v = e.currentTarget;
-            heroVideoLog('event:playing', snapshotVideo(v, 'mobile'));
-            if (isHeroVideoVisible(v) && readPreferHeroSound()) tryEnableSound(v, 'onPlaying');
-          }}
           onPause={(e) => heroVideoLog('event:pause', snapshotVideo(e.currentTarget, 'mobile'))}
           onError={(e) =>
             heroVideoLog('event:error', {
