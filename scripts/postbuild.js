@@ -36,7 +36,7 @@ copyDir(path.join(root, '.next', 'static'), path.join(standaloneDir, '.next', 's
 const standaloneServer = path.join(standaloneDir, 'server.js');
 let serverSrc = fs.readFileSync(standaloneServer, 'utf8');
 
-const marker = 'lookagraphy-passenger-v6';
+const marker = 'lookagraphy-passenger-v5';
 if (serverSrc.includes('Hostinger LiteSpeed') || serverSrc.includes('lookagraphy-')) {
   const end = serverSrc.indexOf('const path = require');
   if (end > 0) {
@@ -45,58 +45,17 @@ if (serverSrc.includes('Hostinger LiteSpeed') || serverSrc.includes('lookagraphy
   serverSrc = serverSrc.replace(/\n\}\s*$/, '\n');
 }
 
+// Pas de verrou PID : Passenger lance plusieurs workers ; un lock + setInterval
+// laisse des processus sans HTTP (504) ; exit(0) sur secondaires → 503.
 const prelude = `/**
  * Hostinger Passenger — ${marker}
  */
-const fs = require('fs');
-
 if (process.env.HOSTNAME && /lsws|extapp-sock|\\.sock/i.test(process.env.HOSTNAME)) {
   console.warn('[lookagraphy] HOSTNAME LiteSpeed ignoré:', process.env.HOSTNAME);
 }
 process.env.HOSTNAME = '0.0.0.0';
-
 const __lookaPort = parseInt(process.env.PORT, 10) || 3000;
-const __lookaLockDir = require('path').join(__dirname, '.lookagraphy.lock.d');
-const __lookaPidFile = require('path').join(__lookaLockDir, 'pid');
-
-function __lookaPidAlive(pid) {
-  if (!pid || pid <= 0) return false;
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (_) {
-    return false;
-  }
-}
-
-function __lookaReleaseLock() {
-  try {
-    fs.rmSync(__lookaLockDir, { recursive: true, force: true });
-  } catch (_) {}
-}
-
-function __lookaTryLock() {
-  try {
-    fs.mkdirSync(__lookaLockDir, { mode: 0o700 });
-  } catch (e) {
-    if (!e || e.code !== 'EEXIST') throw e;
-    try {
-      const old = parseInt(fs.readFileSync(__lookaPidFile, 'utf8'), 10);
-      if (__lookaPidAlive(old)) return false;
-    } catch (_) {}
-    __lookaReleaseLock();
-    return __lookaTryLock();
-  }
-  fs.writeFileSync(__lookaPidFile, String(process.pid));
-  process.on('exit', __lookaReleaseLock);
-  return true;
-}
-
-if (!__lookaTryLock()) {
-  console.log('[lookagraphy] Worker LiteSpeed secondaire — instance principale déjà active');
-  setInterval(() => {}, 1 << 30);
-} else {
-  console.log('[lookagraphy] Instance principale | Node', process.version, '| PORT', __lookaPort);
+console.log('[lookagraphy] ${marker} | Node', process.version, '| PORT', __lookaPort);
 
 `;
 
@@ -112,7 +71,7 @@ if (!serverSrc.includes('minimalMode:')) {
   );
 }
 
-fs.writeFileSync(standaloneServer, prelude + serverSrc + '\n}\n');
+fs.writeFileSync(standaloneServer, prelude + serverSrc);
 console.log('[postbuild] Patched standalone/server.js (' + marker + ')');
 
 const { runSync } = require('./sync-hostinger-nodejs');
