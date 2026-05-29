@@ -7,7 +7,7 @@ import { artistData, ateliersData, expositionsData, evenementsData, galerieData 
 import { fadeUp, fadeUpStagger as stagger, motionViewport } from '@/lib/motion-variants';
 
 export default function Home() {
-  const [muted, setMuted] = useState(true);
+  const [muted, setMuted] = useState(false);
   const [tagline, setTagline] = useState('');
   const [galeriePreview, setGaleriePreview] = useState(galerieData.slice(0, 6));
   const videoDesktopRef = useRef<HTMLVideoElement>(null);
@@ -17,7 +17,7 @@ export default function Home() {
     setTagline("Une calligraphie métissée, portant la liberté et l\u2019humanité dans ses traits, ouverte au monde, inclusive et respectueuse de la planète.");
     try {
       const saved = localStorage.getItem('hero-sound');
-      if (saved === 'on') setMuted(false);
+      if (saved === 'off') setMuted(true);
     } catch (_) {}
   }, []);
 
@@ -64,7 +64,7 @@ export default function Home() {
           ref={videoDesktopRef}
           className="hero-video-desktop"
           autoPlay
-          muted
+          muted={muted}
           loop
           playsInline
           preload="auto"
@@ -78,7 +78,7 @@ export default function Home() {
           ref={videoMobileRef}
           className="hero-video-mobile"
           autoPlay
-          muted
+          muted={muted}
           loop
           playsInline
           preload="auto"

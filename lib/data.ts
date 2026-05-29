@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "LookaGraphy",
   tagline: "L'art de la calligraphie arabe",
   description:
-    "LookaGraphy est l'univers calligraphique de Looka — artiste parisienne qui fusionne calligraphie arabe et japonaise en un style distinctif, célébrant la beauté et l'universalité humaine.",
+    "Découvrez l'univers de notre artiste calligraphe à travers son portfolio, ses cours de calligraphie et sa boutique en ligne. Découvrir Looka.",
   email: "looka.graphy@gmail.com",
   /** Téléphone professionnel dédié calligraphie / ateliers */
   phoneCalligraphy: "+33 6 11 48 93 43",
