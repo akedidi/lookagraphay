@@ -35,8 +35,14 @@ function pauseInactiveHeroVideos(
   }
 }
 
+function isMobileHeroViewport() {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia('(max-width: 767px)').matches;
+}
+
 function readPreferHeroSoundFromStorage(): boolean {
   if (typeof window === 'undefined') return true;
+  if (isMobileHeroViewport()) return false;
   try {
     const v = localStorage.getItem('hero-sound');
     if (v === null) return true;
@@ -64,6 +70,26 @@ export default function Home() {
   const playOneHeroVideo = useCallback(
     async (video: HTMLVideoElement, trigger: string) => {
       const label = video === videoDesktopRef.current ? 'desktop' : 'mobile';
+
+      if (isMobileHeroViewport()) {
+        video.muted = true;
+        if (!video.paused) {
+          heroVideoLog('play:skip-mobile-muted', { trigger, ...snapshotVideo(video, label) });
+          return;
+        }
+        try {
+          await video.play();
+          heroVideoLog('play:ok-mobile-muted', { trigger, ...snapshotVideo(video, label) });
+        } catch (err: unknown) {
+          heroVideoLog('play:fail', {
+            trigger,
+            err: err instanceof Error ? err.message : String(err),
+            ...snapshotVideo(video, label),
+          });
+        }
+        return;
+      }
+
       const preferSound = preferSoundRef.current;
 
       if (!video.paused && !video.muted) {
@@ -326,8 +352,10 @@ export default function Home() {
           <source src="/videos/video-hero-vertical.mp4" type="video/mp4" />
         </video>
 
-        {/* Bouton son */}
+        {/* Bouton son — desktop uniquement (voir .hero-sound-toggle) */}
         <button
+          type="button"
+          className="hero-sound-toggle"
           onClick={toggleSound}
           title={soundOn ? 'Couper le son' : 'Activer le son'}
           style={{
@@ -340,7 +368,6 @@ export default function Home() {
             borderRadius: '50%',
             width: 40,
             height: 40,
-            display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',

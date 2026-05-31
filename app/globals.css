@@ -159,6 +159,16 @@ h1, h2, h3, h4, h5, h6 {
   .hero-video-mobile { display: none; }
 }
 
+/* Son hero : desktop uniquement (autoplay audio peu fiable sur mobile) */
+.hero-sound-toggle {
+  display: none;
+}
+@media (min-width: 768px) {
+  .hero-sound-toggle {
+    display: flex;
+  }
+}
+
 /* Hero overlay */
 .hero-overlay {
   background: linear-gradient(
