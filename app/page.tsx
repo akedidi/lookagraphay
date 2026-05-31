@@ -21,6 +21,20 @@ function getActiveHeroVideos(
   );
 }
 
+/** Coupe la vidéo cachée (desktop sur mobile, mobile sur desktop) pour éviter une fuite audio. */
+function pauseInactiveHeroVideos(
+  desktopRef: RefObject<HTMLVideoElement | null>,
+  mobileRef: RefObject<HTMLVideoElement | null>
+) {
+  const active = new Set(getActiveHeroVideos(desktopRef, mobileRef));
+  for (const video of [desktopRef.current, mobileRef.current]) {
+    if (video && !active.has(video)) {
+      video.pause();
+      video.muted = true;
+    }
+  }
+}
+
 function readPreferHeroSoundFromStorage(): boolean {
   if (typeof window === 'undefined') return true;
   try {
@@ -57,12 +71,26 @@ export default function Home() {
         return;
       }
 
-      if (!video.paused && video.muted && !preferSound) {
-        heroVideoLog('play:skip-muted-by-user-pref', { trigger, ...snapshotVideo(video, label) });
+      if (!preferSound) {
+        video.muted = true;
+        if (!video.paused) {
+          heroVideoLog('play:skip-muted-by-user-pref', { trigger, ...snapshotVideo(video, label) });
+          return;
+        }
+        try {
+          await video.play();
+          heroVideoLog('play:ok-muted-by-user-pref', { trigger, ...snapshotVideo(video, label) });
+        } catch (err: unknown) {
+          heroVideoLog('play:fail', {
+            trigger,
+            err: err instanceof Error ? err.message : String(err),
+            ...snapshotVideo(video, label),
+          });
+        }
         return;
       }
 
-      if (preferSound) {
+      if (!video.paused && video.muted) {
         video.muted = false;
         try {
           await video.play();
@@ -75,7 +103,23 @@ export default function Home() {
             note: 'Politique autoplay — repli en muet (ne pas enregistrer off automatiquement)',
             ...snapshotVideo(video, label),
           });
+          video.muted = true;
+          return;
         }
+      }
+
+      video.muted = false;
+      try {
+        await video.play();
+        heroVideoLog('play:ok-with-sound', { trigger, ...snapshotVideo(video, label) });
+        return;
+      } catch (err: unknown) {
+        heroVideoLog('play:sound-blocked-by-browser', {
+          trigger,
+          err: err instanceof Error ? err.message : String(err),
+          note: 'Politique autoplay — repli en muet (ne pas enregistrer off automatiquement)',
+          ...snapshotVideo(video, label),
+        });
       }
 
       video.muted = true;
@@ -95,6 +139,7 @@ export default function Home() {
 
   const playHeroVideos = useCallback(
     async (trigger: string) => {
+      pauseInactiveHeroVideos(videoDesktopRef, videoMobileRef);
       const videos = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
       heroVideoLog('play:start', {
         trigger,
@@ -138,6 +183,12 @@ export default function Home() {
   useEffect(() => {
     const stored = localStorage.getItem('hero-sound');
     preferSoundRef.current = readPreferHeroSoundFromStorage();
+    pauseInactiveHeroVideos(videoDesktopRef, videoMobileRef);
+    if (!preferSoundRef.current) {
+      for (const video of getActiveHeroVideos(videoDesktopRef, videoMobileRef)) {
+        video.muted = true;
+      }
+    }
     heroVideoLog('pref:localStorage', {
       stored,
       preferSound: preferSoundRef.current,
@@ -151,23 +202,41 @@ export default function Home() {
 
   useEffect(() => {
     const resume = (source: string) => {
-      heroBootedRef.current = false;
+      pauseInactiveHeroVideos(videoDesktopRef, videoMobileRef);
+      if (!preferSoundRef.current) {
+        for (const video of getActiveHeroVideos(videoDesktopRef, videoMobileRef)) {
+          video.muted = true;
+        }
+      }
       const videos = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
-      if (videos.length === 0 || videos.some((v) => v.paused)) void playHeroVideos(`resume-${source}`);
+      if (videos.length === 0 || videos.some((v) => v.paused)) {
+        void playHeroVideos(`resume-${source}`);
+      } else {
+        syncSoundUi();
+      }
     };
 
-    document.addEventListener('visibilitychange', () => {
+    const onVisibilityChange = () => {
       if (document.visibilityState === 'visible') resume('visibility');
-    });
-    window.addEventListener('pageshow', () => resume('pageshow'));
-  }, [playHeroVideos]);
+    };
+    const onPageShow = () => resume('pageshow');
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('pageshow', onPageShow);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('pageshow', onPageShow);
+    };
+  }, [playHeroVideos, syncSoundUi]);
 
   async function toggleSound() {
     const nextSound = !soundOn;
+    preferSoundRef.current = nextSound;
     try {
       localStorage.setItem('hero-sound', nextSound ? 'on' : 'off');
     } catch (_) {}
 
+    pauseInactiveHeroVideos(videoDesktopRef, videoMobileRef);
     const videos = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
     for (const video of videos) {
       video.muted = !nextSound;
@@ -176,6 +245,7 @@ export default function Home() {
           await video.play();
         } catch {
           video.muted = true;
+          preferSoundRef.current = false;
           setSoundOn(false);
           try {
             localStorage.setItem('hero-sound', 'off');
@@ -189,8 +259,12 @@ export default function Home() {
 
   function onHeroCanPlay(video: HTMLVideoElement) {
     if (!isHeroVideoVisible(video)) return;
-    if (!heroBootedRef.current) bootHeroVideo();
-    else void playHeroVideos('canplay');
+    pauseInactiveHeroVideos(videoDesktopRef, videoMobileRef);
+    if (!heroBootedRef.current) {
+      bootHeroVideo();
+      return;
+    }
+    if (video.paused) void playHeroVideos('canplay');
   }
 
   return (
@@ -212,6 +286,7 @@ export default function Home() {
           ref={videoDesktopRef}
           className="hero-video-desktop"
           autoPlay
+          muted
           loop
           playsInline
           preload="auto"
@@ -233,6 +308,7 @@ export default function Home() {
           ref={videoMobileRef}
           className="hero-video-mobile"
           autoPlay
+          muted
           loop
           playsInline
           preload="auto"
