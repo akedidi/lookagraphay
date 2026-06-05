@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { useState, useEffect, useRef, useCallback, type RefObject } from 'react';
 import { artistData, ateliersData, expositionsData, evenementsData, galerieData } from '@/lib/data';
 import { fadeUp, fadeUpStagger as stagger, motionViewport } from '@/lib/motion-variants';
-import { heroVideoLog, isHeroVideoDebugEnabled, snapshotVideo } from '@/lib/hero-video-debug';
+import { heroVideoLog, snapshotVideo } from '@/lib/hero-video-debug';
 
 function isHeroVideoVisible(video: HTMLVideoElement) {
   const style = window.getComputedStyle(video);
@@ -58,110 +58,33 @@ export default function Home() {
   const [galeriePreview, setGaleriePreview] = useState(galerieData.slice(0, 6));
   const videoDesktopRef = useRef<HTMLVideoElement>(null);
   const videoMobileRef = useRef<HTMLVideoElement>(null);
-  /** Évite lecture localStorage au SSR + reflète la préférence après hydratation. */
   const preferSoundRef = useRef(true);
-  const heroBootedRef = useRef(false);
 
   const syncSoundUi = useCallback(() => {
     const active = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
     setSoundOn(active.length > 0 && active.some((v) => !v.muted && !v.paused));
   }, []);
 
-  const playOneHeroVideo = useCallback(
-    async (video: HTMLVideoElement, trigger: string) => {
-      const label = video === videoDesktopRef.current ? 'desktop' : 'mobile';
+  /** Lecture muette uniquement — jamais de démute automatique (Chrome met en pause sinon). */
+  const playOneHeroVideo = useCallback(async (video: HTMLVideoElement, trigger: string) => {
+    const label = video === videoDesktopRef.current ? 'desktop' : 'mobile';
+    if (!video.paused && video.readyState >= 3) {
+      heroVideoLog('play:skip-playing', { trigger, ...snapshotVideo(video, label) });
+      return;
+    }
 
-      if (isMobileHeroViewport()) {
-        video.muted = true;
-        if (!video.paused) {
-          heroVideoLog('play:skip-mobile-muted', { trigger, ...snapshotVideo(video, label) });
-          return;
-        }
-        try {
-          await video.play();
-          heroVideoLog('play:ok-mobile-muted', { trigger, ...snapshotVideo(video, label) });
-        } catch (err: unknown) {
-          heroVideoLog('play:fail', {
-            trigger,
-            err: err instanceof Error ? err.message : String(err),
-            ...snapshotVideo(video, label),
-          });
-        }
-        return;
-      }
-
-      const preferSound = preferSoundRef.current;
-
-      if (!video.paused && !video.muted) {
-        heroVideoLog('play:skip-already-with-sound', { trigger, ...snapshotVideo(video, label) });
-        return;
-      }
-
-      if (!preferSound) {
-        video.muted = true;
-        if (!video.paused) {
-          heroVideoLog('play:skip-muted-by-user-pref', { trigger, ...snapshotVideo(video, label) });
-          return;
-        }
-        try {
-          await video.play();
-          heroVideoLog('play:ok-muted-by-user-pref', { trigger, ...snapshotVideo(video, label) });
-        } catch (err: unknown) {
-          heroVideoLog('play:fail', {
-            trigger,
-            err: err instanceof Error ? err.message : String(err),
-            ...snapshotVideo(video, label),
-          });
-        }
-        return;
-      }
-
-      if (!video.paused && video.muted) {
-        video.muted = false;
-        try {
-          await video.play();
-          heroVideoLog('play:ok-with-sound', { trigger, ...snapshotVideo(video, label) });
-          return;
-        } catch (err: unknown) {
-          heroVideoLog('play:sound-blocked-by-browser', {
-            trigger,
-            err: err instanceof Error ? err.message : String(err),
-            note: 'Politique autoplay — repli en muet (ne pas enregistrer off automatiquement)',
-            ...snapshotVideo(video, label),
-          });
-          video.muted = true;
-          return;
-        }
-      }
-
-      video.muted = false;
-      try {
-        await video.play();
-        heroVideoLog('play:ok-with-sound', { trigger, ...snapshotVideo(video, label) });
-        return;
-      } catch (err: unknown) {
-        heroVideoLog('play:sound-blocked-by-browser', {
-          trigger,
-          err: err instanceof Error ? err.message : String(err),
-          note: 'Politique autoplay — repli en muet (ne pas enregistrer off automatiquement)',
-          ...snapshotVideo(video, label),
-        });
-      }
-
-      video.muted = true;
-      try {
-        await video.play();
-        heroVideoLog('play:ok-muted-fallback', { trigger, ...snapshotVideo(video, label) });
-      } catch (err: unknown) {
-        heroVideoLog('play:fail', {
-          trigger,
-          err: err instanceof Error ? err.message : String(err),
-          ...snapshotVideo(video, label),
-        });
-      }
-    },
-    []
-  );
+    video.muted = true;
+    try {
+      await video.play();
+      heroVideoLog('play:ok-muted', { trigger, ...snapshotVideo(video, label) });
+    } catch (err: unknown) {
+      heroVideoLog('play:fail', {
+        trigger,
+        err: err instanceof Error ? err.message : String(err),
+        ...snapshotVideo(video, label),
+      });
+    }
+  }, []);
 
   const playHeroVideos = useCallback(
     async (trigger: string) => {
@@ -170,8 +93,6 @@ export default function Home() {
       heroVideoLog('play:start', {
         trigger,
         preferSound: preferSoundRef.current,
-        heroSoundStorage:
-          typeof window !== 'undefined' ? localStorage.getItem('hero-sound') : null,
         activeCount: videos.length,
       });
       if (videos.length === 0) {
@@ -184,12 +105,13 @@ export default function Home() {
     [playOneHeroVideo, syncSoundUi]
   );
 
-  const bootHeroVideo = useCallback(() => {
-    if (heroBootedRef.current) return;
-    heroBootedRef.current = true;
-    void playHeroVideos('boot');
-    window.setTimeout(() => void playHeroVideos('boot-retry'), 500);
-  }, [playHeroVideos]);
+  const kickHeroVideo = useCallback(
+    (trigger: string) => {
+      pauseInactiveHeroVideos(videoDesktopRef, videoMobileRef);
+      void playHeroVideos(trigger);
+    },
+    [playHeroVideos]
+  );
 
   useEffect(() => {
     setTagline("Une calligraphie métissée, portant la liberté et l\u2019humanité dans ses traits, ouverte au monde, inclusive et respectueuse de la planète.");
@@ -207,44 +129,36 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const stored = localStorage.getItem('hero-sound');
     preferSoundRef.current = readPreferHeroSoundFromStorage();
-    pauseInactiveHeroVideos(videoDesktopRef, videoMobileRef);
-    if (!preferSoundRef.current) {
-      for (const video of getActiveHeroVideos(videoDesktopRef, videoMobileRef)) {
-        video.muted = true;
-      }
-    }
     heroVideoLog('pref:localStorage', {
-      stored,
+      stored: localStorage.getItem('hero-sound'),
       preferSound: preferSoundRef.current,
-      hint:
-        stored === 'off'
-          ? 'Son désactivé par un clic précédent — bouton 🔊 ou localStorage.removeItem("hero-sound")'
-          : undefined,
     });
-    bootHeroVideo();
-  }, [bootHeroVideo]);
+
+    kickHeroVideo('mount');
+    const timers = [200, 600, 1500].map((ms) =>
+      window.setTimeout(() => kickHeroVideo(`retry-${ms}ms`), ms)
+    );
+
+    const mq = window.matchMedia('(max-width: 767px)');
+    const onResize = () => kickHeroVideo('viewport-change');
+    mq.addEventListener('change', onResize);
+
+    return () => {
+      timers.forEach((t) => window.clearTimeout(t));
+      mq.removeEventListener('change', onResize);
+    };
+  }, [kickHeroVideo]);
 
   useEffect(() => {
     const resume = (source: string) => {
-      pauseInactiveHeroVideos(videoDesktopRef, videoMobileRef);
-      if (!preferSoundRef.current) {
-        for (const video of getActiveHeroVideos(videoDesktopRef, videoMobileRef)) {
-          video.muted = true;
-        }
-      }
-      const videos = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
-      if (videos.length === 0 || videos.some((v) => v.paused)) {
-        void playHeroVideos(`resume-${source}`);
-      } else {
-        syncSoundUi();
-      }
+      kickHeroVideo(`resume-${source}`);
     };
 
     const onVisibilityChange = () => {
       if (document.visibilityState === 'visible') resume('visibility');
     };
+
     const onPageShow = () => resume('pageshow');
 
     document.addEventListener('visibilitychange', onVisibilityChange);
@@ -253,9 +167,11 @@ export default function Home() {
       document.removeEventListener('visibilitychange', onVisibilityChange);
       window.removeEventListener('pageshow', onPageShow);
     };
-  }, [playHeroVideos, syncSoundUi]);
+  }, [kickHeroVideo]);
 
   async function toggleSound() {
+    if (isMobileHeroViewport()) return;
+
     const nextSound = !soundOn;
     preferSoundRef.current = nextSound;
     try {
@@ -266,31 +182,26 @@ export default function Home() {
     const videos = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
     for (const video of videos) {
       video.muted = !nextSound;
-      if (video.paused) {
+      try {
+        await video.play();
+      } catch {
+        video.muted = true;
+        preferSoundRef.current = false;
+        setSoundOn(false);
         try {
-          await video.play();
-        } catch {
-          video.muted = true;
-          preferSoundRef.current = false;
-          setSoundOn(false);
-          try {
-            localStorage.setItem('hero-sound', 'off');
-          } catch (_) {}
-          return;
-        }
+          localStorage.setItem('hero-sound', 'off');
+        } catch (_) {}
+        return;
       }
     }
     setSoundOn(nextSound);
   }
 
-  function onHeroCanPlay(video: HTMLVideoElement) {
+  function onHeroMediaReady(video: HTMLVideoElement, eventName: string) {
+    const label = video === videoDesktopRef.current ? 'desktop' : 'mobile';
+    heroVideoLog(`event:${eventName}`, snapshotVideo(video, label));
     if (!isHeroVideoVisible(video)) return;
-    pauseInactiveHeroVideos(videoDesktopRef, videoMobileRef);
-    if (!heroBootedRef.current) {
-      bootHeroVideo();
-      return;
-    }
-    if (video.paused) void playHeroVideos('canplay');
+    if (video.paused || video.readyState < 3) kickHeroVideo(eventName);
   }
 
   return (
@@ -318,7 +229,8 @@ export default function Home() {
           preload="auto"
           poster="/images/hero-poster.jpg"
           style={{ zIndex: 0 }}
-          onCanPlay={(e) => onHeroCanPlay(e.currentTarget)}
+          onLoadedData={(e) => onHeroMediaReady(e.currentTarget, 'loadeddata')}
+          onCanPlay={(e) => onHeroMediaReady(e.currentTarget, 'canplay')}
           onPause={(e) => heroVideoLog('event:pause', snapshotVideo(e.currentTarget, 'desktop'))}
           onError={(e) =>
             heroVideoLog('event:error', {
@@ -340,7 +252,8 @@ export default function Home() {
           preload="auto"
           poster="/images/hero-poster.jpg"
           style={{ zIndex: 0 }}
-          onCanPlay={(e) => onHeroCanPlay(e.currentTarget)}
+          onLoadedData={(e) => onHeroMediaReady(e.currentTarget, 'loadeddata')}
+          onCanPlay={(e) => onHeroMediaReady(e.currentTarget, 'canplay')}
           onPause={(e) => heroVideoLog('event:pause', snapshotVideo(e.currentTarget, 'mobile'))}
           onError={(e) =>
             heroVideoLog('event:error', {
