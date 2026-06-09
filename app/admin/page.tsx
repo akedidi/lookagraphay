@@ -224,6 +224,9 @@ const SCHEDULE_FILTER_OPTIONS: { value: ScheduleFilter; label: string }[] = [
   { value: 'passé', label: 'Passées' },
 ];
 
+const STORE_CATEGORIES = ['Tableau', 'Bague', "Boucles d'oreilles", 'Pendentif'] as const;
+type StoreCategoryFilter = 'all' | string;
+
 function ListFilter({
   label,
   value,
@@ -279,6 +282,7 @@ export default function AdminPage() {
   const [savingOrder, setSavingOrder] = useState(false);
   const [orderSaveMsg, setOrderSaveMsg] = useState<{ num: string; ok: boolean } | null>(null);
   const [orderStatusFilter, setOrderStatusFilter] = useState<OrderStatusFilter>('all');
+  const [storeCategoryFilter, setStoreCategoryFilter] = useState<StoreCategoryFilter>('all');
   const [expoScheduleFilter, setExpoScheduleFilter] = useState<ScheduleFilter>('all');
   const [evtScheduleFilter, setEvtScheduleFilter] = useState<ScheduleFilter>('all');
 
@@ -562,6 +566,16 @@ export default function AdminPage() {
 
   const filteredOrders =
     orderStatusFilter === 'all' ? orders : orders.filter((o) => o.status === orderStatusFilter);
+  const storeCategoryList = Array.from(
+    new Set([
+      ...STORE_CATEGORIES,
+      ...storeItems.map((i) => String(i.categorie ?? '')).filter(Boolean),
+    ])
+  );
+  const filteredStoreItems =
+    storeCategoryFilter === 'all'
+      ? storeItems
+      : storeItems.filter((i) => i.categorie === storeCategoryFilter);
   const filteredExpositions =
     expoScheduleFilter === 'all'
       ? expositions
@@ -576,6 +590,14 @@ export default function AdminPage() {
     ...ORDER_STATUSES.map((s) => ({
       value: s,
       label: `${ORDER_STATUS_LABELS[s]} (${orders.filter((o) => o.status === s).length})`,
+    })),
+  ];
+
+  const storeCategoryFilterOptions: { value: StoreCategoryFilter; label: string }[] = [
+    { value: 'all', label: `Toutes (${storeItems.length})` },
+    ...storeCategoryList.map((c) => ({
+      value: c,
+      label: `${c} (${storeItems.filter((i) => i.categorie === c).length})`,
     })),
   ];
 
@@ -656,13 +678,22 @@ export default function AdminPage() {
               <button onClick={() => { setEditStore({ ...emptyStore }); setIsNew(true); }} style={btnGold}>+<span className="admin-btn-text"> Nouvel article</span></button>
             </div>
 
+            <div style={{ marginBottom: '1.25rem' }}>
+              <ListFilter
+                label="Catégorie"
+                value={storeCategoryFilter}
+                onChange={(v) => setStoreCategoryFilter(v)}
+                options={storeCategoryFilterOptions}
+              />
+            </div>
+
             {editStore && (
               <div className="admin-form-pad" style={{ background: dark, border: `1px solid rgba(201,168,76,0.2)`, marginBottom: '2rem' }}>
                 <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.3rem', color: light, marginBottom: '1.5rem' }}>{isNew ? 'Nouvel article' : 'Modifier l\'article'}</h3>
                 <div className="admin-form-grid">
                   <Field label="Titre" value={editStore.titre} onChange={(v: string) => setEditStore({ ...editStore, titre: v })} />
                   <Field label="Sous-titre" value={editStore.sous_titre} onChange={(v: string) => setEditStore({ ...editStore, sous_titre: v })} />
-                  <Select label="Catégorie" value={editStore.categorie} onChange={(v: string) => setEditStore({ ...editStore, categorie: v })} options={['Tableau', 'Bague', "Boucles d'oreilles", 'Pendentif']} />
+                  <Select label="Catégorie" value={editStore.categorie} onChange={(v: string) => setEditStore({ ...editStore, categorie: v })} options={[...STORE_CATEGORIES]} />
                   <Field label="Année" value={editStore.annee} onChange={(v: string) => setEditStore({ ...editStore, annee: v })} />
                   <Field label="Technique" value={editStore.technique} onChange={(v: string) => setEditStore({ ...editStore, technique: v })} />
                   <Field label="Dimensions" value={editStore.dimensions} onChange={(v: string) => setEditStore({ ...editStore, dimensions: v })} />
@@ -725,7 +756,12 @@ export default function AdminPage() {
             )}
 
             <div style={{ display: 'grid', gap: '1px', background: 'rgba(201,168,76,0.1)' }}>
-              {storeItems.map(item => (
+              {storeItems.length > 0 && filteredStoreItems.length === 0 && (
+                <div style={{ background: '#2A2520', padding: '2rem', textAlign: 'center', fontFamily: 'Montserrat, sans-serif', fontSize: '0.82rem', color: 'rgba(245,240,232,0.4)' }}>
+                  Aucun article pour cette catégorie.
+                </div>
+              )}
+              {filteredStoreItems.map(item => (
                 <div key={item.id} className="admin-item-row" style={{ background: '#2A2520', padding: '1rem 1.25rem' }}>
                   {item.images?.[0] && (
                     <img src={item.images[0]} alt="" style={{ width: 56, height: 56, objectFit: 'cover', flexShrink: 0 }} />
