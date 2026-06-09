@@ -199,6 +199,66 @@ const emptyStore = {
 const emptyExpo = { titre: '', lieu: '', dates: '', statut: 'passé', description: '', image: '', images: [] };
 const emptyEvt = { titre: '', date: '', heure: '', lieu: '', type: 'Vernissage', statut: 'à venir', description: '', images: [] };
 
+const ORDER_STATUSES = ['en_attente', 'paye', 'expedie', 'livre', 'annule'] as const;
+const ORDER_STATUS_LABELS: Record<string, string> = {
+  en_attente: 'En attente',
+  paye: 'Payé',
+  expedie: 'Expédié',
+  livre: 'Livré',
+  annule: 'Annulé',
+};
+const ORDER_STATUS_COLORS: Record<string, string> = {
+  en_attente: '#E4C97A',
+  paye: '#6fcf97',
+  expedie: '#56CCF2',
+  livre: '#6fcf97',
+  annule: '#e05555',
+};
+
+type OrderStatusFilter = 'all' | (typeof ORDER_STATUSES)[number];
+type ScheduleFilter = 'all' | 'à venir' | 'passé';
+
+const SCHEDULE_FILTER_OPTIONS: { value: ScheduleFilter; label: string }[] = [
+  { value: 'all', label: 'Toutes' },
+  { value: 'à venir', label: 'À venir' },
+  { value: 'passé', label: 'Passées' },
+];
+
+function ListFilter({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+      <span style={{ ...labelStyle, marginBottom: 0, fontSize: '0.62rem' }}>{label}</span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        style={{
+          ...inputStyle,
+          width: 'auto',
+          minWidth: 168,
+          padding: '0.45rem 0.75rem',
+          fontSize: '0.78rem',
+        }}
+      >
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [authChecking, setAuthChecking] = useState(true);
@@ -218,6 +278,9 @@ export default function AdminPage() {
   const [editOrderDraft, setEditOrderDraft] = useState<any>(null);
   const [savingOrder, setSavingOrder] = useState(false);
   const [orderSaveMsg, setOrderSaveMsg] = useState<{ num: string; ok: boolean } | null>(null);
+  const [orderStatusFilter, setOrderStatusFilter] = useState<OrderStatusFilter>('all');
+  const [expoScheduleFilter, setExpoScheduleFilter] = useState<ScheduleFilter>('all');
+  const [evtScheduleFilter, setEvtScheduleFilter] = useState<ScheduleFilter>('all');
 
   const [editStore, setEditStore] = useState<any>(null);
   const [editExpo, setEditExpo] = useState<any>(null);
@@ -497,6 +560,25 @@ export default function AdminPage() {
     <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 'clamp(1.4rem, 2.5vw, 2rem)', color: light, letterSpacing: '0.04em', marginBottom: '0.25rem' }}>{t}</h2>
   );
 
+  const filteredOrders =
+    orderStatusFilter === 'all' ? orders : orders.filter((o) => o.status === orderStatusFilter);
+  const filteredExpositions =
+    expoScheduleFilter === 'all'
+      ? expositions
+      : expositions.filter((e) => e.statut === expoScheduleFilter);
+  const filteredEvenements =
+    evtScheduleFilter === 'all'
+      ? evenements
+      : evenements.filter((e) => e.statut === evtScheduleFilter);
+
+  const orderFilterOptions: { value: OrderStatusFilter; label: string }[] = [
+    { value: 'all', label: 'Toutes les commandes' },
+    ...ORDER_STATUSES.map((s) => ({
+      value: s,
+      label: `${ORDER_STATUS_LABELS[s]} (${orders.filter((o) => o.status === s).length})`,
+    })),
+  ];
+
   return (
     <div style={{ minHeight: '100vh', background: '#2A2520', color: light }}>
       {/* Header */}
@@ -690,6 +772,21 @@ export default function AdminPage() {
               <button onClick={() => { setEditExpo({ ...emptyExpo }); setIsNew(true); }} style={btnGold}>+<span className="admin-btn-text"> Nouvelle exposition</span></button>
             </div>
 
+            <div style={{ marginBottom: '1.25rem' }}>
+              <ListFilter
+                label="Filtrer"
+                value={expoScheduleFilter}
+                onChange={(v) => setExpoScheduleFilter(v as ScheduleFilter)}
+                options={SCHEDULE_FILTER_OPTIONS.map((o) => ({
+                  ...o,
+                  label:
+                    o.value === 'all'
+                      ? `Toutes (${expositions.length})`
+                      : `${o.label} (${expositions.filter((e) => e.statut === o.value).length})`,
+                }))}
+              />
+            </div>
+
             {editExpo && (
               <div className="admin-form-pad" style={{ background: dark, border: `1px solid rgba(201,168,76,0.2)`, marginBottom: '2rem' }}>
                 <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.3rem', color: light, marginBottom: '1.5rem' }}>{isNew ? 'Nouvelle exposition' : 'Modifier l\'exposition'}</h3>
@@ -710,7 +807,7 @@ export default function AdminPage() {
             )}
 
             <div style={{ display: 'grid', gap: '1px', background: 'rgba(201,168,76,0.1)' }}>
-              {expositions.map(expo => (
+              {filteredExpositions.map(expo => (
                 <div key={expo.id} className="admin-item-row" style={{ background: '#2A2520', padding: '1rem 1.25rem' }}>
                   {expo.image && (
                     <img src={expo.image} alt="" style={{ width: 56, height: 56, objectFit: 'cover', flexShrink: 0 }} />
@@ -730,6 +827,11 @@ export default function AdminPage() {
                   Aucune exposition. Cliquez sur «&nbsp;Init DB&nbsp;» pour migrer les données.
                 </div>
               )}
+              {expositions.length > 0 && filteredExpositions.length === 0 && (
+                <div style={{ background: '#2A2520', padding: '2rem', textAlign: 'center', fontFamily: 'Montserrat, sans-serif', fontSize: '0.82rem', color: 'rgba(245,240,232,0.4)' }}>
+                  Aucune exposition pour ce filtre.
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -740,6 +842,21 @@ export default function AdminPage() {
             <div className="admin-section-head">
               {sectionTitle('Événements')}
               <button onClick={() => { setEditEvt({ ...emptyEvt }); setIsNew(true); }} style={btnGold}>+<span className="admin-btn-text"> Nouvel événement</span></button>
+            </div>
+
+            <div style={{ marginBottom: '1.25rem' }}>
+              <ListFilter
+                label="Filtrer"
+                value={evtScheduleFilter}
+                onChange={(v) => setEvtScheduleFilter(v as ScheduleFilter)}
+                options={SCHEDULE_FILTER_OPTIONS.map((o) => ({
+                  ...o,
+                  label:
+                    o.value === 'all'
+                      ? `Tous (${evenements.length})`
+                      : `${o.label} (${evenements.filter((e) => e.statut === o.value).length})`,
+                }))}
+              />
             </div>
 
             {editEvt && (
@@ -763,7 +880,7 @@ export default function AdminPage() {
             )}
 
             <div style={{ display: 'grid', gap: '1px', background: 'rgba(201,168,76,0.1)' }}>
-              {evenements.map(evt => (
+              {filteredEvenements.map(evt => (
                 <div key={evt.id} className="admin-item-row" style={{ background: '#2A2520', padding: '1rem 1.25rem' }}>
                   <div className="admin-item-info">
                     <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', color: light }}>{evt.titre}</div>
@@ -780,6 +897,11 @@ export default function AdminPage() {
                   Aucun événement. Cliquez sur «&nbsp;Init DB&nbsp;» pour migrer les données.
                 </div>
               )}
+              {evenements.length > 0 && filteredEvenements.length === 0 && (
+                <div style={{ background: '#2A2520', padding: '2rem', textAlign: 'center', fontFamily: 'Montserrat, sans-serif', fontSize: '0.82rem', color: 'rgba(245,240,232,0.4)' }}>
+                  Aucun événement pour ce filtre.
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -790,6 +912,15 @@ export default function AdminPage() {
             <div className="admin-section-head">
               {sectionTitle('Commandes')}
               <button onClick={fetchOrders} style={btnOutline}>↻ Actualiser</button>
+            </div>
+
+            <div style={{ marginBottom: '1.25rem' }}>
+              <ListFilter
+                label="Statut"
+                value={orderStatusFilter}
+                onChange={(v) => setOrderStatusFilter(v as OrderStatusFilter)}
+                options={orderFilterOptions}
+              />
             </div>
 
             {ordersLoading && (
@@ -805,14 +936,13 @@ export default function AdminPage() {
                     Aucune commande pour le moment.
                   </div>
                 )}
-                {orders.map(order => {
-                  const statusColors: Record<string, string> = {
-                    en_attente: '#E4C97A', paye: '#6fcf97', expedie: '#56CCF2', livre: '#6fcf97', annule: '#e05555',
-                  };
-                  const statusLabels: Record<string, string> = {
-                    en_attente: 'En attente', paye: 'Payé', expedie: 'Expédié', livre: 'Livré', annule: 'Annulé',
-                  };
-                  const color = statusColors[order.status] ?? gold;
+                {orders.length > 0 && filteredOrders.length === 0 && (
+                  <div style={{ background: '#2A2520', padding: '2rem', textAlign: 'center', fontFamily: 'Montserrat, sans-serif', fontSize: '0.82rem', color: 'rgba(245,240,232,0.4)' }}>
+                    Aucune commande pour ce statut.
+                  </div>
+                )}
+                {filteredOrders.map(order => {
+                  const color = ORDER_STATUS_COLORS[order.status] ?? gold;
                   const isEditing = editingOrder === order.order_number;
                   const d = isEditing ? editOrderDraft : null;
 
@@ -860,7 +990,7 @@ export default function AdminPage() {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                             <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: color }} />
                             <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', color, textTransform: 'uppercase', letterSpacing: '0.12em' }}>
-                              {statusLabels[order.status] ?? order.status}
+                              {ORDER_STATUS_LABELS[order.status] ?? order.status}
                             </span>
                           </div>
                           <button
@@ -880,20 +1010,20 @@ export default function AdminPage() {
                           <div style={{ marginBottom: '1.5rem' }}>
                             <label style={labelStyle}>Statut de la commande</label>
                             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.4rem' }}>
-                              {(['en_attente', 'paye', 'expedie', 'livre', 'annule'] as const).map(s => (
+                              {ORDER_STATUSES.map(s => (
                                 <button
                                   key={s}
                                   onClick={() => setEditOrderDraft({ ...d, status: s })}
                                   style={{
                                     fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', letterSpacing: '0.12em', textTransform: 'uppercase',
                                     padding: '0.45rem 0.85rem', border: 'none', cursor: 'pointer',
-                                    background: d.status === s ? (statusColors[s] ?? gold) : 'rgba(245,240,232,0.08)',
+                                    background: d.status === s ? (ORDER_STATUS_COLORS[s] ?? gold) : 'rgba(245,240,232,0.08)',
                                     color: d.status === s ? dark : 'rgba(245,240,232,0.5)',
                                     fontWeight: d.status === s ? 600 : 300,
                                     transition: 'all 0.2s',
                                   }}
                                 >
-                                  {statusLabels[s]}
+                                  {ORDER_STATUS_LABELS[s]}
                                 </button>
                               ))}
                             </div>
