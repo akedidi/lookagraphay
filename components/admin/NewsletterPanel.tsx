@@ -73,6 +73,18 @@ type Campaign = {
   created_at: string;
 };
 
+function formatSentAt(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 export default function NewsletterPanel({ onFlash }: { onFlash: (m: string) => void }) {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -285,6 +297,9 @@ export default function NewsletterPanel({ onFlash }: { onFlash: (m: string) => v
                     }}
                   >
                     <span style={{ minWidth: 0 }}>
+                      <span style={{ display: 'block', color: 'rgba(245,240,232,0.45)', fontSize: '0.68rem', marginBottom: '0.2rem' }}>
+                        {formatSentAt(c.created_at)}
+                      </span>
                       {c.subject} — {c.sent_count} envoyés
                       {c.failed_count > 0 ? ` (${c.failed_count} échecs)` : ''}
                     </span>
