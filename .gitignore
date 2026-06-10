@@ -141,3 +141,7 @@ dist
 .lookagraphy.lock
 .lookagraphy.lock.d
 .lookagraphy.pid.lock
+
+# Sauvegardes locales scripts/compress-site-videos.sh
+public/.video-backups/
+public/.video-compress-tmp/
