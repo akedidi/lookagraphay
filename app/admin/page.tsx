@@ -273,6 +273,24 @@ function filterOrdersByTextSearch<T extends OrderSearchable>(orders: T[], rawQue
     .map((row) => row.order);
 }
 
+function orderLocalDateKey(createdAt: string): string {
+  const d = new Date(createdAt);
+  if (Number.isNaN(d.getTime())) return '';
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function isOrderInPurchaseDateRange(createdAt: string, from: string, to: string): boolean {
+  if (!from && !to) return true;
+  const key = orderLocalDateKey(createdAt);
+  if (!key) return false;
+  if (from && key < from) return false;
+  if (to && key > to) return false;
+  return true;
+}
+
 function ListFilter({
   label,
   value,
@@ -359,6 +377,8 @@ export default function AdminPage() {
   const [orderSaveMsg, setOrderSaveMsg] = useState<{ num: string; ok: boolean } | null>(null);
   const [orderStatusFilter, setOrderStatusFilter] = useState<OrderStatusFilter>('all');
   const [orderSearchQuery, setOrderSearchQuery] = useState('');
+  const [orderDateFrom, setOrderDateFrom] = useState('');
+  const [orderDateTo, setOrderDateTo] = useState('');
   const [storeCategoryFilter, setStoreCategoryFilter] = useState<StoreCategoryFilter>('all');
   const [expoScheduleFilter, setExpoScheduleFilter] = useState<ScheduleFilter>('all');
   const [evtScheduleFilter, setEvtScheduleFilter] = useState<ScheduleFilter>('all');
@@ -671,7 +691,10 @@ export default function AdminPage() {
 
   const statusFilteredOrders =
     orderStatusFilter === 'all' ? orders : orders.filter((o) => o.status === orderStatusFilter);
-  const filteredOrders = filterOrdersByTextSearch(statusFilteredOrders, orderSearchQuery);
+  const dateFilteredOrders = statusFilteredOrders.filter((o) =>
+    isOrderInPurchaseDateRange(String(o.created_at ?? ''), orderDateFrom, orderDateTo)
+  );
+  const filteredOrders = filterOrdersByTextSearch(dateFilteredOrders, orderSearchQuery);
   const storeCategoryList = Array.from(
     new Set([
       ...STORE_CATEGORIES,
@@ -1068,6 +1091,33 @@ export default function AdminPage() {
                   }}
                 />
               </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                <span style={{ ...labelStyle, marginBottom: 0, fontSize: '0.62rem' }}>Date d&apos;achat</span>
+                <input
+                  type="date"
+                  value={orderDateFrom}
+                  onChange={(e) => setOrderDateFrom(e.target.value)}
+                  style={{
+                    ...inputStyle,
+                    width: 'auto',
+                    padding: '0.45rem 0.75rem',
+                    fontSize: '0.78rem',
+                  }}
+                />
+                <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: 'rgba(245,240,232,0.45)' }}>→</span>
+                <input
+                  type="date"
+                  value={orderDateTo}
+                  min={orderDateFrom || undefined}
+                  onChange={(e) => setOrderDateTo(e.target.value)}
+                  style={{
+                    ...inputStyle,
+                    width: 'auto',
+                    padding: '0.45rem 0.75rem',
+                    fontSize: '0.78rem',
+                  }}
+                />
+              </div>
             </div>
 
             {ordersLoading && (
@@ -1087,6 +1137,8 @@ export default function AdminPage() {
                   <div style={{ background: '#2A2520', padding: '2rem', textAlign: 'center', fontFamily: 'Montserrat, sans-serif', fontSize: '0.82rem', color: 'rgba(245,240,232,0.4)' }}>
                     {orderSearchQuery.trim()
                       ? 'Aucune commande ne correspond à cette recherche.'
+                      : orderDateFrom || orderDateTo
+                      ? 'Aucune commande pour cette période.'
                       : 'Aucune commande pour ce statut.'}
                   </div>
                 )}
