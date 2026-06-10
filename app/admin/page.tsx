@@ -308,6 +308,36 @@ function ListFilter({
   );
 }
 
+function AdminClickableLabel({
+  onClick,
+  children,
+  style,
+}: {
+  onClick: () => void;
+  children: React.ReactNode;
+  style?: React.CSSProperties;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        fontFamily: 'Cormorant Garamond, serif',
+        fontSize: '1rem',
+        color: light,
+        cursor: 'pointer',
+        background: 'none',
+        border: 'none',
+        padding: 0,
+        textAlign: 'left',
+        ...style,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
 export default function AdminPage() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [authChecking, setAuthChecking] = useState(true);
@@ -427,6 +457,34 @@ export default function AdminPage() {
       tracking_url: order.tracking_url ?? '',
     });
     setOrderSaveMsg(null);
+  }
+
+  function toggleEditOrder(order: any) {
+    if (editingOrder === order.order_number) setEditingOrder(null);
+    else openEditOrder(order);
+  }
+
+  function startEditStoreItem(item: any) {
+    setEditStore({
+      ...item,
+      in_galerie: item.in_galerie ?? false,
+      promo_enabled: item.promo_enabled ?? false,
+      promo_type: item.promo_type || 'percent',
+      promo_value: item.promo_value != null ? String(item.promo_value) : '',
+      promo_start: toDatetimeLocalValue(item.promo_start),
+      promo_end: toDatetimeLocalValue(item.promo_end),
+    });
+    setIsNew(false);
+  }
+
+  function startEditExpoItem(expo: any) {
+    setEditExpo({ ...expo, images: expo.images || [] });
+    setIsNew(false);
+  }
+
+  function startEditEvtItem(evt: any) {
+    setEditEvt({ ...evt, images: evt.images || [] });
+    setIsNew(false);
   }
 
   async function saveOrderEdit(orderNumber: string) {
@@ -815,7 +873,7 @@ export default function AdminPage() {
                     <img src={item.images[0]} alt="" style={{ width: 56, height: 56, objectFit: 'cover', flexShrink: 0 }} />
                   )}
                   <div className="admin-item-info">
-                    <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', color: light }}>{item.titre}</div>
+                    <AdminClickableLabel onClick={() => startEditStoreItem(item)}>{item.titre}</AdminClickableLabel>
                     <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: gold }}>
                       {item.categorie} · {item.promo_active ? `${item.prix_promo}€ (promo, était ${item.prix}€)` : `${item.prix}€`} · {item.disponible ? 'DISPO' : 'Indisponible'}
                       {item.promo_enabled && !item.promo_active ? ' · promo programmée/off' : ''}
@@ -823,18 +881,7 @@ export default function AdminPage() {
                     </div>
                   </div>
                   <div className="admin-item-actions">
-                    <button onClick={() => {
-                      setEditStore({
-                        ...item,
-                        in_galerie: item.in_galerie ?? false,
-                        promo_enabled: item.promo_enabled ?? false,
-                        promo_type: item.promo_type || 'percent',
-                        promo_value: item.promo_value != null ? String(item.promo_value) : '',
-                        promo_start: toDatetimeLocalValue(item.promo_start),
-                        promo_end: toDatetimeLocalValue(item.promo_end),
-                      });
-                      setIsNew(false);
-                    }} style={btnOutline}><span className="admin-btn-text">Modifier</span><span className="admin-icon">✎</span></button>
+                    <button onClick={() => startEditStoreItem(item)} style={btnOutline}><span className="admin-btn-text">Modifier</span><span className="admin-icon">✎</span></button>
                     <button onClick={() => deleteStore(item.id)} style={btnDanger}><span className="admin-btn-text">Supprimer</span><span className="admin-icon">✕</span></button>
                   </div>
                 </div>
@@ -897,11 +944,11 @@ export default function AdminPage() {
                     <img src={expo.image} alt="" style={{ width: 56, height: 56, objectFit: 'cover', flexShrink: 0 }} />
                   )}
                   <div className="admin-item-info">
-                    <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', color: light }}>{expo.titre}</div>
+                    <AdminClickableLabel onClick={() => startEditExpoItem(expo)}>{expo.titre}</AdminClickableLabel>
                     <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: gold }}>{expo.lieu} · {expo.statut}</div>
                   </div>
                   <div className="admin-item-actions">
-                    <button onClick={() => { setEditExpo({ ...expo, images: expo.images || [] }); setIsNew(false); }} style={btnOutline}><span className="admin-btn-text">Modifier</span><span className="admin-icon">✎</span></button>
+                    <button onClick={() => startEditExpoItem(expo)} style={btnOutline}><span className="admin-btn-text">Modifier</span><span className="admin-icon">✎</span></button>
                     <button onClick={() => deleteExpo(expo.id)} style={btnDanger}><span className="admin-btn-text">Supprimer</span><span className="admin-icon">✕</span></button>
                   </div>
                 </div>
@@ -967,11 +1014,11 @@ export default function AdminPage() {
               {filteredEvenements.map(evt => (
                 <div key={evt.id} className="admin-item-row" style={{ background: '#2A2520', padding: '1rem 1.25rem' }}>
                   <div className="admin-item-info">
-                    <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', color: light }}>{evt.titre}</div>
+                    <AdminClickableLabel onClick={() => startEditEvtItem(evt)}>{evt.titre}</AdminClickableLabel>
                     <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: gold }}>{evt.type} · {evt.date} · {evt.statut}</div>
                   </div>
                   <div className="admin-item-actions">
-                    <button onClick={() => { setEditEvt({ ...evt, images: evt.images || [] }); setIsNew(false); }} style={btnOutline}><span className="admin-btn-text">Modifier</span><span className="admin-icon">✎</span></button>
+                    <button onClick={() => startEditEvtItem(evt)} style={btnOutline}><span className="admin-btn-text">Modifier</span><span className="admin-icon">✎</span></button>
                     <button onClick={() => deleteEvt(evt.id)} style={btnDanger}><span className="admin-btn-text">Supprimer</span><span className="admin-icon">✕</span></button>
                   </div>
                 </div>
@@ -1054,9 +1101,12 @@ export default function AdminPage() {
                       {/* ── Ligne résumé ── */}
                       <div style={{ padding: '1.25rem', display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'flex-start' }}>
                         <div style={{ flex: 1, minWidth: 200 }}>
-                          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', color: light, marginBottom: '0.2rem' }}>
+                          <AdminClickableLabel
+                            onClick={() => toggleEditOrder(order)}
+                            style={{ marginBottom: '0.2rem' }}
+                          >
                             {order.order_number}
-                          </div>
+                          </AdminClickableLabel>
                           <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: 'rgba(245,240,232,0.55)' }}>
                             {order.nom} · {order.email}{order.telephone ? ` · ${order.telephone}` : ''}
                             {order.pays_residence ? ` · Rés. ${order.pays_residence}` : ''}
@@ -1077,9 +1127,17 @@ export default function AdminPage() {
                               : '🌍 International'}
                           </div>
                           {order.tracking_number && (
-                            <div style={{ marginTop: '0.3rem', fontFamily: 'Montserrat, sans-serif', fontSize: '0.67rem', color: 'rgba(201,168,76,0.75)' }}>
+                            <AdminClickableLabel
+                              onClick={() => toggleEditOrder(order)}
+                              style={{
+                                marginTop: '0.3rem',
+                                fontFamily: 'Montserrat, sans-serif',
+                                fontSize: '0.67rem',
+                                color: 'rgba(201,168,76,0.75)',
+                              }}
+                            >
                               📦 Suivi{order.carrier ? ` (${order.carrier})` : ''} : {order.tracking_number}
-                            </div>
+                            </AdminClickableLabel>
                           )}
                           {order.notes && (
                             <div style={{ marginTop: '0.3rem', fontFamily: 'Montserrat, sans-serif', fontSize: '0.67rem', fontWeight: 300, color: 'rgba(245,240,232,0.38)', fontStyle: 'italic' }}>
@@ -1096,7 +1154,7 @@ export default function AdminPage() {
                             </span>
                           </div>
                           <button
-                            onClick={() => isEditing ? setEditingOrder(null) : openEditOrder(order)}
+                            onClick={() => toggleEditOrder(order)}
                             style={{ ...btnOutline, fontSize: '0.65rem', padding: '0.35rem 0.9rem', marginTop: '0.25rem' }}
                           >
                             {isEditing ? '✕ Fermer' : '✎ Modifier'}
