@@ -227,6 +227,52 @@ const SCHEDULE_FILTER_OPTIONS: { value: ScheduleFilter; label: string }[] = [
 const STORE_CATEGORIES = ['Tableau', 'Bague', "Boucles d'oreilles", 'Pendentif'] as const;
 type StoreCategoryFilter = 'all' | string;
 
+type OrderSearchable = { nom?: string; email?: string };
+
+function orderSearchHaystacks(order: OrderSearchable): string[] {
+  const nom = String(order.nom ?? '').trim().toLowerCase();
+  const email = String(order.email ?? '').trim().toLowerCase();
+  const parts = nom.split(/\s+/).filter(Boolean);
+  const reversedNom = parts.length > 1 ? parts.slice().reverse().join(' ') : '';
+  return [email, nom, reversedNom, ...parts].filter(Boolean);
+}
+
+/** null = pas de correspondance ; 1 = startsWith ; 2 = contains */
+function orderSearchRank(order: OrderSearchable, rawQuery: string): number | null {
+  const query = rawQuery.trim().toLowerCase();
+  if (!query) return 0;
+
+  const haystacks = orderSearchHaystacks(order);
+  let best: number | null = null;
+
+  for (const h of haystacks) {
+    if (h.startsWith(query)) best = best === null ? 1 : Math.min(best, 1);
+    else if (h.includes(query)) best = best === null ? 2 : Math.min(best, 2);
+  }
+
+  const tokens = query.split(/\s+/).filter(Boolean);
+  if (tokens.length > 1 && best === null) {
+    const combined = haystacks.join(' ');
+    if (tokens.every((t) => combined.includes(t))) best = 2;
+  }
+
+  return best;
+}
+
+function filterOrdersByTextSearch<T extends OrderSearchable>(orders: T[], rawQuery: string): T[] {
+  const query = rawQuery.trim();
+  if (!query) return orders;
+
+  return orders
+    .map((order, index) => ({ order, index, rank: orderSearchRank(order, query) }))
+    .filter((row) => row.rank !== null)
+    .sort((a, b) => {
+      if (a.rank !== b.rank) return a.rank! - b.rank!;
+      return a.index - b.index;
+    })
+    .map((row) => row.order);
+}
+
 function ListFilter({
   label,
   value,
@@ -282,6 +328,7 @@ export default function AdminPage() {
   const [savingOrder, setSavingOrder] = useState(false);
   const [orderSaveMsg, setOrderSaveMsg] = useState<{ num: string; ok: boolean } | null>(null);
   const [orderStatusFilter, setOrderStatusFilter] = useState<OrderStatusFilter>('all');
+  const [orderSearchQuery, setOrderSearchQuery] = useState('');
   const [storeCategoryFilter, setStoreCategoryFilter] = useState<StoreCategoryFilter>('all');
   const [expoScheduleFilter, setExpoScheduleFilter] = useState<ScheduleFilter>('all');
   const [evtScheduleFilter, setEvtScheduleFilter] = useState<ScheduleFilter>('all');
@@ -564,8 +611,9 @@ export default function AdminPage() {
     <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300, fontSize: 'clamp(1.4rem, 2.5vw, 2rem)', color: light, letterSpacing: '0.04em', marginBottom: '0.25rem' }}>{t}</h2>
   );
 
-  const filteredOrders =
+  const statusFilteredOrders =
     orderStatusFilter === 'all' ? orders : orders.filter((o) => o.status === orderStatusFilter);
+  const filteredOrders = filterOrdersByTextSearch(statusFilteredOrders, orderSearchQuery);
   const storeCategoryList = Array.from(
     new Set([
       ...STORE_CATEGORIES,
@@ -950,13 +998,29 @@ export default function AdminPage() {
               <button onClick={fetchOrders} style={btnOutline}>↻ Actualiser</button>
             </div>
 
-            <div style={{ marginBottom: '1.25rem' }}>
+            <div style={{ marginBottom: '1.25rem', display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
               <ListFilter
                 label="Statut"
                 value={orderStatusFilter}
                 onChange={(v) => setOrderStatusFilter(v as OrderStatusFilter)}
                 options={orderFilterOptions}
               />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                <span style={{ ...labelStyle, marginBottom: 0, fontSize: '0.62rem' }}>Client</span>
+                <input
+                  type="search"
+                  value={orderSearchQuery}
+                  onChange={(e) => setOrderSearchQuery(e.target.value)}
+                  placeholder="Prénom, nom ou email…"
+                  style={{
+                    ...inputStyle,
+                    width: 'auto',
+                    minWidth: 220,
+                    padding: '0.45rem 0.75rem',
+                    fontSize: '0.78rem',
+                  }}
+                />
+              </div>
             </div>
 
             {ordersLoading && (
@@ -974,7 +1038,9 @@ export default function AdminPage() {
                 )}
                 {orders.length > 0 && filteredOrders.length === 0 && (
                   <div style={{ background: '#2A2520', padding: '2rem', textAlign: 'center', fontFamily: 'Montserrat, sans-serif', fontSize: '0.82rem', color: 'rgba(245,240,232,0.4)' }}>
-                    Aucune commande pour ce statut.
+                    {orderSearchQuery.trim()
+                      ? 'Aucune commande ne correspond à cette recherche.'
+                      : 'Aucune commande pour ce statut.'}
                   </div>
                 )}
                 {filteredOrders.map(order => {
