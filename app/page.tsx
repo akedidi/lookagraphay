@@ -6,6 +6,12 @@ import { useState, useEffect, useRef, useCallback, type RefObject } from 'react'
 import { artistData, ateliersData, expositionsData, evenementsData, galerieData } from '@/lib/data';
 import { fadeUp, fadeUpStagger as stagger, motionViewport } from '@/lib/motion-variants';
 import { heroVideoLog, snapshotVideo } from '@/lib/hero-video-debug';
+import {
+  HERO_SOUND_KEY,
+  isMobileHeroViewport,
+  readPreferHeroSoundFromStorage,
+  shouldAttemptHeroSoundAuto,
+} from '@/lib/hero-sound';
 
 function isHeroVideoVisible(video: HTMLVideoElement) {
   const style = window.getComputedStyle(video);
@@ -35,29 +41,14 @@ function pauseInactiveHeroVideos(
   }
 }
 
-function isMobileHeroViewport() {
-  if (typeof window === 'undefined') return false;
-  return window.matchMedia('(max-width: 767px)').matches;
-}
-
-function readPreferHeroSoundFromStorage(): boolean {
-  if (typeof window === 'undefined') return true;
-  if (isMobileHeroViewport()) return false;
-  try {
-    const v = localStorage.getItem('hero-sound');
-    if (v === null) return true;
-    return v !== 'off';
-  } catch {
-    return true;
-  }
-}
-
 export default function Home() {
   const [soundOn, setSoundOn] = useState(false);
   const [tagline, setTagline] = useState('');
   const [galeriePreview, setGaleriePreview] = useState(galerieData.slice(0, 6));
   const videoDesktopRef = useRef<HTMLVideoElement>(null);
   const videoMobileRef = useRef<HTMLVideoElement>(null);
+  const heroSectionRef = useRef<HTMLElement>(null);
+  const heroLeftOnceRef = useRef(false);
   const preferSoundRef = useRef(true);
 
   const syncSoundUi = useCallback(() => {
@@ -86,13 +77,44 @@ export default function Home() {
     }
   }, []);
 
+  const tryEnableHeroSound = useCallback(async (trigger: string) => {
+    if (!shouldAttemptHeroSoundAuto()) return;
+
+    preferSoundRef.current = true;
+    pauseInactiveHeroVideos(videoDesktopRef, videoMobileRef);
+    const videos = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
+
+    for (const video of videos) {
+      video.muted = false;
+      try {
+        await video.play();
+      } catch (err: unknown) {
+        video.muted = true;
+        heroVideoLog('sound:auto-fail', {
+          trigger,
+          err: err instanceof Error ? err.message : String(err),
+        });
+        return;
+      }
+    }
+
+    try {
+      localStorage.setItem(HERO_SOUND_KEY, 'on');
+    } catch {
+      /* ignore */
+    }
+    setSoundOn(true);
+    heroVideoLog('sound:auto-on', { trigger });
+  }, []);
+
   const playHeroVideos = useCallback(
-    async (trigger: string) => {
+    async (trigger: string, options?: { attemptSound?: boolean }) => {
       pauseInactiveHeroVideos(videoDesktopRef, videoMobileRef);
       const videos = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
       heroVideoLog('play:start', {
         trigger,
         preferSound: preferSoundRef.current,
+        attemptSound: Boolean(options?.attemptSound),
         activeCount: videos.length,
       });
       if (videos.length === 0) {
@@ -100,15 +122,18 @@ export default function Home() {
         return;
       }
       await Promise.all(videos.map((v) => playOneHeroVideo(v, trigger)));
+      if (options?.attemptSound) {
+        await tryEnableHeroSound(trigger);
+      }
       syncSoundUi();
     },
-    [playOneHeroVideo, syncSoundUi]
+    [playOneHeroVideo, syncSoundUi, tryEnableHeroSound]
   );
 
   const kickHeroVideo = useCallback(
-    (trigger: string) => {
+    (trigger: string, options?: { attemptSound?: boolean }) => {
       pauseInactiveHeroVideos(videoDesktopRef, videoMobileRef);
-      void playHeroVideos(trigger);
+      void playHeroVideos(trigger, options);
     },
     [playHeroVideos]
   );
@@ -135,9 +160,10 @@ export default function Home() {
       preferSound: preferSoundRef.current,
     });
 
-    kickHeroVideo('mount');
+    const resumeSound = shouldAttemptHeroSoundAuto();
+    kickHeroVideo('mount', { attemptSound: resumeSound });
     const timers = [200, 600, 1500].map((ms) =>
-      window.setTimeout(() => kickHeroVideo(`retry-${ms}ms`), ms)
+      window.setTimeout(() => kickHeroVideo(`retry-${ms}ms`, { attemptSound: resumeSound }), ms)
     );
 
     const mq = window.matchMedia('(max-width: 767px)');
@@ -152,7 +178,7 @@ export default function Home() {
 
   useEffect(() => {
     const resume = (source: string) => {
-      kickHeroVideo(`resume-${source}`);
+      kickHeroVideo(`resume-${source}`, { attemptSound: shouldAttemptHeroSoundAuto() });
     };
 
     const onVisibilityChange = () => {
@@ -169,14 +195,48 @@ export default function Home() {
     };
   }, [kickHeroVideo]);
 
+  useEffect(() => {
+    const el = heroSectionRef.current;
+    if (!el) return;
+
+    let wasIntersecting = true;
+
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        const intersecting = entry.isIntersecting && entry.intersectionRatio >= 0.25;
+
+        if (!intersecting && wasIntersecting) {
+          heroLeftOnceRef.current = true;
+        }
+
+        if (
+          intersecting &&
+          !wasIntersecting &&
+          heroLeftOnceRef.current &&
+          shouldAttemptHeroSoundAuto()
+        ) {
+          kickHeroVideo('hero-scroll-return', { attemptSound: true });
+        }
+
+        wasIntersecting = intersecting;
+      },
+      { threshold: [0, 0.25] }
+    );
+
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [kickHeroVideo]);
+
   async function toggleSound() {
     if (isMobileHeroViewport()) return;
 
     const nextSound = !soundOn;
     preferSoundRef.current = nextSound;
     try {
-      localStorage.setItem('hero-sound', nextSound ? 'on' : 'off');
-    } catch (_) {}
+      localStorage.setItem(HERO_SOUND_KEY, nextSound ? 'on' : 'off');
+    } catch {
+      /* ignore */
+    }
 
     pauseInactiveHeroVideos(videoDesktopRef, videoMobileRef);
     const videos = getActiveHeroVideos(videoDesktopRef, videoMobileRef);
@@ -189,8 +249,10 @@ export default function Home() {
         preferSoundRef.current = false;
         setSoundOn(false);
         try {
-          localStorage.setItem('hero-sound', 'off');
-        } catch (_) {}
+          localStorage.setItem(HERO_SOUND_KEY, 'off');
+        } catch {
+          /* ignore */
+        }
         return;
       }
     }
@@ -208,6 +270,7 @@ export default function Home() {
     <div style={{ background: '#F5F0E8' }}>
       {/* ── HERO VIDEO ── */}
       <section
+        ref={heroSectionRef}
         style={{
           position: 'relative',
           display: 'flex',
