@@ -30,15 +30,28 @@ export async function POST(request: NextRequest) {
 
     const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
     const safeName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-    const dir = path.join(process.cwd(), 'public', 'images', safeFolder);
-
-    await mkdir(dir, { recursive: true });
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    await writeFile(path.join(dir, safeName), buffer);
 
-    return NextResponse.json({ path: `/images/${safeFolder}/${safeName}` });
+    // Si UPLOAD_DIR est configuré (dossier persistant hors git), on l'utilise.
+    // Sinon on tombe sur public/images/ (dev local uniquement).
+    const uploadDir = process.env.UPLOAD_DIR;
+
+    let publicPath: string;
+    if (uploadDir) {
+      const dir = path.join(uploadDir, safeFolder);
+      await mkdir(dir, { recursive: true });
+      await writeFile(path.join(dir, safeName), buffer);
+      publicPath = `/api/uploads/${safeFolder}/${safeName}`;
+    } else {
+      const dir = path.join(process.cwd(), 'public', 'images', safeFolder);
+      await mkdir(dir, { recursive: true });
+      await writeFile(path.join(dir, safeName), buffer);
+      publicPath = `/images/${safeFolder}/${safeName}`;
+    }
+
+    return NextResponse.json({ path: publicPath });
   } catch (err: any) {
     console.error('Upload error:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });
