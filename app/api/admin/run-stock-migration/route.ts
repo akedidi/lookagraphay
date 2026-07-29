@@ -13,10 +13,12 @@ const SPECIFIC_OVERRIDES: Array<{ pattern: string; or: boolean; argent: boolean 
 
 const STOCK_DATA: Array<{ pattern: string; or: boolean; argent: boolean }> = [
   { pattern: 'horria',   or: true,  argent: false },
+  { pattern: 'horrya',   or: true,  argent: false },
   { pattern: 'liberté',  or: true,  argent: false },
   { pattern: 'mahabba',  or: true,  argent: true  },
   { pattern: 'ichiq',    or: true,  argent: false },
   { pattern: 'chawq',    or: false, argent: false },
+  { pattern: 'shawq',    or: false, argent: false },
   { pattern: 'salam',    or: true,  argent: false },
   { pattern: 'hob',      or: true,  argent: false },
   { pattern: 'holm',     or: false, argent: false },
