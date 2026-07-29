@@ -69,11 +69,34 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    // Mises à jour directes pour les titres qui résistent au matching
+    const DIRECT_UPDATES: Array<{ titre: string; stock: { or: boolean; argent: boolean } }> = [
+      { titre: 'Horrya — حرية',                    stock: { or: true,  argent: false } },
+      { titre: 'Shawq — شوق (Taille moyenne  5,5cm)', stock: { or: true,  argent: false } }, // boucle
+    ];
+    // Shawq — شوق sans précision de taille : peut être bague (rupture) ou boucle
+    // On sélectionne par catégorie
+    await conn.execute(
+      `UPDATE store_items SET stock_options = ? WHERE titre = 'Shawq — شوق' AND categorie = 'Bague'`,
+      [JSON.stringify({ or: false, argent: false })]
+    );
+    await conn.execute(
+      `UPDATE store_items SET stock_options = ? WHERE titre = 'Shawq — شوق' AND categorie != 'Bague'`,
+      [JSON.stringify({ or: true, argent: false })]
+    );
+    for (const u of DIRECT_UPDATES) {
+      await conn.execute(
+        `UPDATE store_items SET stock_options = ? WHERE titre = ?`,
+        [JSON.stringify(u.stock), u.titre]
+      );
+    }
+
     return NextResponse.json({
       ok: true,
       updated: results.filter(r => r.updated).length,
       total: rows.length,
       results,
+      direct_updates_applied: true,
     });
   } finally {
     conn.release();
