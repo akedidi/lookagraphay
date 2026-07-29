@@ -398,9 +398,15 @@ export default function StorePage() {
                           Rupture
                         </span>
                       ) : partielRupture ? (
-                        <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.58rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#E4C97A', background: 'rgba(26,18,9,0.82)', padding: '0.25rem 0.5rem', border: '1px solid rgba(228,201,122,0.4)' }}>
-                          {item.stock_options?.or === false ? 'Or : rupture' : 'Argent : rupture'}
-                        </span>
+                        <>
+                          <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.58rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#e05555', background: 'rgba(26,18,9,0.82)', padding: '0.25rem 0.5rem', border: '1px solid rgba(224,85,85,0.4)' }}>
+                            {item.stock_options?.or === false ? 'Or : rupture' : 'Argent : rupture'}
+                          </span>
+                          <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.58rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#7ec87e', background: 'rgba(26,18,9,0.82)', padding: '0.25rem 0.5rem', border: '1px solid rgba(126,200,126,0.4)' }}>
+                            {item.stock_options?.or === false ? 'Argent dispo' : 'Or dispo'}
+                          </span>
+                        </>
+                      
                       ) : item.disponible ? (
                         <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.62rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C9A84C', background: 'rgba(26,18,9,0.75)', padding: '0.25rem 0.5rem', border: '1px solid rgba(201,168,76,0.4)' }}>
                           Dispo
