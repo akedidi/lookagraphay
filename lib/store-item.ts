@@ -12,6 +12,11 @@ import {
 
 export type StoreItemRow = Record<string, unknown>;
 
+export type StockOptions = {
+  or: boolean;
+  argent: boolean;
+};
+
 export type MappedStoreItem = {
   id: number;
   titre: string;
@@ -38,6 +43,7 @@ export type MappedStoreItem = {
   ordre?: number;
   style?: string | null;
   extrait?: string | null;
+  stock_options: StockOptions | null;
 };
 
 export function mapStoreItemFromRow(row: StoreItemRow): MappedStoreItem {
@@ -83,7 +89,40 @@ export function mapStoreItemFromRow(row: StoreItemRow): MappedStoreItem {
     ordre: row.ordre != null ? Number(row.ordre) : 0,
     style: row.style ? String(row.style) : null,
     extrait: row.extrait ? String(row.extrait) : null,
+    stock_options: (() => {
+      if (!row.stock_options) return null;
+      try {
+        const parsed = typeof row.stock_options === 'string'
+          ? JSON.parse(row.stock_options)
+          : row.stock_options;
+        if (parsed && typeof parsed === 'object') {
+          return {
+            or: parsed.or !== false,
+            argent: parsed.argent !== false,
+          } as StockOptions;
+        }
+      } catch {}
+      return null;
+    })(),
   };
+}
+
+/** Helper : est-ce qu'une matière est en rupture pour cet article ? */
+export function isMatiereEnRupture(
+  item: Pick<MappedStoreItem, 'stock_options'>,
+  matiere: 'or' | 'argent'
+): boolean {
+  if (!item.stock_options) return false;
+  return item.stock_options[matiere] === false;
+}
+
+/** Helper : est-ce que toutes les options sont en rupture ? */
+export function isTotalementEnRupture(
+  item: Pick<MappedStoreItem, 'stock_options' | 'disponible'>
+): boolean {
+  if (!item.disponible) return true;
+  if (!item.stock_options) return false;
+  return item.stock_options.or === false && item.stock_options.argent === false;
 }
 
 export function resolvePriceForBase(item: PromoInput, basePrice: number) {

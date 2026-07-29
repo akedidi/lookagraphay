@@ -63,8 +63,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       style,
       extrait,
       in_galerie,
+      stock_options,
     } = body;
     const promo = promoParams(body);
+    const stockJson = stock_options ? JSON.stringify(stock_options) : null;
 
     const conn = await pool.getConnection();
     try {
@@ -73,7 +75,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       `UPDATE store_items SET
         titre=?,sous_titre=?,categorie=?,description=?,citation=?,technique=?,dimensions=?,annee=?,prix=?,
         images=?,disponible=?,paypal_link=?,ordre=?,style=?,extrait=?,in_galerie=?,
-        promo_enabled=?,promo_type=?,promo_value=?,promo_start=?,promo_end=?
+        promo_enabled=?,promo_type=?,promo_value=?,promo_start=?,promo_end=?,stock_options=?
        WHERE id=?`,
       [
         titre,
@@ -97,6 +99,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         promo.value,
         promo.start,
         promo.end,
+        stockJson,
         params.id,
       ]
       );

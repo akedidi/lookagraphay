@@ -195,7 +195,10 @@ const emptyStore = {
   titre: '', sous_titre: '', categorie: 'Tableau', description: '', citation: '', technique: '', dimensions: '', annee: '',
   prix: '', images: [], disponible: true, paypal_link: '', ordre: 0, style: 'Calligraphie contemporaine', extrait: '', in_galerie: true,
   promo_enabled: false, promo_type: 'percent', promo_value: '', promo_start: '', promo_end: '',
+  stock_options: null as { or: boolean; argent: boolean } | null,
 };
+
+const BIJOU_CATEGORIES = ['Bague', "Boucles d'oreilles", 'Pendentif'];
 const emptyExpo = { titre: '', lieu: '', dates: '', statut: 'passé', description: '', image: '', images: [] };
 const emptyEvt = { titre: '', date: '', heure: '', lieu: '', type: 'Vernissage', statut: 'à venir', description: '', images: [] };
 
@@ -485,6 +488,7 @@ export default function AdminPage() {
   }
 
   function startEditStoreItem(item: any) {
+    const isBijouCat = BIJOU_CATEGORIES.includes(item.categorie);
     setEditStore({
       ...item,
       in_galerie: item.in_galerie ?? false,
@@ -493,6 +497,9 @@ export default function AdminPage() {
       promo_value: item.promo_value != null ? String(item.promo_value) : '',
       promo_start: toDatetimeLocalValue(item.promo_start),
       promo_end: toDatetimeLocalValue(item.promo_end),
+      stock_options: isBijouCat
+        ? (item.stock_options ?? { or: true, argent: true })
+        : null,
     });
     setIsNew(false);
   }
@@ -742,6 +749,18 @@ export default function AdminPage() {
           {!initDone && storeItems.length === 0 && (
             <button onClick={initDb} style={btnGold}>⚙ Init DB</button>
           )}
+          <button
+            onClick={async () => {
+              if (!confirm('Appliquer les données de stock du document Word aux bijoux existants ?')) return;
+              const res = await fetch('/api/admin/init-stock', { method: 'POST', ...adminFetchInit });
+              const data = await res.json();
+              flash(data.ok ? `✅ ${data.message}` : `❌ ${data.error}`);
+              if (data.ok) fetchAll();
+            }}
+            style={{ ...btnOutline, fontSize: '0.65rem' }}
+          >
+            📦 Init Stock Bijoux
+          </button>
           <a
             href="/"
             target="_blank"
@@ -839,6 +858,46 @@ export default function AdminPage() {
                 <Toggle label="Disponibilité" value={editStore.disponible} onChange={(v: boolean) => setEditStore({ ...editStore, disponible: v })} />
                 <Toggle label="Afficher dans la galerie" value={editStore.in_galerie} onChange={(v: boolean) => setEditStore({ ...editStore, in_galerie: v })} />
 
+                {/* Stock par option (bijoux uniquement) */}
+                {BIJOU_CATEGORIES.includes(editStore.categorie) && (
+                  <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.15)' }}>
+                    <p style={{ ...labelStyle, marginBottom: '0.75rem', fontSize: '0.72rem' }}>Stock par matière</p>
+                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(245,240,232,0.45)', marginBottom: '0.75rem', lineHeight: 1.5 }}>
+                      Désactivez une option pour afficher « Rupture » côté client. S'applique indépendamment du toggle Disponibilité.
+                    </p>
+                    <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+                      {/* Or */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                        <label style={{ ...labelStyle, marginBottom: 0 }}>Argent trempé dans l'or</label>
+                        <button
+                          type="button"
+                          onClick={() => setEditStore({ ...editStore, stock_options: { ...(editStore.stock_options ?? { or: true, argent: true }), or: !(editStore.stock_options?.or ?? true) } })}
+                          style={{ width: 44, height: 24, borderRadius: 12, background: (editStore.stock_options?.or ?? true) ? gold : '#e05555', border: 'none', cursor: 'pointer', position: 'relative', transition: 'all 0.2s' }}
+                        >
+                          <span style={{ position: 'absolute', top: 3, left: (editStore.stock_options?.or ?? true) ? 22 : 3, width: 18, height: 18, borderRadius: '50%', background: dark, transition: 'all 0.2s' }} />
+                        </button>
+                        <span style={{ color: (editStore.stock_options?.or ?? true) ? gold : '#e05555', fontSize: '0.72rem', fontFamily: 'Montserrat, sans-serif' }}>
+                          {(editStore.stock_options?.or ?? true) ? 'En stock' : 'Rupture'}
+                        </span>
+                      </div>
+                      {/* Argent */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                        <label style={{ ...labelStyle, marginBottom: 0 }}>Argent</label>
+                        <button
+                          type="button"
+                          onClick={() => setEditStore({ ...editStore, stock_options: { ...(editStore.stock_options ?? { or: true, argent: true }), argent: !(editStore.stock_options?.argent ?? true) } })}
+                          style={{ width: 44, height: 24, borderRadius: 12, background: (editStore.stock_options?.argent ?? true) ? gold : '#e05555', border: 'none', cursor: 'pointer', position: 'relative', transition: 'all 0.2s' }}
+                        >
+                          <span style={{ position: 'absolute', top: 3, left: (editStore.stock_options?.argent ?? true) ? 22 : 3, width: 18, height: 18, borderRadius: '50%', background: dark, transition: 'all 0.2s' }} />
+                        </button>
+                        <span style={{ color: (editStore.stock_options?.argent ?? true) ? gold : '#e05555', fontSize: '0.72rem', fontFamily: 'Montserrat, sans-serif' }}>
+                          {(editStore.stock_options?.argent ?? true) ? 'En stock' : 'Rupture'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid rgba(201,168,76,0.2)' }}>
                   <p style={{ ...labelStyle, marginBottom: '0.75rem', fontSize: '0.72rem' }}>Promotion</p>
                   <Toggle label="Promotion active (manuel)" value={editStore.promo_enabled} onChange={(v: boolean) => setEditStore({ ...editStore, promo_enabled: v })} />
@@ -901,6 +960,18 @@ export default function AdminPage() {
                       {item.categorie} · {item.promo_active ? `${item.prix_promo}€ (promo, était ${item.prix}€)` : `${item.prix}€`} · {item.disponible ? 'DISPO' : 'Indisponible'}
                       {item.promo_enabled && !item.promo_active ? ' · promo programmée/off' : ''}
                       {item.promo_active && formatPromoLabel(item) ? ` · ${formatPromoLabel(item)}` : ''}
+                      {item.stock_options && BIJOU_CATEGORIES.includes(item.categorie) && (
+                        <>
+                          {item.stock_options.or === false && item.stock_options.argent === false
+                            ? <span style={{ color: '#e05555' }}> · ⚠ Rupture totale</span>
+                            : item.stock_options.or === false
+                            ? <span style={{ color: '#E4C97A' }}> · Or: rupture</span>
+                            : item.stock_options.argent === false
+                            ? <span style={{ color: '#E4C97A' }}> · Argent: rupture</span>
+                            : <span style={{ color: '#6fcf97' }}> · Stock OK</span>
+                          }
+                        </>
+                      )}
                     </div>
                   </div>
                   <div className="admin-item-actions">

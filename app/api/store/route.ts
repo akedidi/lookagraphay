@@ -51,6 +51,7 @@ export async function GET() {
         promo_value DECIMAL(10,2) NULL,
         promo_start DATETIME NULL,
         promo_end DATETIME NULL,
+        stock_options JSON NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
@@ -94,8 +95,10 @@ export async function POST(req: NextRequest) {
       style,
       extrait,
       in_galerie,
+      stock_options,
     } = body;
     const promo = promoParams(body);
+    const stockJson = stock_options ? JSON.stringify(stock_options) : null;
 
     const conn = await pool.getConnection();
     try {
@@ -104,8 +107,8 @@ export async function POST(req: NextRequest) {
         `INSERT INTO store_items (
           titre,sous_titre,categorie,description,citation,technique,dimensions,annee,prix,
           images,disponible,paypal_link,ordre,style,extrait,in_galerie,
-          promo_enabled,promo_type,promo_value,promo_start,promo_end
-        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+          promo_enabled,promo_type,promo_value,promo_start,promo_end,stock_options
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
         [
           titre,
           sous_titre || null,
@@ -128,6 +131,7 @@ export async function POST(req: NextRequest) {
           promo.value,
           promo.start,
           promo.end,
+          stockJson,
         ]
       ) as [{ insertId: number }, unknown];
       return NextResponse.json({ id: result.insertId });

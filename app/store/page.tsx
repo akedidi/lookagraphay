@@ -18,6 +18,7 @@ import {
   type Matiere,
   type Quantite,
 } from '@/lib/bijou-pricing';
+import { isMatiereEnRupture, isTotalementEnRupture } from '@/lib/store-item';
 import { fadeUp, motionViewport } from '@/lib/motion-variants';
 
 type StoreItem = MappedStoreItem;
@@ -41,22 +42,35 @@ function quantiteLabel(q: Quantite): string {
 function PrixSelector({
   categorie,
   itemPromo,
+  stockOptions,
   onChange,
+  onRuptureChange,
 }: {
   categorie: string;
   itemPromo: PromoInput;
+  stockOptions?: { or: boolean; argent: boolean } | null;
   onChange: (prix: number, prixOriginal: number | undefined, matiere: string, quantite?: string) => void;
+  onRuptureChange?: (inRupture: boolean) => void;
 }) {
-  const [matiere, setMatiere] = useState<Matiere>('argent');
+  // Si argent en rupture mais or dispo, démarrer sur or (et vice versa)
+  const defaultMatiere: Matiere =
+    stockOptions?.argent === false && stockOptions?.or !== false ? 'or' : 'argent';
+  const [matiere, setMatiere] = useState<Matiere>(defaultMatiere);
   const [quantite, setQuantite] = useState<Quantite>('paire');
   const isBoucle = categorie === "Boucles d'oreilles";
   const priced = resolvePriceForBase(itemPromo, calcPrix(categorie, matiere, quantite));
   const mounted = useRef(false);
 
+  const isOrRupture = stockOptions ? stockOptions.or === false : false;
+  const isArgentRupture = stockOptions ? stockOptions.argent === false : false;
+  const isSelectedRupture = matiere === 'or' ? isOrRupture : isArgentRupture;
+
   function emit(m: Matiere, q: Quantite) {
     const base = calcPrix(categorie, m, q);
     const { final, active, original } = resolvePriceForBase(itemPromo, base);
     onChange(final, active ? original : undefined, matiereLabel(m), isBoucle ? quantiteLabel(q) : undefined);
+    const enRupture = stockOptions ? (m === 'or' ? stockOptions.or === false : stockOptions.argent === false) : false;
+    onRuptureChange?.(enRupture);
   }
 
   function handleMatiere(m: Matiere) {
@@ -74,25 +88,44 @@ function PrixSelector({
       mounted.current = true;
       emit(matiere, quantite);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const optBtn = (label: string, active: boolean, onClick: () => void) => (
+  const optBtn = (label: string, active: boolean, onClick: () => void, inRupture = false) => (
     <button
-      onClick={onClick}
+      onClick={inRupture ? undefined : onClick}
+      disabled={inRupture}
       style={{
         fontFamily: 'Montserrat, sans-serif',
         fontSize: '0.75rem',
         letterSpacing: '0.12em',
         padding: '0.55rem 1rem',
-        border: `1.5px solid ${active ? '#C9A84C' : 'rgba(61,43,31,0.2)'}`,
+        border: `1.5px solid ${inRupture ? 'rgba(61,43,31,0.12)' : active ? '#C9A84C' : 'rgba(61,43,31,0.2)'}`,
         background: active ? 'rgba(201,168,76,0.1)' : 'transparent',
-        color: active ? '#1A1209' : 'rgba(61,43,31,0.55)',
-        cursor: 'pointer',
+        color: inRupture ? 'rgba(61,43,31,0.3)' : active ? '#1A1209' : 'rgba(61,43,31,0.55)',
+        cursor: inRupture ? 'not-allowed' : 'pointer',
         transition: 'all 0.2s',
         fontWeight: active ? 600 : 300,
+        position: 'relative' as const,
+        textDecoration: inRupture ? 'line-through' : 'none',
       }}
     >
       {label}
+      {inRupture && (
+        <span style={{
+          display: 'block',
+          fontFamily: 'Montserrat, sans-serif',
+          fontSize: '0.55rem',
+          letterSpacing: '0.15em',
+          textTransform: 'uppercase',
+          color: '#c0392b',
+          textDecoration: 'none',
+          marginTop: '0.1rem',
+          fontWeight: 500,
+        }}>
+          Rupture
+        </span>
+      )}
     </button>
   );
 
@@ -103,8 +136,8 @@ function PrixSelector({
           Matière
         </span>
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          {optBtn('Argent', matiere === 'argent', () => handleMatiere('argent'))}
-          {optBtn("Argent trempé dans l'or", matiere === 'or', () => handleMatiere('or'))}
+          {optBtn('Argent', matiere === 'argent', () => handleMatiere('argent'), isArgentRupture)}
+          {optBtn("Argent trempé dans l'or", matiere === 'or', () => handleMatiere('or'), isOrRupture)}
         </div>
       </div>
 
@@ -121,15 +154,23 @@ function PrixSelector({
       )}
 
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', flexWrap: 'wrap' }}>
-        <PriceDisplay
-          original={priced.original}
-          final={priced.final}
-          active={priced.active}
-          size="lg"
-        />
-        <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(61,43,31,0.45)', letterSpacing: '0.1em' }}>
-          TVA incluse
-        </span>
+        {isSelectedRupture ? (
+          <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.85rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#c0392b', fontWeight: 500 }}>
+            Rupture momentanée
+          </span>
+        ) : (
+          <>
+            <PriceDisplay
+              original={priced.original}
+              final={priced.final}
+              active={priced.active}
+              size="lg"
+            />
+            <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(61,43,31,0.45)', letterSpacing: '0.1em' }}>
+              TVA incluse
+            </span>
+          </>
+        )}
       </div>
     </div>
   );
@@ -149,6 +190,7 @@ export default function StorePage() {
   const [selectedQuantite, setSelectedQuantite] = useState<string | undefined>(undefined);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [addedFeedback, setAddedFeedback] = useState(false);
+  const [selectedRupture, setSelectedRupture] = useState(false);
   const { addItem } = useCart();
 
   useEffect(() => {
@@ -183,17 +225,25 @@ export default function StorePage() {
   function openItem(item: StoreItem) {
     setSelected(item);
     setModalImg(0);
+    setAddedFeedback(false);
     if (isBijou(item.categorie)) {
+      // Choisir la matière par défaut : préférer argent sauf si en rupture
+      const defaultM: Matiere =
+        item.stock_options?.argent === false && item.stock_options?.or !== false ? 'or' : 'argent';
       const defaultQ: Quantite = 'paire';
-      const base = calcBijouBasePrice(item.categorie, 'argent', defaultQ) || item.prix;
+      const base = calcBijouBasePrice(item.categorie, defaultM, defaultQ) || item.prix;
       const { final } = resolvePriceForBase(promoInputFromStoreItem(item), base);
       setSelectedPrix(final);
-      setSelectedMatiere('Argent');
+      setSelectedMatiere(matiereLabel(defaultM));
       setSelectedQuantite(item.categorie === "Boucles d'oreilles" ? 'la paire' : undefined);
+      // Rupture sur la matière par défaut ?
+      const enRupture = item.stock_options ? item.stock_options[defaultM] === false : false;
+      setSelectedRupture(enRupture);
     } else {
       setSelectedPrix(item.prix_promo);
       setSelectedMatiere('');
       setSelectedQuantite(undefined);
+      setSelectedRupture(false);
     }
   }
 
@@ -335,15 +385,30 @@ export default function StorePage() {
                   )}
                 </div>
 
-                {/* Badge disponible */}
-                <div style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', alignItems: 'flex-end' }}>
-                  {display.active && <PromoBadge label={display.label} light />}
-                  {item.disponible && (
-                    <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.62rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C9A84C', background: 'rgba(26,18,9,0.75)', padding: '0.25rem 0.5rem', border: '1px solid rgba(201,168,76,0.4)' }}>
-                      Dispo
-                    </span>
-                  )}
-                </div>
+                {/* Badges */}
+                {(() => {
+                  const totalRupture = isTotalementEnRupture(item);
+                  const partielRupture = !totalRupture && isBijou(item.categorie) && item.stock_options &&
+                    (item.stock_options.or === false || item.stock_options.argent === false);
+                  return (
+                    <div style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', alignItems: 'flex-end' }}>
+                      {display.active && <PromoBadge label={display.label} light />}
+                      {totalRupture ? (
+                        <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.58rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#e05555', background: 'rgba(26,18,9,0.82)', padding: '0.25rem 0.5rem', border: '1px solid rgba(224,85,85,0.4)' }}>
+                          Rupture
+                        </span>
+                      ) : partielRupture ? (
+                        <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.58rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#E4C97A', background: 'rgba(26,18,9,0.82)', padding: '0.25rem 0.5rem', border: '1px solid rgba(228,201,122,0.4)' }}>
+                          {item.stock_options?.or === false ? 'Or : rupture' : 'Argent : rupture'}
+                        </span>
+                      ) : item.disponible ? (
+                        <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.62rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C9A84C', background: 'rgba(26,18,9,0.75)', padding: '0.25rem 0.5rem', border: '1px solid rgba(201,168,76,0.4)' }}>
+                          Dispo
+                        </span>
+                      ) : null}
+                    </div>
+                  );
+                })()}
               </motion.div>
             );
             })}
@@ -484,11 +549,13 @@ export default function StorePage() {
                   <PrixSelector
                     categorie={selected.categorie}
                     itemPromo={promoInputFromStoreItem(selected)}
+                    stockOptions={selected.stock_options}
                     onChange={(prix, _orig, matiere, quantite) => {
                       setSelectedPrix(prix);
                       setSelectedMatiere(matiere);
                       setSelectedQuantite(quantite);
                     }}
+                    onRuptureChange={(inRupture) => setSelectedRupture(inRupture)}
                   />
                   </>
                   );
@@ -516,42 +583,60 @@ export default function StorePage() {
                   );
                 })()}
 
-                {selected.disponible && (
+                {selected.disponible && !isTotalementEnRupture(selected) && (
                   <>
-                    <button
-                      onClick={() => {
-                        const base = selectedPrix || selected.prix_promo;
-                        const priced = isBijou(selected.categorie)
-                          ? resolvePriceForBase(promoInputFromStoreItem(selected), base)
-                          : getStoreItemDisplayPrice(selected);
-                        addItem({
-                          id: selected.id,
-                          titre: selected.titre,
-                          prix: priced.final,
-                          prix_original: priced.active ? priced.original : undefined,
-                          images: selected.images,
-                          categorie: selected.categorie,
-                          matiere: selectedMatiere || undefined,
-                          quantite_label: selectedQuantite,
-                          poids_kg: getPoidsKg(selected.categorie),
-                        });
-                        setAddedFeedback(true);
-                        setTimeout(() => setAddedFeedback(false), 2200);
-                      }}
-                      style={{
-                        display: 'block', width: '100%', textAlign: 'center',
-                        fontFamily: 'Montserrat, sans-serif', fontSize: '0.78rem',
-                        letterSpacing: '0.25em', textTransform: 'uppercase',
-                        background: addedFeedback ? 'rgba(201,168,76,0.15)' : '#1A1209',
-                        color: addedFeedback ? '#C9A84C' : '#F5F0E8',
-                        border: '2px solid #1A1209',
-                        padding: '0.9rem 1.5rem', cursor: 'pointer',
-                        fontWeight: 500, transition: 'all 0.3s',
-                      }}
-                    >
-                      {addedFeedback ? '✓ Ajouté au panier' : 'Ajouter au panier'}
-                    </button>
+                    {selectedRupture ? (
+                      <div style={{ padding: '1rem', background: 'rgba(224,85,85,0.08)', border: '1px solid rgba(224,85,85,0.25)', textAlign: 'center' }}>
+                        <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: '#c0392b', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 500, marginBottom: '0.25rem' }}>
+                          Rupture momentanée
+                        </p>
+                        <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(61,43,31,0.5)', lineHeight: 1.5 }}>
+                          Cette option n'est pas disponible actuellement. Sélectionnez une autre matière ou revenez prochainement.
+                        </p>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          const base = selectedPrix || selected.prix_promo;
+                          const priced = isBijou(selected.categorie)
+                            ? resolvePriceForBase(promoInputFromStoreItem(selected), base)
+                            : getStoreItemDisplayPrice(selected);
+                          addItem({
+                            id: selected.id,
+                            titre: selected.titre,
+                            prix: priced.final,
+                            prix_original: priced.active ? priced.original : undefined,
+                            images: selected.images,
+                            categorie: selected.categorie,
+                            matiere: selectedMatiere || undefined,
+                            quantite_label: selectedQuantite,
+                            poids_kg: getPoidsKg(selected.categorie),
+                          });
+                          setAddedFeedback(true);
+                          setTimeout(() => setAddedFeedback(false), 2200);
+                        }}
+                        style={{
+                          display: 'block', width: '100%', textAlign: 'center',
+                          fontFamily: 'Montserrat, sans-serif', fontSize: '0.78rem',
+                          letterSpacing: '0.25em', textTransform: 'uppercase',
+                          background: addedFeedback ? 'rgba(201,168,76,0.15)' : '#1A1209',
+                          color: addedFeedback ? '#C9A84C' : '#F5F0E8',
+                          border: '2px solid #1A1209',
+                          padding: '0.9rem 1.5rem', cursor: 'pointer',
+                          fontWeight: 500, transition: 'all 0.3s',
+                        }}
+                      >
+                        {addedFeedback ? '✓ Ajouté au panier' : 'Ajouter au panier'}
+                      </button>
+                    )}
                   </>
+                )}
+                {isTotalementEnRupture(selected) && (
+                  <div style={{ padding: '1rem', background: 'rgba(224,85,85,0.08)', border: '1px solid rgba(224,85,85,0.25)', textAlign: 'center' }}>
+                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', color: '#c0392b', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 500 }}>
+                      Rupture momentanée — toutes options
+                    </p>
+                  </div>
                 )}
               </div>
             </motion.div>
