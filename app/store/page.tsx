@@ -91,43 +91,62 @@ function PrixSelector({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const optBtn = (label: string, active: boolean, onClick: () => void, inRupture = false) => (
-    <button
-      onClick={inRupture ? undefined : onClick}
-      disabled={inRupture}
-      style={{
-        fontFamily: 'Montserrat, sans-serif',
-        fontSize: '0.75rem',
-        letterSpacing: '0.12em',
-        padding: '0.55rem 1rem',
-        border: `1.5px solid ${inRupture ? 'rgba(61,43,31,0.12)' : active ? '#C9A84C' : 'rgba(61,43,31,0.2)'}`,
-        background: active ? 'rgba(201,168,76,0.1)' : 'transparent',
-        color: inRupture ? 'rgba(61,43,31,0.3)' : active ? '#1A1209' : 'rgba(61,43,31,0.55)',
-        cursor: inRupture ? 'not-allowed' : 'pointer',
-        transition: 'all 0.2s',
-        fontWeight: active ? 600 : 300,
-        position: 'relative' as const,
-        textDecoration: inRupture ? 'line-through' : 'none',
-      }}
-    >
-      {label}
-      {inRupture && (
-        <span style={{
-          display: 'block',
+  const hasPartialRupture = (isOrRupture && !isArgentRupture) || (!isOrRupture && isArgentRupture);
+
+  const optBtn = (label: string, active: boolean, onClick: () => void, inRupture = false) => {
+    const showDispo = !inRupture && hasPartialRupture;
+    return (
+      <button
+        onClick={inRupture ? undefined : onClick}
+        disabled={inRupture}
+        style={{
           fontFamily: 'Montserrat, sans-serif',
-          fontSize: '0.55rem',
-          letterSpacing: '0.15em',
-          textTransform: 'uppercase',
-          color: '#c0392b',
-          textDecoration: 'none',
-          marginTop: '0.1rem',
-          fontWeight: 500,
-        }}>
-          Rupture
-        </span>
-      )}
-    </button>
-  );
+          fontSize: '0.75rem',
+          letterSpacing: '0.12em',
+          padding: '0.55rem 1rem',
+          border: `1.5px solid ${inRupture ? 'rgba(61,43,31,0.12)' : active ? '#C9A84C' : showDispo ? 'rgba(126,200,126,0.5)' : 'rgba(61,43,31,0.2)'}`,
+          background: active ? 'rgba(201,168,76,0.1)' : showDispo ? 'rgba(126,200,126,0.06)' : 'transparent',
+          color: inRupture ? 'rgba(61,43,31,0.3)' : active ? '#1A1209' : 'rgba(61,43,31,0.55)',
+          cursor: inRupture ? 'not-allowed' : 'pointer',
+          transition: 'all 0.2s',
+          fontWeight: active ? 600 : 300,
+          position: 'relative' as const,
+          textDecoration: inRupture ? 'line-through' : 'none',
+        }}
+      >
+        {label}
+        {inRupture && (
+          <span style={{
+            display: 'block',
+            fontFamily: 'Montserrat, sans-serif',
+            fontSize: '0.55rem',
+            letterSpacing: '0.15em',
+            textTransform: 'uppercase',
+            color: '#c0392b',
+            textDecoration: 'none',
+            marginTop: '0.1rem',
+            fontWeight: 500,
+          }}>
+            Rupture
+          </span>
+        )}
+        {showDispo && (
+          <span style={{
+            display: 'block',
+            fontFamily: 'Montserrat, sans-serif',
+            fontSize: '0.55rem',
+            letterSpacing: '0.15em',
+            textTransform: 'uppercase',
+            color: '#4a9e4a',
+            marginTop: '0.1rem',
+            fontWeight: 500,
+          }}>
+            Disponible
+          </span>
+        )}
+      </button>
+    );
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '1.5rem' }}>
@@ -403,7 +422,7 @@ export default function StorePage() {
                             {item.stock_options?.or === false ? 'Or : rupture' : 'Argent : rupture'}
                           </span>
                           <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.58rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#7ec87e', background: 'rgba(26,18,9,0.82)', padding: '0.25rem 0.5rem', border: '1px solid rgba(126,200,126,0.4)' }}>
-                            {item.stock_options?.or === false ? 'Argent dispo' : 'Or dispo'}
+                            {item.stock_options?.or === false ? 'Argent dispo' : 'Argent doré dispo'}
                           </span>
                         </>
                       
