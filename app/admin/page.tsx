@@ -5,20 +5,31 @@ import { adminFetchInit, adminJsonInit } from '@/lib/admin-fetch';
 import { toDatetimeLocalValue } from '@/lib/store-item';
 import { formatPromoLabel } from '@/lib/promo';
 import {
+  APPAREL_SIZES,
   STORE_CATEGORIES as STORE_CATEGORIES_CONST,
   defaultApparelOptions,
   isApparelCategory,
   isBijouStoreCategory,
   type ApparelOptions,
+  type ApparelSize,
 } from '@/lib/store-categories';
 
-type ApparelOptionsForm = { tshirt_prix: string; sweatshirt_prix: string };
+type ApparelOptionsForm = {
+  tshirt_prix: string;
+  sweatshirt_prix: string;
+  tshirt_enabled: boolean;
+  sweatshirt_enabled: boolean;
+  sizes: ApparelSize[];
+};
 
 function toApparelForm(options: ApparelOptions | null | undefined, fallback = 0): ApparelOptionsForm {
   const base = options ?? defaultApparelOptions(fallback);
   return {
     tshirt_prix: String(base.tshirt_prix ?? fallback),
     sweatshirt_prix: String(base.sweatshirt_prix ?? fallback),
+    tshirt_enabled: base.tshirt_enabled !== false,
+    sweatshirt_enabled: base.sweatshirt_enabled !== false,
+    sizes: base.sizes?.length ? [...base.sizes] : [...APPAREL_SIZES],
   };
 }
 import NewsletterPanel from '@/components/admin/NewsletterPanel';
@@ -623,15 +634,44 @@ export default function AdminPage() {
     let apparel_options: ApparelOptions | null = null;
     let prix = parseFloat(editStore.prix) || 0;
     if (isApparel) {
-      const tshirt = parseFloat(String(editStore.apparel_options?.tshirt_prix ?? '')) || 0;
-      const sweat = parseFloat(String(editStore.apparel_options?.sweatshirt_prix ?? '')) || 0;
-      if (tshirt <= 0 || sweat <= 0) {
+      const form = editStore.apparel_options ?? toApparelForm(null);
+      const tshirt = parseFloat(String(form.tshirt_prix ?? '')) || 0;
+      const sweat = parseFloat(String(form.sweatshirt_prix ?? '')) || 0;
+      const tshirtOn = form.tshirt_enabled !== false;
+      const sweatOn = form.sweatshirt_enabled !== false;
+      if (!tshirtOn && !sweatOn) {
         setSaving(false);
-        flash('❌ Indiquez un prix T-shirt et un prix Sweat-shirt.');
+        flash('❌ Activez au moins une option (T-shirt ou Sweat-shirt).');
         return;
       }
-      apparel_options = { tshirt_prix: tshirt, sweatshirt_prix: sweat };
-      prix = Math.min(tshirt, sweat);
+      if (tshirtOn && tshirt <= 0) {
+        setSaving(false);
+        flash('❌ Indiquez un prix T-shirt valide.');
+        return;
+      }
+      if (sweatOn && sweat <= 0) {
+        setSaving(false);
+        flash('❌ Indiquez un prix Sweat-shirt valide.');
+        return;
+      }
+      const sizes = (form.sizes?.length ? form.sizes : [...APPAREL_SIZES]) as ApparelSize[];
+      if (sizes.length === 0) {
+        setSaving(false);
+        flash('❌ Sélectionnez au moins une taille.');
+        return;
+      }
+      apparel_options = {
+        tshirt_prix: tshirtOn ? tshirt : (tshirt > 0 ? tshirt : defaultApparelOptions().tshirt_prix),
+        sweatshirt_prix: sweatOn ? sweat : (sweat > 0 ? sweat : defaultApparelOptions().sweatshirt_prix),
+        tshirt_enabled: tshirtOn,
+        sweatshirt_enabled: sweatOn,
+        sizes,
+      };
+      const activePrices = [
+        tshirtOn ? tshirt : null,
+        sweatOn ? sweat : null,
+      ].filter((p): p is number => p != null && p > 0);
+      prix = activePrices.length ? Math.min(...activePrices) : defaultApparelOptions().tshirt_prix;
     }
     const body = {
       ...rest,
@@ -935,45 +975,106 @@ export default function AdminPage() {
                   )}
                   <Field label="Ordre d'affichage" value={editStore.ordre} onChange={(v: string) => setEditStore({ ...editStore, ordre: v })} type="number" />
                 </div>
-                {isApparelCategory(editStore.categorie) && (
+                {isApparelCategory(editStore.categorie) && (() => {
+                  const apparel = editStore.apparel_options ?? toApparelForm(null);
+                  const toggleSize = (size: ApparelSize) => {
+                    const current = apparel.sizes ?? [...APPAREL_SIZES];
+                    const next = current.includes(size)
+                      ? current.filter((s: ApparelSize) => s !== size)
+                      : [...current, size];
+                    setEditStore({
+                      ...editStore,
+                      apparel_options: { ...apparel, sizes: next },
+                    });
+                  };
+                  return (
                   <div style={{ marginTop: '0.25rem', marginBottom: '1rem', padding: '1rem', background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.15)' }}>
-                    <p style={{ ...labelStyle, marginBottom: '0.5rem', fontSize: '0.72rem' }}>Options du même visuel</p>
+                    <p style={{ ...labelStyle, marginBottom: '0.5rem', fontSize: '0.72rem' }}>Options du même visuel (paramétrables)</p>
                     <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(245,240,232,0.45)', marginBottom: '0.85rem', lineHeight: 1.5 }}>
-                      Un article = un design. Le client choisit T-shirt ou Sweat-shirt (prix distincts), puis une taille (même prix pour toutes les tailles).
+                      Un article = un design. Activez les modèles, fixez leurs prix, choisissez les tailles proposées. Tout est modifiable ici à tout moment.
                     </p>
-                    <div className="admin-form-grid">
-                      <Field
-                        label="Prix T-shirt (€)"
-                        value={editStore.apparel_options?.tshirt_prix ?? ''}
-                        onChange={(v: string) =>
-                          setEditStore({
-                            ...editStore,
-                            apparel_options: {
-                              ...(editStore.apparel_options ?? toApparelForm(null)),
-                              tshirt_prix: v,
-                            },
-                            prix: v,
-                          })
-                        }
-                        type="number"
-                      />
-                      <Field
-                        label="Prix Sweat-shirt (€)"
-                        value={editStore.apparel_options?.sweatshirt_prix ?? ''}
-                        onChange={(v: string) =>
-                          setEditStore({
-                            ...editStore,
-                            apparel_options: {
-                              ...(editStore.apparel_options ?? toApparelForm(null)),
-                              sweatshirt_prix: v,
-                            },
-                          })
-                        }
-                        type="number"
-                      />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+                        <div style={{ padding: '0.85rem', border: '1px solid rgba(201,168,76,0.2)' }}>
+                          <Toggle
+                            label="Option T-shirt"
+                            value={apparel.tshirt_enabled !== false}
+                            onChange={(v: boolean) =>
+                              setEditStore({
+                                ...editStore,
+                                apparel_options: { ...apparel, tshirt_enabled: v },
+                              })
+                            }
+                          />
+                          <Field
+                            label="Prix T-shirt (€)"
+                            value={apparel.tshirt_prix ?? ''}
+                            onChange={(v: string) =>
+                              setEditStore({
+                                ...editStore,
+                                apparel_options: { ...apparel, tshirt_prix: v },
+                                prix: v,
+                              })
+                            }
+                            type="number"
+                          />
+                        </div>
+                        <div style={{ padding: '0.85rem', border: '1px solid rgba(201,168,76,0.2)' }}>
+                          <Toggle
+                            label="Option Sweat-shirt"
+                            value={apparel.sweatshirt_enabled !== false}
+                            onChange={(v: boolean) =>
+                              setEditStore({
+                                ...editStore,
+                                apparel_options: { ...apparel, sweatshirt_enabled: v },
+                              })
+                            }
+                          />
+                          <Field
+                            label="Prix Sweat-shirt (€)"
+                            value={apparel.sweatshirt_prix ?? ''}
+                            onChange={(v: string) =>
+                              setEditStore({
+                                ...editStore,
+                                apparel_options: { ...apparel, sweatshirt_prix: v },
+                              })
+                            }
+                            type="number"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <p style={{ ...labelStyle, marginBottom: '0.55rem' }}>Tailles proposées (même prix selon le modèle)</p>
+                        <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
+                          {APPAREL_SIZES.map((size) => {
+                            const active = (apparel.sizes ?? [...APPAREL_SIZES]).includes(size);
+                            return (
+                              <button
+                                key={size}
+                                type="button"
+                                onClick={() => toggleSize(size)}
+                                style={{
+                                  fontFamily: 'Montserrat, sans-serif',
+                                  fontSize: '0.72rem',
+                                  letterSpacing: '0.12em',
+                                  minWidth: '2.6rem',
+                                  padding: '0.45rem 0.7rem',
+                                  border: `1px solid ${active ? gold : 'rgba(201,168,76,0.25)'}`,
+                                  background: active ? 'rgba(201,168,76,0.18)' : 'transparent',
+                                  color: active ? light : 'rgba(245,240,232,0.45)',
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                {size}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                )}
+                  );
+                })()}
                 <Field label="Citation" value={editStore.citation} onChange={(v: string) => setEditStore({ ...editStore, citation: v })} type="textarea" />
                 <div className="admin-form-grid">
                   <Field label="Style (galerie)" value={editStore.style} onChange={(v: string) => setEditStore({ ...editStore, style: v })} />

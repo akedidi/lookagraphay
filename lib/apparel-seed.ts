@@ -107,6 +107,9 @@ export function apparelSeedPayload(item: (typeof APPAREL_SEED_ITEMS)[number]) {
     apparel_options: {
       tshirt_prix: DEFAULT_TSHIRT_PRIX,
       sweatshirt_prix: DEFAULT_SWEATSHIRT_PRIX,
+      tshirt_enabled: true,
+      sweatshirt_enabled: true,
+      sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     },
   };
 }

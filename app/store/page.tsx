@@ -19,9 +19,9 @@ import {
   type Quantite,
 } from '@/lib/bijou-pricing';
 import {
-  APPAREL_SIZES,
-  APPAREL_TYPES,
   apparelBasePrice,
+  apparelEnabledSizes,
+  apparelEnabledTypes,
   apparelSizeLabel,
   apparelTypeLabel,
   isApparelCategory,
@@ -232,7 +232,9 @@ function ApparelSelector({
     sizeLabel?: string;
   }) => void;
 }) {
-  const selectedType = type ?? 'tshirt';
+  const availableTypes = apparelEnabledTypes(apparelOptions);
+  const availableSizes = apparelEnabledSizes(apparelOptions);
+  const selectedType = type && availableTypes.includes(type) ? type : availableTypes[0];
   const base = apparelBasePrice(apparelOptions, selectedType, fallbackPrix);
   const priced = resolvePriceForBase(itemPromo, base);
 
@@ -259,7 +261,7 @@ function ApparelSelector({
   );
 
   function emit(nextType: ApparelType | null, nextSize: ApparelSize | null) {
-    const t = nextType ?? 'tshirt';
+    const t = nextType && availableTypes.includes(nextType) ? nextType : availableTypes[0];
     const nextBase = apparelBasePrice(apparelOptions, t, fallbackPrix);
     const nextPriced = resolvePriceForBase(itemPromo, nextBase);
     onChange({
@@ -279,7 +281,7 @@ function ApparelSelector({
           Modèle
         </span>
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          {APPAREL_TYPES.map((t) =>
+          {availableTypes.map((t) =>
             optBtn(apparelTypeLabel(t), type === t, () => emit(t, size))
           )}
         </div>
@@ -290,8 +292,8 @@ function ApparelSelector({
           Taille
         </span>
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          {APPAREL_SIZES.map((s) =>
-            optBtn(s, size === s, () => emit(type ?? 'tshirt', s))
+          {availableSizes.map((s) =>
+            optBtn(s, size === s, () => emit(type ?? selectedType, s))
           )}
         </div>
         <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(61,43,31,0.45)', marginTop: '0.55rem' }}>
@@ -382,7 +384,7 @@ export default function StorePage() {
       const enRupture = item.stock_options ? item.stock_options[defaultM] === false : false;
       setSelectedRupture(enRupture);
     } else if (isApparel(item.categorie)) {
-      const defaultType: ApparelType = 'tshirt';
+      const defaultType = apparelEnabledTypes(item.apparel_options)[0];
       const base = apparelBasePrice(item.apparel_options, defaultType, item.prix);
       const { final } = resolvePriceForBase(promoInputFromStoreItem(item), base);
       setSelectedPrix(final);

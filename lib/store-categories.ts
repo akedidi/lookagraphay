@@ -27,33 +27,42 @@ export const APPAREL_TYPE_LABELS: Record<ApparelType, string> = {
 export const APPAREL_SIZES = ['S', 'M', 'L', 'XL', 'XXL'] as const;
 export type ApparelSize = (typeof APPAREL_SIZES)[number];
 
-export type ApparelOptions = {
-  tshirt_prix: number;
-  sweatshirt_prix: number;
-};
-
-export function isBijouStoreCategory(categorie: string): boolean {
-  return (BIJOU_CATEGORIES as readonly string[]).includes(categorie);
-}
-
-export function isApparelCategory(categorie: string): boolean {
-  return categorie === APPAREL_CATEGORY;
-}
-
 /** Prix catalogue par défaut : T-shirt 50 €, Sweat-shirt 65 €. */
 export const DEFAULT_TSHIRT_PRIX = 50;
 export const DEFAULT_SWEATSHIRT_PRIX = 65;
+
+export type ApparelOptions = {
+  tshirt_prix: number;
+  sweatshirt_prix: number;
+  /** Afficher l'option T-shirt côté boutique (défaut true). */
+  tshirt_enabled: boolean;
+  /** Afficher l'option Sweat-shirt côté boutique (défaut true). */
+  sweatshirt_enabled: boolean;
+  /** Tailles proposées au client (défaut toutes). */
+  sizes: ApparelSize[];
+};
+
+function normalizeSizes(raw: unknown): ApparelSize[] {
+  if (!Array.isArray(raw) || raw.length === 0) return [...APPAREL_SIZES];
+  const parsed = raw
+    .map((s) => String(s).replace(/^taille\s+/i, '').trim().toUpperCase())
+    .filter((s): s is ApparelSize => (APPAREL_SIZES as readonly string[]).includes(s));
+  return parsed.length > 0 ? parsed : [...APPAREL_SIZES];
+}
 
 export function defaultApparelOptions(_fallbackPrix = 0): ApparelOptions {
   return {
     tshirt_prix: DEFAULT_TSHIRT_PRIX,
     sweatshirt_prix: DEFAULT_SWEATSHIRT_PRIX,
+    tshirt_enabled: true,
+    sweatshirt_enabled: true,
+    sizes: [...APPAREL_SIZES],
   };
 }
 
 export function parseApparelOptions(
   value: unknown,
-  fallbackPrix = DEFAULT_TSHIRT_PRIX
+  _fallbackPrix = DEFAULT_TSHIRT_PRIX
 ): ApparelOptions | null {
   if (!value) return null;
   try {
@@ -66,10 +75,21 @@ export function parseApparelOptions(
       tshirt_prix: Number.isFinite(tshirt) && tshirt > 0 ? tshirt : DEFAULT_TSHIRT_PRIX,
       sweatshirt_prix:
         Number.isFinite(sweat) && sweat > 0 ? sweat : DEFAULT_SWEATSHIRT_PRIX,
+      tshirt_enabled: raw.tshirt_enabled !== false,
+      sweatshirt_enabled: raw.sweatshirt_enabled !== false,
+      sizes: normalizeSizes(raw.sizes),
     };
   } catch {
     return null;
   }
+}
+
+export function isBijouStoreCategory(categorie: string): boolean {
+  return (BIJOU_CATEGORIES as readonly string[]).includes(categorie);
+}
+
+export function isApparelCategory(categorie: string): boolean {
+  return categorie === APPAREL_CATEGORY;
 }
 
 export function apparelTypeLabel(type: ApparelType): string {
@@ -101,6 +121,19 @@ export function apparelSizeLabel(size: ApparelSize): string {
   return `Taille ${size}`;
 }
 
+export function apparelEnabledTypes(options: ApparelOptions | null | undefined): ApparelType[] {
+  const opts = options ?? defaultApparelOptions();
+  const types: ApparelType[] = [];
+  if (opts.tshirt_enabled) types.push('tshirt');
+  if (opts.sweatshirt_enabled) types.push('sweatshirt');
+  return types.length > 0 ? types : ['tshirt'];
+}
+
+export function apparelEnabledSizes(options: ApparelOptions | null | undefined): ApparelSize[] {
+  const opts = options ?? defaultApparelOptions();
+  return opts.sizes.length > 0 ? opts.sizes : [...APPAREL_SIZES];
+}
+
 export function apparelBasePrice(
   options: ApparelOptions | null | undefined,
   type: ApparelType,
@@ -111,15 +144,19 @@ export function apparelBasePrice(
   return Number.isFinite(price) ? price : fallbackPrix;
 }
 
-/** Prix catalogue affiché en grille (le plus bas des deux options). */
+/** Prix catalogue affiché en grille (le plus bas des options activées). */
 export function apparelDisplayBasePrice(
   options: ApparelOptions | null | undefined,
   fallbackPrix = 0
 ): number {
-  if (!options) return fallbackPrix;
-  const prices = [options.tshirt_prix, options.sweatshirt_prix].filter(
-    (p) => Number.isFinite(p) && p > 0
-  );
-  if (prices.length === 0) return fallbackPrix;
+  if (!options) return fallbackPrix || DEFAULT_TSHIRT_PRIX;
+  const prices: number[] = [];
+  if (options.tshirt_enabled && options.tshirt_prix > 0) prices.push(options.tshirt_prix);
+  if (options.sweatshirt_enabled && options.sweatshirt_prix > 0) prices.push(options.sweatshirt_prix);
+  if (prices.length === 0) {
+    if (options.tshirt_prix > 0) prices.push(options.tshirt_prix);
+    if (options.sweatshirt_prix > 0) prices.push(options.sweatshirt_prix);
+  }
+  if (prices.length === 0) return fallbackPrix || DEFAULT_TSHIRT_PRIX;
   return Math.min(...prices);
 }

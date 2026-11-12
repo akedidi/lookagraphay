@@ -8,6 +8,8 @@ import {
 import { calcShipping, getPoidsKg } from '@/lib/shipping';
 import {
   apparelBasePrice,
+  apparelEnabledSizes,
+  apparelEnabledTypes,
   apparelSizeLabel,
   apparelTypeLabel,
   isApparelCategory,
@@ -66,12 +68,12 @@ function unitPriceForLine(item: MappedStoreItem, line: OrderLineInput): { unitPr
 
   if (isApparelCategory(item.categorie)) {
     const type = parseApparelType(line.matiere);
-    if (!type) {
-      throw new Error(`« ${item.titre} » : veuillez choisir T-shirt ou Sweat-shirt`);
+    if (!type || !apparelEnabledTypes(item.apparel_options).includes(type)) {
+      throw new Error(`« ${item.titre} » : veuillez choisir un modèle disponible`);
     }
     const size = parseApparelSize(line.quantite_label);
-    if (!size) {
-      throw new Error(`« ${item.titre} » : veuillez choisir une taille (S–XXL)`);
+    if (!size || !apparelEnabledSizes(item.apparel_options).includes(size)) {
+      throw new Error(`« ${item.titre} » : veuillez choisir une taille disponible`);
     }
     const base = apparelBasePrice(item.apparel_options, type, item.prix);
     const promo = resolvePriceForBase(promoInputFromItem(item), base);
