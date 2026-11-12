@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
 import { requireAdmin } from '@/lib/admin-auth';
+import { ensureApparelSeedItems } from '@/lib/apparel-seed';
 import { ensureStoreColumns } from '@/lib/store-schema';
 import { fromDatetimeLocalValue, mapStoreItemFromRow } from '@/lib/store-item';
 
@@ -58,6 +59,12 @@ export async function GET() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     await ensureStoreColumns(conn);
+    // Première visite boutique après deploy : crée les designs vêtements manquants.
+    try {
+      await ensureApparelSeedItems(conn);
+    } catch (seedErr) {
+      console.error('[lookagraphy] apparel seed skipped |', seedErr);
+    }
     const [rows] = (await conn.execute(
       'SELECT * FROM store_items ORDER BY ordre ASC, id ASC'
     )) as [Record<string, unknown>[], unknown];
