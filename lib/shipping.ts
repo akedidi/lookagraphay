@@ -3,6 +3,9 @@ export const POIDS_KG: Record<string, number> = {
   Bague: 0.15,
   Pendentif: 0.1,
   "Boucles d'oreilles": 0.2,
+  'T-shirts et sweat-shirts': 0.4,
+  Totebags: 0.3,
+  Mugs: 0.55,
 };
 
 export function getPoidsKg(categorie: string): number {

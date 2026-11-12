@@ -6,6 +6,11 @@ import {
   parseQuantite,
 } from '@/lib/bijou-pricing';
 import { calcShipping, getPoidsKg } from '@/lib/shipping';
+import {
+  apparelSizeLabel,
+  isApparelCategory,
+  parseApparelSize,
+} from '@/lib/store-categories';
 import { mapStoreItemFromRow, resolvePriceForBase, type MappedStoreItem } from '@/lib/store-item';
 import type { PromoInput } from '@/lib/promo';
 
@@ -119,6 +124,15 @@ export async function validateOrderPricing(
     const { unitPrice, original } = unitPriceForLine(item, line);
     const poids_kg = getPoidsKg(item.categorie);
 
+    let matiere = line.matiere || undefined;
+    if (isApparelCategory(item.categorie)) {
+      const size = parseApparelSize(line.matiere);
+      if (!size) {
+        throw new Error(`« ${item.titre} » : veuillez choisir une taille (S–XXL)`);
+      }
+      matiere = apparelSizeLabel(size);
+    }
+
     validated.push({
       id: item.id,
       titre: item.titre,
@@ -126,7 +140,7 @@ export async function validateOrderPricing(
       prix_original: original,
       qty,
       categorie: item.categorie,
-      matiere: line.matiere || undefined,
+      matiere,
       quantite_label: line.quantite_label || undefined,
       poids_kg,
     });

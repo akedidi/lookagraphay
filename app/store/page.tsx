@@ -18,6 +18,12 @@ import {
   type Matiere,
   type Quantite,
 } from '@/lib/bijou-pricing';
+import {
+  APPAREL_SIZES,
+  apparelSizeLabel,
+  isApparelCategory,
+  type ApparelSize,
+} from '@/lib/store-categories';
 import { isMatiereEnRupture, isTotalementEnRupture } from '@/lib/store-item';
 import { fadeUp, motionViewport } from '@/lib/motion-variants';
 
@@ -25,6 +31,10 @@ type StoreItem = MappedStoreItem;
 
 function isBijou(cat: string) {
   return isBijouCategory(cat);
+}
+
+function isApparel(cat: string) {
+  return isApparelCategory(cat);
 }
 
 function calcPrix(cat: string, m: Matiere, q: Quantite): number {
@@ -195,6 +205,54 @@ function PrixSelector({
   );
 }
 
+function TailleSelector({
+  value,
+  onChange,
+}: {
+  value: ApparelSize | null;
+  onChange: (size: ApparelSize) => void;
+}) {
+  return (
+    <div style={{ marginBottom: '1.5rem' }}>
+      <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#C9A84C', display: 'block', marginBottom: '0.6rem' }}>
+        Taille
+      </span>
+      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+        {APPAREL_SIZES.map((size) => {
+          const active = value === size;
+          return (
+            <button
+              key={size}
+              type="button"
+              onClick={() => onChange(size)}
+              style={{
+                fontFamily: 'Montserrat, sans-serif',
+                fontSize: '0.75rem',
+                letterSpacing: '0.12em',
+                minWidth: '2.75rem',
+                padding: '0.55rem 0.85rem',
+                border: `1.5px solid ${active ? '#C9A84C' : 'rgba(61,43,31,0.2)'}`,
+                background: active ? 'rgba(201,168,76,0.1)' : 'transparent',
+                color: active ? '#1A1209' : 'rgba(61,43,31,0.55)',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                fontWeight: active ? 600 : 300,
+              }}
+            >
+              {size}
+            </button>
+          );
+        })}
+      </div>
+      {!value && (
+        <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(61,43,31,0.45)', marginTop: '0.55rem' }}>
+          Choisissez une taille pour ajouter au panier
+        </p>
+      )}
+    </div>
+  );
+}
+
 
 const arabicLetters = ['ب', 'ل', 'ن', 'م', 'ح', 'ع'];
 
@@ -207,6 +265,7 @@ export default function StorePage() {
   const [selectedPrix, setSelectedPrix] = useState(0);
   const [selectedMatiere, setSelectedMatiere] = useState('');
   const [selectedQuantite, setSelectedQuantite] = useState<string | undefined>(undefined);
+  const [selectedTaille, setSelectedTaille] = useState<ApparelSize | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [addedFeedback, setAddedFeedback] = useState(false);
   const [selectedRupture, setSelectedRupture] = useState(false);
@@ -245,6 +304,7 @@ export default function StorePage() {
     setSelected(item);
     setModalImg(0);
     setAddedFeedback(false);
+    setSelectedTaille(null);
     if (isBijou(item.categorie)) {
       // Choisir la matière par défaut : préférer argent sauf si en rupture
       const defaultM: Matiere =
@@ -587,7 +647,7 @@ export default function StorePage() {
                 })() : (() => {
                   const display = getStoreItemDisplayPrice(selected);
                   return (
-                  <div style={{ marginBottom: '1.5rem' }}>
+                  <div style={{ marginBottom: isApparel(selected.categorie) ? '1rem' : '1.5rem' }}>
                     {display.active && (
                       <div style={{ marginBottom: '0.65rem' }}>
                         <PromoBadge label={display.label} />
@@ -608,6 +668,16 @@ export default function StorePage() {
                   );
                 })()}
 
+                {isApparel(selected.categorie) && (
+                  <TailleSelector
+                    value={selectedTaille}
+                    onChange={(size) => {
+                      setSelectedTaille(size);
+                      setSelectedMatiere(apparelSizeLabel(size));
+                    }}
+                  />
+                )}
+
                 {selected.disponible && !isTotalementEnRupture(selected) && (
                   <>
                     {selectedRupture ? (
@@ -621,11 +691,16 @@ export default function StorePage() {
                       </div>
                     ) : (
                       <button
+                        disabled={isApparel(selected.categorie) && !selectedTaille}
                         onClick={() => {
+                          if (isApparel(selected.categorie) && !selectedTaille) return;
                           const base = selectedPrix || selected.prix_promo;
                           const priced = isBijou(selected.categorie)
                             ? resolvePriceForBase(promoInputFromStoreItem(selected), base)
                             : getStoreItemDisplayPrice(selected);
+                          const variantLabel = isApparel(selected.categorie) && selectedTaille
+                            ? apparelSizeLabel(selectedTaille)
+                            : (selectedMatiere || undefined);
                           addItem({
                             id: selected.id,
                             titre: selected.titre,
@@ -633,7 +708,7 @@ export default function StorePage() {
                             prix_original: priced.active ? priced.original : undefined,
                             images: selected.images,
                             categorie: selected.categorie,
-                            matiere: selectedMatiere || undefined,
+                            matiere: variantLabel,
                             quantite_label: selectedQuantite,
                             poids_kg: getPoidsKg(selected.categorie),
                           });
@@ -644,14 +719,20 @@ export default function StorePage() {
                           display: 'block', width: '100%', textAlign: 'center',
                           fontFamily: 'Montserrat, sans-serif', fontSize: '0.78rem',
                           letterSpacing: '0.25em', textTransform: 'uppercase',
-                          background: addedFeedback ? 'rgba(201,168,76,0.15)' : '#1A1209',
+                          background: addedFeedback ? 'rgba(201,168,76,0.15)' : (isApparel(selected.categorie) && !selectedTaille) ? 'rgba(26,18,9,0.35)' : '#1A1209',
                           color: addedFeedback ? '#C9A84C' : '#F5F0E8',
                           border: '2px solid #1A1209',
-                          padding: '0.9rem 1.5rem', cursor: 'pointer',
+                          padding: '0.9rem 1.5rem',
+                          cursor: (isApparel(selected.categorie) && !selectedTaille) ? 'not-allowed' : 'pointer',
                           fontWeight: 500, transition: 'all 0.3s',
+                          opacity: (isApparel(selected.categorie) && !selectedTaille) ? 0.7 : 1,
                         }}
                       >
-                        {addedFeedback ? '✓ Ajouté au panier' : 'Ajouter au panier'}
+                        {addedFeedback
+                          ? '✓ Ajouté au panier'
+                          : isApparel(selected.categorie) && !selectedTaille
+                            ? 'Choisir une taille'
+                            : 'Ajouter au panier'}
                       </button>
                     )}
                   </>

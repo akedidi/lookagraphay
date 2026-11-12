@@ -4,6 +4,11 @@ import { CARRIER_SUGGESTIONS } from '@/lib/carriers';
 import { adminFetchInit, adminJsonInit } from '@/lib/admin-fetch';
 import { toDatetimeLocalValue } from '@/lib/store-item';
 import { formatPromoLabel } from '@/lib/promo';
+import {
+  STORE_CATEGORIES as STORE_CATEGORIES_CONST,
+  isApparelCategory,
+  isBijouStoreCategory,
+} from '@/lib/store-categories';
 import NewsletterPanel from '@/components/admin/NewsletterPanel';
 
 const gold = '#C9A84C';
@@ -198,7 +203,6 @@ const emptyStore = {
   stock_options: null as { or: boolean; argent: boolean } | null,
 };
 
-const BIJOU_CATEGORIES = ['Bague', "Boucles d'oreilles", 'Pendentif'];
 const emptyExpo = { titre: '', lieu: '', dates: '', statut: 'passé', description: '', image: '', images: [] };
 const emptyEvt = { titre: '', date: '', heure: '', lieu: '', type: 'Vernissage', statut: 'à venir', description: '', images: [] };
 
@@ -227,7 +231,7 @@ const SCHEDULE_FILTER_OPTIONS: { value: ScheduleFilter; label: string }[] = [
   { value: 'passé', label: 'Passées' },
 ];
 
-const STORE_CATEGORIES = ['Tableau', 'Bague', "Boucles d'oreilles", 'Pendentif'] as const;
+const STORE_CATEGORIES = [...STORE_CATEGORIES_CONST];
 type StoreCategoryFilter = 'all' | string;
 
 type OrderSearchable = { nom?: string; email?: string };
@@ -488,7 +492,7 @@ export default function AdminPage() {
   }
 
   function startEditStoreItem(item: any) {
-    const isBijouCat = BIJOU_CATEGORIES.includes(item.categorie);
+    const isBijouCat = isBijouStoreCategory(item.categorie);
     setEditStore({
       ...item,
       in_galerie: item.in_galerie ?? false,
@@ -841,7 +845,24 @@ export default function AdminPage() {
                 <div className="admin-form-grid">
                   <Field label="Titre" value={editStore.titre} onChange={(v: string) => setEditStore({ ...editStore, titre: v })} />
                   <Field label="Sous-titre" value={editStore.sous_titre} onChange={(v: string) => setEditStore({ ...editStore, sous_titre: v })} />
-                  <Select label="Catégorie" value={editStore.categorie} onChange={(v: string) => setEditStore({ ...editStore, categorie: v })} options={[...STORE_CATEGORIES]} />
+                  <Select
+                    label="Catégorie"
+                    value={editStore.categorie}
+                    onChange={(v: string) => {
+                      const next = { ...editStore, categorie: v };
+                      if (isBijouStoreCategory(v)) {
+                        next.stock_options = editStore.stock_options ?? { or: true, argent: true };
+                        next.in_galerie = false;
+                      } else {
+                        next.stock_options = null;
+                        if (isApparelCategory(v) || v === 'Totebags' || v === 'Mugs') {
+                          next.in_galerie = false;
+                        }
+                      }
+                      setEditStore(next);
+                    }}
+                    options={[...STORE_CATEGORIES]}
+                  />
                   <Field label="Année" value={editStore.annee} onChange={(v: string) => setEditStore({ ...editStore, annee: v })} />
                   <Field label="Technique" value={editStore.technique} onChange={(v: string) => setEditStore({ ...editStore, technique: v })} />
                   <Field label="Dimensions" value={editStore.dimensions} onChange={(v: string) => setEditStore({ ...editStore, dimensions: v })} />
@@ -859,7 +880,7 @@ export default function AdminPage() {
                 <Toggle label="Afficher dans la galerie" value={editStore.in_galerie} onChange={(v: boolean) => setEditStore({ ...editStore, in_galerie: v })} />
 
                 {/* Stock par option (bijoux uniquement) */}
-                {BIJOU_CATEGORIES.includes(editStore.categorie) && (
+                {isBijouStoreCategory(editStore.categorie) && (
                   <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.15)' }}>
                     <p style={{ ...labelStyle, marginBottom: '0.75rem', fontSize: '0.72rem' }}>Stock par matière</p>
                     <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(245,240,232,0.45)', marginBottom: '0.75rem', lineHeight: 1.5 }}>
@@ -960,7 +981,7 @@ export default function AdminPage() {
                       {item.categorie} · {item.promo_active ? `${item.prix_promo}€ (promo, était ${item.prix}€)` : `${item.prix}€`} · {item.disponible ? 'DISPO' : 'Indisponible'}
                       {item.promo_enabled && !item.promo_active ? ' · promo programmée/off' : ''}
                       {item.promo_active && formatPromoLabel(item) ? ` · ${formatPromoLabel(item)}` : ''}
-                      {item.stock_options && BIJOU_CATEGORIES.includes(item.categorie) && (
+                      {item.stock_options && isBijouStoreCategory(item.categorie) && (
                         <>
                           {item.stock_options.or === false && item.stock_options.argent === false
                             ? <span style={{ color: '#e05555' }}> · ⚠ Rupture totale</span>
