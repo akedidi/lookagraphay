@@ -23,8 +23,8 @@ type CartContextType = {
   items: CartItem[];
   hydrated: boolean;
   addItem: (item: Omit<CartItem, 'qty'>) => void;
-  removeItem: (id: number, matiere?: string) => void;
-  updateQty: (id: number, qty: number, matiere?: string) => void;
+  removeItem: (id: number, matiere?: string, quantite_label?: string) => void;
+  updateQty: (id: number, qty: number, matiere?: string, quantite_label?: string) => void;
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
@@ -35,8 +35,8 @@ type CartContextType = {
 
 const CartContext = createContext<CartContextType | null>(null);
 
-function itemKey(id: number, matiere?: string) {
-  return `${id}-${matiere ?? ''}`;
+function itemKey(id: number, matiere?: string, quantite_label?: string) {
+  return `${id}-${matiere ?? ''}-${quantite_label ?? ''}`;
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -63,28 +63,34 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [items, hydrated]);
 
   function addItem(newItem: Omit<CartItem, 'qty'>) {
-    const key = itemKey(newItem.id, newItem.matiere);
+    const key = itemKey(newItem.id, newItem.matiere, newItem.quantite_label);
     setItems(prev => {
-      const existing = prev.find(i => itemKey(i.id, i.matiere) === key);
+      const existing = prev.find(i => itemKey(i.id, i.matiere, i.quantite_label) === key);
       if (existing) {
-        return prev.map(i => itemKey(i.id, i.matiere) === key ? { ...i, qty: i.qty + 1 } : i);
+        return prev.map(i =>
+          itemKey(i.id, i.matiere, i.quantite_label) === key ? { ...i, qty: i.qty + 1 } : i
+        );
       }
       return [...prev, { ...newItem, qty: 1 }];
     });
     setIsOpen(true);
   }
 
-  function removeItem(id: number, matiere?: string) {
-    const key = itemKey(id, matiere);
-    setItems(prev => prev.filter(i => itemKey(i.id, i.matiere) !== key));
+  function removeItem(id: number, matiere?: string, quantite_label?: string) {
+    const key = itemKey(id, matiere, quantite_label);
+    setItems(prev => prev.filter(i => itemKey(i.id, i.matiere, i.quantite_label) !== key));
   }
 
-  function updateQty(id: number, qty: number, matiere?: string) {
-    const key = itemKey(id, matiere);
+  function updateQty(id: number, qty: number, matiere?: string, quantite_label?: string) {
+    const key = itemKey(id, matiere, quantite_label);
     if (qty <= 0) {
-      setItems(prev => prev.filter(i => itemKey(i.id, i.matiere) !== key));
+      setItems(prev => prev.filter(i => itemKey(i.id, i.matiere, i.quantite_label) !== key));
     } else {
-      setItems(prev => prev.map(i => itemKey(i.id, i.matiere) === key ? { ...i, qty } : i));
+      setItems(prev =>
+        prev.map(i =>
+          itemKey(i.id, i.matiere, i.quantite_label) === key ? { ...i, qty } : i
+        )
+      );
     }
   }
 

@@ -4,6 +4,13 @@ import {
   type Quantite,
 } from '@/lib/bijou-pricing';
 import {
+  apparelDisplayBasePrice,
+  defaultApparelOptions,
+  isApparelCategory,
+  parseApparelOptions,
+  type ApparelOptions,
+} from '@/lib/store-categories';
+import {
   computePromoPrice,
   formatPromoLabel,
   type PromoInput,
@@ -44,6 +51,7 @@ export type MappedStoreItem = {
   style?: string | null;
   extrait?: string | null;
   stock_options: StockOptions | null;
+  apparel_options: ApparelOptions | null;
 };
 
 export function mapStoreItemFromRow(row: StoreItemRow): MappedStoreItem {
@@ -104,6 +112,9 @@ export function mapStoreItemFromRow(row: StoreItemRow): MappedStoreItem {
       } catch {}
       return null;
     })(),
+    apparel_options: isApparelCategory(String(row.categorie ?? ''))
+      ? (parseApparelOptions(row.apparel_options, prix) ?? defaultApparelOptions())
+      : parseApparelOptions(row.apparel_options, prix),
   };
 }
 
@@ -169,6 +180,7 @@ export function getStoreItemDisplayPrice(
     | 'promo_value'
     | 'promo_start'
     | 'promo_end'
+    | 'apparel_options'
   >
 ): StoreDisplayPrice {
   const promoInput = promoInputFromStoreItem(item);
@@ -176,6 +188,8 @@ export function getStoreItemDisplayPrice(
   if (isBijouCategory(item.categorie)) {
     const fromTarif = defaultBijouBasePrice(item.categorie);
     if (fromTarif > 0) base = fromTarif;
+  } else if (isApparelCategory(item.categorie)) {
+    base = apparelDisplayBasePrice(item.apparel_options, base);
   }
   const priced = resolvePriceForBase(promoInput, base);
   const label = priced.active

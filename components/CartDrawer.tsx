@@ -72,7 +72,7 @@ export default function CartDrawer() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', background: 'rgba(201,168,76,0.08)' }}>
                   {items.map((item) => (
                     <div
-                      key={`${item.id}-${item.matiere}`}
+                      key={`${item.id}-${item.matiere}-${item.quantite_label}`}
                       style={{ background: '#2A2520', padding: '1rem', display: 'flex', gap: '0.85rem', alignItems: 'flex-start' }}
                     >
                       {/* Thumbnail */}
@@ -109,18 +109,18 @@ export default function CartDrawer() {
                           <button
                             type="button"
                             className="touch-target"
-                            onClick={() => updateQty(item.id, item.qty - 1, item.matiere)}
+                            onClick={() => updateQty(item.id, item.qty - 1, item.matiere, item.quantite_label)}
                             style={{ border: '1px solid rgba(201,168,76,0.3)', background: 'none', color: ivory, cursor: 'pointer', fontSize: '1rem', flexShrink: 0 }}
                           >−</button>
                           <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.82rem', color: ivory, minWidth: 20, textAlign: 'center' }}>{item.qty}</span>
                           <button
                             type="button"
                             className="touch-target"
-                            onClick={() => updateQty(item.id, item.qty + 1, item.matiere)}
+                            onClick={() => updateQty(item.id, item.qty + 1, item.matiere, item.quantite_label)}
                             style={{ border: '1px solid rgba(201,168,76,0.3)', background: 'none', color: ivory, cursor: 'pointer', fontSize: '1rem', flexShrink: 0 }}
                           >+</button>
                           <button
-                            onClick={() => removeItem(item.id, item.matiere)}
+                            onClick={() => removeItem(item.id, item.matiere, item.quantite_label)}
                             style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'rgba(224,85,85,0.7)', cursor: 'pointer', fontSize: '0.7rem', fontFamily: 'Montserrat, sans-serif', letterSpacing: '0.1em', padding: 0 }}
                           >Retirer</button>
                         </div>

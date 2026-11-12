@@ -20,9 +20,14 @@ import {
 } from '@/lib/bijou-pricing';
 import {
   APPAREL_SIZES,
+  APPAREL_TYPES,
+  apparelBasePrice,
   apparelSizeLabel,
+  apparelTypeLabel,
   isApparelCategory,
+  type ApparelOptions,
   type ApparelSize,
+  type ApparelType,
 } from '@/lib/store-categories';
 import { isMatiereEnRupture, isTotalementEnRupture } from '@/lib/store-item';
 import { fadeUp, motionViewport } from '@/lib/motion-variants';
@@ -205,50 +210,106 @@ function PrixSelector({
   );
 }
 
-function TailleSelector({
-  value,
+function ApparelSelector({
+  itemPromo,
+  apparelOptions,
+  fallbackPrix,
+  type,
+  size,
   onChange,
 }: {
-  value: ApparelSize | null;
-  onChange: (size: ApparelSize) => void;
+  itemPromo: PromoInput;
+  apparelOptions: ApparelOptions | null;
+  fallbackPrix: number;
+  type: ApparelType | null;
+  size: ApparelSize | null;
+  onChange: (next: {
+    type: ApparelType | null;
+    size: ApparelSize | null;
+    prix: number;
+    prixOriginal?: number;
+    typeLabel?: string;
+    sizeLabel?: string;
+  }) => void;
 }) {
+  const selectedType = type ?? 'tshirt';
+  const base = apparelBasePrice(apparelOptions, selectedType, fallbackPrix);
+  const priced = resolvePriceForBase(itemPromo, base);
+
+  const optBtn = (label: string, active: boolean, onClick: () => void) => (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        fontFamily: 'Montserrat, sans-serif',
+        fontSize: '0.75rem',
+        letterSpacing: '0.12em',
+        minWidth: '2.75rem',
+        padding: '0.55rem 0.85rem',
+        border: `1.5px solid ${active ? '#C9A84C' : 'rgba(61,43,31,0.2)'}`,
+        background: active ? 'rgba(201,168,76,0.1)' : 'transparent',
+        color: active ? '#1A1209' : 'rgba(61,43,31,0.55)',
+        cursor: 'pointer',
+        transition: 'all 0.2s',
+        fontWeight: active ? 600 : 300,
+      }}
+    >
+      {label}
+    </button>
+  );
+
+  function emit(nextType: ApparelType | null, nextSize: ApparelSize | null) {
+    const t = nextType ?? 'tshirt';
+    const nextBase = apparelBasePrice(apparelOptions, t, fallbackPrix);
+    const nextPriced = resolvePriceForBase(itemPromo, nextBase);
+    onChange({
+      type: nextType,
+      size: nextSize,
+      prix: nextPriced.final,
+      prixOriginal: nextPriced.active ? nextPriced.original : undefined,
+      typeLabel: nextType ? apparelTypeLabel(nextType) : undefined,
+      sizeLabel: nextSize ? apparelSizeLabel(nextSize) : undefined,
+    });
+  }
+
   return (
-    <div style={{ marginBottom: '1.5rem' }}>
-      <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#C9A84C', display: 'block', marginBottom: '0.6rem' }}>
-        Taille
-      </span>
-      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-        {APPAREL_SIZES.map((size) => {
-          const active = value === size;
-          return (
-            <button
-              key={size}
-              type="button"
-              onClick={() => onChange(size)}
-              style={{
-                fontFamily: 'Montserrat, sans-serif',
-                fontSize: '0.75rem',
-                letterSpacing: '0.12em',
-                minWidth: '2.75rem',
-                padding: '0.55rem 0.85rem',
-                border: `1.5px solid ${active ? '#C9A84C' : 'rgba(61,43,31,0.2)'}`,
-                background: active ? 'rgba(201,168,76,0.1)' : 'transparent',
-                color: active ? '#1A1209' : 'rgba(61,43,31,0.55)',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                fontWeight: active ? 600 : 300,
-              }}
-            >
-              {size}
-            </button>
-          );
-        })}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '1.5rem' }}>
+      <div>
+        <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#C9A84C', display: 'block', marginBottom: '0.6rem' }}>
+          Modèle
+        </span>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          {APPAREL_TYPES.map((t) =>
+            optBtn(apparelTypeLabel(t), type === t, () => emit(t, size))
+          )}
+        </div>
       </div>
-      {!value && (
+
+      <div>
+        <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#C9A84C', display: 'block', marginBottom: '0.6rem' }}>
+          Taille
+        </span>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          {APPAREL_SIZES.map((s) =>
+            optBtn(s, size === s, () => emit(type ?? 'tshirt', s))
+          )}
+        </div>
         <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(61,43,31,0.45)', marginTop: '0.55rem' }}>
-          Choisissez une taille pour ajouter au panier
+          Même prix pour toutes les tailles
         </p>
-      )}
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', flexWrap: 'wrap' }}>
+        <PriceDisplay
+          original={priced.original}
+          final={priced.final}
+          active={priced.active}
+          size="lg"
+        />
+        <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(61,43,31,0.45)', letterSpacing: '0.1em' }}>
+          TVA incluse
+        </span>
+      </div>
     </div>
   );
 }
@@ -265,6 +326,7 @@ export default function StorePage() {
   const [selectedPrix, setSelectedPrix] = useState(0);
   const [selectedMatiere, setSelectedMatiere] = useState('');
   const [selectedQuantite, setSelectedQuantite] = useState<string | undefined>(undefined);
+  const [selectedApparelType, setSelectedApparelType] = useState<ApparelType | null>(null);
   const [selectedTaille, setSelectedTaille] = useState<ApparelSize | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [addedFeedback, setAddedFeedback] = useState(false);
@@ -304,6 +366,7 @@ export default function StorePage() {
     setSelected(item);
     setModalImg(0);
     setAddedFeedback(false);
+    setSelectedApparelType(null);
     setSelectedTaille(null);
     if (isBijou(item.categorie)) {
       // Choisir la matière par défaut : préférer argent sauf si en rupture
@@ -318,6 +381,15 @@ export default function StorePage() {
       // Rupture sur la matière par défaut ?
       const enRupture = item.stock_options ? item.stock_options[defaultM] === false : false;
       setSelectedRupture(enRupture);
+    } else if (isApparel(item.categorie)) {
+      const defaultType: ApparelType = 'tshirt';
+      const base = apparelBasePrice(item.apparel_options, defaultType, item.prix);
+      const { final } = resolvePriceForBase(promoInputFromStoreItem(item), base);
+      setSelectedPrix(final);
+      setSelectedApparelType(defaultType);
+      setSelectedMatiere(apparelTypeLabel(defaultType));
+      setSelectedQuantite(undefined);
+      setSelectedRupture(false);
     } else {
       setSelectedPrix(item.prix_promo);
       setSelectedMatiere('');
@@ -621,7 +693,7 @@ export default function StorePage() {
                 {/* Séparateur avant tarif */}
                 <div style={{ height: 1, background: 'rgba(61,43,31,0.1)', marginBottom: '1.5rem' }} />
 
-                {/* Sélecteur prix pour bijoux */}
+                {/* Sélecteur prix pour bijoux / vêtements */}
                 {isBijou(selected.categorie) ? (() => {
                   const bijouDisplay = getStoreItemDisplayPrice(selected);
                   return (
@@ -644,10 +716,35 @@ export default function StorePage() {
                   />
                   </>
                   );
+                })() : isApparel(selected.categorie) ? (() => {
+                  const apparelDisplay = getStoreItemDisplayPrice(selected);
+                  return (
+                  <>
+                  {apparelDisplay.active && (
+                    <div style={{ marginBottom: '0.75rem' }}>
+                      <PromoBadge label={apparelDisplay.label} />
+                    </div>
+                  )}
+                  <ApparelSelector
+                    itemPromo={promoInputFromStoreItem(selected)}
+                    apparelOptions={selected.apparel_options}
+                    fallbackPrix={selected.prix}
+                    type={selectedApparelType}
+                    size={selectedTaille}
+                    onChange={({ type, size, prix, typeLabel, sizeLabel }) => {
+                      setSelectedApparelType(type);
+                      setSelectedTaille(size);
+                      setSelectedPrix(prix);
+                      setSelectedMatiere(typeLabel || '');
+                      setSelectedQuantite(sizeLabel);
+                    }}
+                  />
+                  </>
+                  );
                 })() : (() => {
                   const display = getStoreItemDisplayPrice(selected);
                   return (
-                  <div style={{ marginBottom: isApparel(selected.categorie) ? '1rem' : '1.5rem' }}>
+                  <div style={{ marginBottom: '1.5rem' }}>
                     {display.active && (
                       <div style={{ marginBottom: '0.65rem' }}>
                         <PromoBadge label={display.label} />
@@ -668,16 +765,6 @@ export default function StorePage() {
                   );
                 })()}
 
-                {isApparel(selected.categorie) && (
-                  <TailleSelector
-                    value={selectedTaille}
-                    onChange={(size) => {
-                      setSelectedTaille(size);
-                      setSelectedMatiere(apparelSizeLabel(size));
-                    }}
-                  />
-                )}
-
                 {selected.disponible && !isTotalementEnRupture(selected) && (
                   <>
                     {selectedRupture ? (
@@ -691,16 +778,25 @@ export default function StorePage() {
                       </div>
                     ) : (
                       <button
-                        disabled={isApparel(selected.categorie) && !selectedTaille}
+                        disabled={isApparel(selected.categorie) && (!selectedApparelType || !selectedTaille)}
                         onClick={() => {
-                          if (isApparel(selected.categorie) && !selectedTaille) return;
-                          const base = selectedPrix || selected.prix_promo;
-                          const priced = isBijou(selected.categorie)
-                            ? resolvePriceForBase(promoInputFromStoreItem(selected), base)
-                            : getStoreItemDisplayPrice(selected);
-                          const variantLabel = isApparel(selected.categorie) && selectedTaille
-                            ? apparelSizeLabel(selectedTaille)
-                            : (selectedMatiere || undefined);
+                          if (isApparel(selected.categorie) && (!selectedApparelType || !selectedTaille)) return;
+                          let priced: { final: number; original: number; active: boolean };
+                          if (isApparel(selected.categorie) && selectedApparelType) {
+                            const catalog = apparelBasePrice(
+                              selected.apparel_options,
+                              selectedApparelType,
+                              selected.prix
+                            );
+                            priced = resolvePriceForBase(promoInputFromStoreItem(selected), catalog);
+                          } else if (isBijou(selected.categorie)) {
+                            priced = resolvePriceForBase(
+                              promoInputFromStoreItem(selected),
+                              selectedPrix || selected.prix
+                            );
+                          } else {
+                            priced = getStoreItemDisplayPrice(selected);
+                          }
                           addItem({
                             id: selected.id,
                             titre: selected.titre,
@@ -708,7 +804,7 @@ export default function StorePage() {
                             prix_original: priced.active ? priced.original : undefined,
                             images: selected.images,
                             categorie: selected.categorie,
-                            matiere: variantLabel,
+                            matiere: selectedMatiere || undefined,
                             quantite_label: selectedQuantite,
                             poids_kg: getPoidsKg(selected.categorie),
                           });
@@ -719,19 +815,23 @@ export default function StorePage() {
                           display: 'block', width: '100%', textAlign: 'center',
                           fontFamily: 'Montserrat, sans-serif', fontSize: '0.78rem',
                           letterSpacing: '0.25em', textTransform: 'uppercase',
-                          background: addedFeedback ? 'rgba(201,168,76,0.15)' : (isApparel(selected.categorie) && !selectedTaille) ? 'rgba(26,18,9,0.35)' : '#1A1209',
+                          background: addedFeedback
+                            ? 'rgba(201,168,76,0.15)'
+                            : (isApparel(selected.categorie) && (!selectedApparelType || !selectedTaille))
+                              ? 'rgba(26,18,9,0.35)'
+                              : '#1A1209',
                           color: addedFeedback ? '#C9A84C' : '#F5F0E8',
                           border: '2px solid #1A1209',
                           padding: '0.9rem 1.5rem',
-                          cursor: (isApparel(selected.categorie) && !selectedTaille) ? 'not-allowed' : 'pointer',
+                          cursor: (isApparel(selected.categorie) && (!selectedApparelType || !selectedTaille)) ? 'not-allowed' : 'pointer',
                           fontWeight: 500, transition: 'all 0.3s',
-                          opacity: (isApparel(selected.categorie) && !selectedTaille) ? 0.7 : 1,
+                          opacity: (isApparel(selected.categorie) && (!selectedApparelType || !selectedTaille)) ? 0.7 : 1,
                         }}
                       >
                         {addedFeedback
                           ? '✓ Ajouté au panier'
-                          : isApparel(selected.categorie) && !selectedTaille
-                            ? 'Choisir une taille'
+                          : isApparel(selected.categorie) && (!selectedApparelType || !selectedTaille)
+                            ? 'Choisir modèle et taille'
                             : 'Ajouter au panier'}
                       </button>
                     )}

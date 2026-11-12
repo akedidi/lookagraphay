@@ -33,4 +33,5 @@ export async function ensureStoreColumns(conn: PoolConnection): Promise<void> {
   await addColumnIfMissing(conn, existing, 'promo_start', 'DATETIME NULL AFTER promo_value');
   await addColumnIfMissing(conn, existing, 'promo_end', 'DATETIME NULL AFTER promo_start');
   await addColumnIfMissing(conn, existing, 'stock_options', 'JSON NULL AFTER promo_end');
+  await addColumnIfMissing(conn, existing, 'apparel_options', 'JSON NULL AFTER stock_options');
 }

@@ -7,9 +7,12 @@ import {
 } from '@/lib/bijou-pricing';
 import { calcShipping, getPoidsKg } from '@/lib/shipping';
 import {
+  apparelBasePrice,
   apparelSizeLabel,
+  apparelTypeLabel,
   isApparelCategory,
   parseApparelSize,
+  parseApparelType,
 } from '@/lib/store-categories';
 import { mapStoreItemFromRow, resolvePriceForBase, type MappedStoreItem } from '@/lib/store-item';
 import type { PromoInput } from '@/lib/promo';
@@ -54,6 +57,23 @@ function unitPriceForLine(item: MappedStoreItem, line: OrderLineInput): { unitPr
       parseMatiere(line.matiere),
       parseQuantite(line.quantite_label)
     );
+    const promo = resolvePriceForBase(promoInputFromItem(item), base);
+    return {
+      unitPrice: promo.final,
+      original: promo.active ? promo.original : undefined,
+    };
+  }
+
+  if (isApparelCategory(item.categorie)) {
+    const type = parseApparelType(line.matiere);
+    if (!type) {
+      throw new Error(`« ${item.titre} » : veuillez choisir T-shirt ou Sweat-shirt`);
+    }
+    const size = parseApparelSize(line.quantite_label);
+    if (!size) {
+      throw new Error(`« ${item.titre} » : veuillez choisir une taille (S–XXL)`);
+    }
+    const base = apparelBasePrice(item.apparel_options, type, item.prix);
     const promo = resolvePriceForBase(promoInputFromItem(item), base);
     return {
       unitPrice: promo.final,
@@ -125,12 +145,15 @@ export async function validateOrderPricing(
     const poids_kg = getPoidsKg(item.categorie);
 
     let matiere = line.matiere || undefined;
+    let quantite_label = line.quantite_label || undefined;
     if (isApparelCategory(item.categorie)) {
-      const size = parseApparelSize(line.matiere);
-      if (!size) {
-        throw new Error(`« ${item.titre} » : veuillez choisir une taille (S–XXL)`);
+      const type = parseApparelType(line.matiere);
+      const size = parseApparelSize(line.quantite_label);
+      if (!type || !size) {
+        throw new Error(`« ${item.titre} » : choisissez le modèle et la taille`);
       }
-      matiere = apparelSizeLabel(size);
+      matiere = apparelTypeLabel(type);
+      quantite_label = apparelSizeLabel(size);
     }
 
     validated.push({
@@ -141,7 +164,7 @@ export async function validateOrderPricing(
       qty,
       categorie: item.categorie,
       matiere,
-      quantite_label: line.quantite_label || undefined,
+      quantite_label,
       poids_kg,
     });
 

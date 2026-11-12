@@ -6,9 +6,21 @@ import { toDatetimeLocalValue } from '@/lib/store-item';
 import { formatPromoLabel } from '@/lib/promo';
 import {
   STORE_CATEGORIES as STORE_CATEGORIES_CONST,
+  defaultApparelOptions,
   isApparelCategory,
   isBijouStoreCategory,
+  type ApparelOptions,
 } from '@/lib/store-categories';
+
+type ApparelOptionsForm = { tshirt_prix: string; sweatshirt_prix: string };
+
+function toApparelForm(options: ApparelOptions | null | undefined, fallback = 0): ApparelOptionsForm {
+  const base = options ?? defaultApparelOptions(fallback);
+  return {
+    tshirt_prix: String(base.tshirt_prix ?? fallback),
+    sweatshirt_prix: String(base.sweatshirt_prix ?? fallback),
+  };
+}
 import NewsletterPanel from '@/components/admin/NewsletterPanel';
 
 const gold = '#C9A84C';
@@ -201,6 +213,7 @@ const emptyStore = {
   prix: '', images: [], disponible: true, paypal_link: '', ordre: 0, style: 'Calligraphie contemporaine', extrait: '', in_galerie: true,
   promo_enabled: false, promo_type: 'percent', promo_value: '', promo_start: '', promo_end: '',
   stock_options: null as { or: boolean; argent: boolean } | null,
+  apparel_options: null as ApparelOptionsForm | null,
 };
 
 const emptyExpo = { titre: '', lieu: '', dates: '', statut: 'passé', description: '', image: '', images: [] };
@@ -493,6 +506,8 @@ export default function AdminPage() {
 
   function startEditStoreItem(item: any) {
     const isBijouCat = isBijouStoreCategory(item.categorie);
+    const isApparelCat = isApparelCategory(item.categorie);
+    const fallbackPrix = Number(item.prix) || 0;
     setEditStore({
       ...item,
       in_galerie: item.in_galerie ?? false,
@@ -503,6 +518,9 @@ export default function AdminPage() {
       promo_end: toDatetimeLocalValue(item.promo_end),
       stock_options: isBijouCat
         ? (item.stock_options ?? { or: true, argent: true })
+        : null,
+      apparel_options: isApparelCat
+        ? toApparelForm(item.apparel_options, fallbackPrix)
         : null,
     });
     setIsNew(false);
@@ -601,9 +619,25 @@ export default function AdminPage() {
     }
 
     const { promo: _promo, prix_promo: _pp, promo_active: _pa, ...rest } = editStore;
+    const isApparel = isApparelCategory(editStore.categorie);
+    let apparel_options: ApparelOptions | null = null;
+    let prix = parseFloat(editStore.prix) || 0;
+    if (isApparel) {
+      const tshirt = parseFloat(String(editStore.apparel_options?.tshirt_prix ?? '')) || 0;
+      const sweat = parseFloat(String(editStore.apparel_options?.sweatshirt_prix ?? '')) || 0;
+      if (tshirt <= 0 || sweat <= 0) {
+        setSaving(false);
+        flash('❌ Indiquez un prix T-shirt et un prix Sweat-shirt.');
+        return;
+      }
+      apparel_options = { tshirt_prix: tshirt, sweatshirt_prix: sweat };
+      prix = Math.min(tshirt, sweat);
+    }
     const body = {
       ...rest,
-      prix: parseFloat(editStore.prix) || 0,
+      prix,
+      apparel_options,
+      stock_options: isBijouStoreCategory(editStore.categorie) ? editStore.stock_options : null,
       ordre: parseInt(editStore.ordre, 10) || 0,
       promo_enabled: Boolean(editStore.promo_enabled),
       promo_type: editStore.promo_enabled ? editStore.promo_type || 'percent' : null,
@@ -852,10 +886,17 @@ export default function AdminPage() {
                       const next = { ...editStore, categorie: v };
                       if (isBijouStoreCategory(v)) {
                         next.stock_options = editStore.stock_options ?? { or: true, argent: true };
+                        next.apparel_options = null;
+                        next.in_galerie = false;
+                      } else if (isApparelCategory(v)) {
+                        next.stock_options = null;
+                        next.apparel_options = editStore.apparel_options ?? toApparelForm(null);
+                        next.prix = String(defaultApparelOptions().tshirt_prix);
                         next.in_galerie = false;
                       } else {
                         next.stock_options = null;
-                        if (isApparelCategory(v) || v === 'Totebags' || v === 'Mugs') {
+                        next.apparel_options = null;
+                        if (v === 'Totebags' || v === 'Mugs') {
                           next.in_galerie = false;
                         }
                       }
@@ -866,9 +907,50 @@ export default function AdminPage() {
                   <Field label="Année" value={editStore.annee} onChange={(v: string) => setEditStore({ ...editStore, annee: v })} />
                   <Field label="Technique" value={editStore.technique} onChange={(v: string) => setEditStore({ ...editStore, technique: v })} />
                   <Field label="Dimensions" value={editStore.dimensions} onChange={(v: string) => setEditStore({ ...editStore, dimensions: v })} />
-                  <Field label="Prix (€)" value={editStore.prix} onChange={(v: string) => setEditStore({ ...editStore, prix: v })} type="number" />
+                  {!isApparelCategory(editStore.categorie) && (
+                    <Field label="Prix (€)" value={editStore.prix} onChange={(v: string) => setEditStore({ ...editStore, prix: v })} type="number" />
+                  )}
                   <Field label="Ordre d'affichage" value={editStore.ordre} onChange={(v: string) => setEditStore({ ...editStore, ordre: v })} type="number" />
                 </div>
+                {isApparelCategory(editStore.categorie) && (
+                  <div style={{ marginTop: '0.25rem', marginBottom: '1rem', padding: '1rem', background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.15)' }}>
+                    <p style={{ ...labelStyle, marginBottom: '0.5rem', fontSize: '0.72rem' }}>Options du même visuel</p>
+                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(245,240,232,0.45)', marginBottom: '0.85rem', lineHeight: 1.5 }}>
+                      Un article = un design. Le client choisit T-shirt ou Sweat-shirt (prix distincts), puis une taille (même prix pour toutes les tailles).
+                    </p>
+                    <div className="admin-form-grid">
+                      <Field
+                        label="Prix T-shirt (€)"
+                        value={editStore.apparel_options?.tshirt_prix ?? ''}
+                        onChange={(v: string) =>
+                          setEditStore({
+                            ...editStore,
+                            apparel_options: {
+                              ...(editStore.apparel_options ?? toApparelForm(null)),
+                              tshirt_prix: v,
+                            },
+                            prix: v,
+                          })
+                        }
+                        type="number"
+                      />
+                      <Field
+                        label="Prix Sweat-shirt (€)"
+                        value={editStore.apparel_options?.sweatshirt_prix ?? ''}
+                        onChange={(v: string) =>
+                          setEditStore({
+                            ...editStore,
+                            apparel_options: {
+                              ...(editStore.apparel_options ?? toApparelForm(null)),
+                              sweatshirt_prix: v,
+                            },
+                          })
+                        }
+                        type="number"
+                      />
+                    </div>
+                  </div>
+                )}
                 <Field label="Citation" value={editStore.citation} onChange={(v: string) => setEditStore({ ...editStore, citation: v })} type="textarea" />
                 <div className="admin-form-grid">
                   <Field label="Style (galerie)" value={editStore.style} onChange={(v: string) => setEditStore({ ...editStore, style: v })} />
