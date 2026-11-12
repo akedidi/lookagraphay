@@ -8,70 +8,70 @@ import {
 /** Collection vêtements (1 visuel = 1 article, options T-shirt / Sweat-shirt). */
 export const APPAREL_SEED_ITEMS = [
   {
-    titre: 'Rasma Ḥayāt — رسمة حياة',
-    sous_titre: 'Dessin de vie',
+    titre: 'L’art est vie — الفن حياة',
+    sous_titre: 'L’art est vie',
     description:
-      'Calligraphie blanche sur fond noir : « Dessin de vie ». Un même visuel proposé en T-shirt ou Sweat-shirt, tailles S à XXL.',
-    citation: 'رسمة حياة',
+      'Calligraphie blanche sur fond noir : « L’art est vie » (الفن حياة). Un même visuel proposé en T-shirt ou Sweat-shirt, tailles S à XXL.',
+    citation: 'الفن حياة',
     technique: 'Sérigraphie calligraphique',
     dimensions: 'Coupe unisexe',
     annee: '2025',
-    images: ['/images/articles/vetements/rasma-hayat.jpg'],
+    images: ['/images/articles/vetements/fann-hayat.jpg'],
     ordre: 100,
   },
   {
-    titre: 'Khadīja — خديجة',
-    sous_titre: 'Calligraphie d’un prénom',
-    description:
-      'Prénom calligraphié en blanc sur tee noir. Disponible en T-shirt ou Sweat-shirt, toutes tailles au même prix selon le modèle.',
-    citation: 'خديجة',
-    technique: 'Sérigraphie calligraphique',
-    dimensions: 'Coupe unisexe',
-    annee: '2025',
-    images: ['/images/articles/vetements/khadija.jpg'],
-    ordre: 101,
-  },
-  {
-    titre: 'Al-Mūsīqā Ḥayāt — الموسيقى حياة',
-    sous_titre: 'La musique est vie',
-    description:
-      'Calligraphie « La musique est vie », avec une clé de sol intégrée au trait. Même design en T-shirt (50 €) ou Sweat-shirt (65 €).',
-    citation: 'الموسيقى حياة',
-    technique: 'Sérigraphie calligraphique',
-    dimensions: 'Coupe unisexe',
-    annee: '2025',
-    images: ['/images/articles/vetements/musiqa-hayat.jpg'],
-    ordre: 102,
-  },
-  {
-    titre: 'Al-Sīnimā Ḥayāt — السينما حياة',
+    titre: 'Le cinéma est vie — السينما حياة',
     sous_titre: 'Le cinéma est vie',
     description:
-      '« Le cinéma est vie » en calligraphie contemporaine blanche sur noir. Options T-shirt / Sweat-shirt, tailles S–XXL.',
+      'Calligraphie « Le cinéma est vie » (السينما حياة) en blanc sur noir. Options T-shirt / Sweat-shirt, tailles S–XXL.',
     citation: 'السينما حياة',
     technique: 'Sérigraphie calligraphique',
     dimensions: 'Coupe unisexe',
     annee: '2025',
     images: ['/images/articles/vetements/cinema-hayat.jpg'],
-    ordre: 103,
+    ordre: 101,
   },
   {
-    titre: 'Al-Fann Ḥayāt — فن حياة',
-    sous_titre: 'L’art est vie',
+    titre: 'La calligraphie est vie — الخط حياة',
+    sous_titre: 'La calligraphie est vie',
     description:
-      'Calligraphie « L’art est vie » sur tee noir. Un visuel, deux modèles (T-shirt ou Sweat-shirt), prix selon le modèle choisi.',
-    citation: 'فن حياة',
+      'Calligraphie « La calligraphie est vie » (الخط حياة). Disponible en T-shirt ou Sweat-shirt ; prix selon le modèle, tailles au même tarif.',
+    citation: 'الخط حياة',
     technique: 'Sérigraphie calligraphique',
     dimensions: 'Coupe unisexe',
     annee: '2025',
-    images: ['/images/articles/vetements/fann-hayat.jpg'],
+    images: ['/images/articles/vetements/khadija.jpg'],
+    ordre: 102,
+  },
+  {
+    titre: 'La musique est vie — الموسيقى حياة',
+    sous_titre: 'La musique est vie',
+    description:
+      'Calligraphie « La musique est vie » (الموسيقى حياة), avec une clé de sol intégrée au trait. T-shirt 50 € / Sweat-shirt 65 €.',
+    citation: 'الموسيقى حياة',
+    technique: 'Sérigraphie calligraphique',
+    dimensions: 'Coupe unisexe',
+    annee: '2025',
+    images: ['/images/articles/vetements/musiqa-hayat.jpg'],
+    ordre: 103,
+  },
+  {
+    titre: 'La peinture est vie — الرسم حياة',
+    sous_titre: 'La peinture est vie',
+    description:
+      'Calligraphie « La peinture est vie » (الرسم حياة). Un visuel, deux modèles (T-shirt ou Sweat-shirt), tailles S–XXL.',
+    citation: 'الرسم حياة',
+    technique: 'Sérigraphie calligraphique',
+    dimensions: 'Coupe unisexe',
+    annee: '2025',
+    images: ['/images/articles/vetements/rasma-hayat.jpg'],
     ordre: 104,
   },
   {
-    titre: 'Al-Masraḥ Ḥayāt — المسرح حياة',
+    titre: 'Le théâtre est vie — المسرح حياة',
     sous_titre: 'Le théâtre est vie',
     description:
-      '« Le théâtre est vie » calligraphié en blanc. Disponible en T-shirt et Sweat-shirt ; les tailles ne changent pas le prix.',
+      'Calligraphie « Le théâtre est vie » (المسرح حياة). Disponible en T-shirt et Sweat-shirt ; les tailles ne changent pas le prix.',
     citation: 'المسرح حياة',
     technique: 'Sérigraphie calligraphique',
     dimensions: 'Coupe unisexe',
@@ -115,25 +115,62 @@ export function apparelSeedPayload(item: (typeof APPAREL_SEED_ITEMS)[number]) {
   };
 }
 
-/** Insert les designs manquants (idempotent). */
+/**
+ * Insert ou met à jour les designs (match sur le chemin image).
+ * Met à jour titre / textes si l’article existe déjà sous un ancien nom.
+ */
 export async function ensureApparelSeedItems(
   conn: PoolConnection
-): Promise<{ inserted: number; skipped: number }> {
+): Promise<{ inserted: number; updated: number; skipped: number }> {
   let inserted = 0;
+  let updated = 0;
   let skipped = 0;
 
   for (const item of APPAREL_SEED_ITEMS) {
-    const [existing] = (await conn.execute(
-      'SELECT id FROM store_items WHERE titre = ? LIMIT 1',
-      [item.titre]
-    )) as [{ id: number }[], unknown];
+    const imagePath = item.images[0];
+    const [byImage] = (await conn.execute(
+      `SELECT id, titre FROM store_items
+       WHERE categorie = ? AND images LIKE ?
+       LIMIT 1`,
+      [APPAREL_CATEGORY, `%${imagePath}%`]
+    )) as [{ id: number; titre: string }[], unknown];
 
-    if (existing.length > 0) {
-      skipped += 1;
+    const [byTitre] = byImage.length
+      ? [[], null]
+      : ((await conn.execute('SELECT id, titre FROM store_items WHERE titre = ? LIMIT 1', [
+          item.titre,
+        ])) as [{ id: number; titre: string }[], unknown]);
+
+    const existing = byImage[0] ?? byTitre[0];
+    const p = apparelSeedPayload(item);
+
+    if (existing) {
+      await conn.execute(
+        `UPDATE store_items SET
+          titre=?, sous_titre=?, description=?, citation=?, technique=?, dimensions=?,
+          annee=?, images=?, ordre=?, style=?, extrait=?, categorie=?
+         WHERE id=?`,
+        [
+          p.titre,
+          p.sous_titre,
+          p.description,
+          p.citation,
+          p.technique,
+          p.dimensions,
+          p.annee,
+          JSON.stringify(p.images),
+          p.ordre,
+          p.style,
+          p.extrait,
+          APPAREL_CATEGORY,
+          existing.id,
+        ]
+      );
+      if (existing.titre !== p.titre) updated += 1;
+      else skipped += 1;
       continue;
     }
 
-    const p = apparelSeedPayload(item);
     await conn.execute(
       `INSERT INTO store_items (
         titre,sous_titre,categorie,description,citation,technique,dimensions,annee,prix,
@@ -169,5 +206,5 @@ export async function ensureApparelSeedItems(
     inserted += 1;
   }
 
-  return { inserted, skipped };
+  return { inserted, updated, skipped };
 }

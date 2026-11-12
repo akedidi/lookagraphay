@@ -914,7 +914,9 @@ export default function AdminPage() {
                         return;
                       }
                       await fetchAll();
-                      flash(`✅ Vêtements : ${data.inserted} ajouté(s), ${data.skipped} déjà présent(s)`);
+                      flash(
+                        `✅ Vêtements : ${data.inserted} ajouté(s), ${data.updated ?? 0} mis à jour, ${data.skipped} inchangé(s)`
+                      );
                     } catch {
                       flash('❌ Erreur réseau');
                     }

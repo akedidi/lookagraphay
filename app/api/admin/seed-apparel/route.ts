@@ -12,10 +12,11 @@ export async function POST(req: NextRequest) {
   const conn = await pool.getConnection();
   try {
     await ensureStoreColumns(conn);
-    const { inserted, skipped } = await ensureApparelSeedItems(conn);
+    const { inserted, updated, skipped } = await ensureApparelSeedItems(conn);
     return NextResponse.json({
       ok: true,
       inserted,
+      updated,
       skipped,
       total: APPAREL_SEED_ITEMS.length,
     });
