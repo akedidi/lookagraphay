@@ -861,7 +861,30 @@ export default function AdminPage() {
           <div>
             <div className="admin-section-head">
               {sectionTitle('Articles du Store')}
-              <button onClick={() => { setEditStore({ ...emptyStore }); setIsNew(true); }} style={btnGold}>+<span className="admin-btn-text"> Nouvel article</span></button>
+              <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!confirm('Importer la collection vêtements (6 designs, T-shirt 50 € / Sweat 65 €) ? Les articles déjà présents sont ignorés.')) return;
+                    try {
+                      const res = await fetch('/api/admin/seed-apparel', { method: 'POST', ...adminFetchInit });
+                      const data = await res.json();
+                      if (!res.ok || !data.ok) {
+                        flash(`❌ ${typeof data.error === 'string' ? data.error : 'Import impossible'}`);
+                        return;
+                      }
+                      await fetchAll();
+                      flash(`✅ Vêtements : ${data.inserted} ajouté(s), ${data.skipped} déjà présent(s)`);
+                    } catch {
+                      flash('❌ Erreur réseau');
+                    }
+                  }}
+                  style={{ ...btnOutline, fontSize: '0.65rem' }}
+                >
+                  Importer vêtements
+                </button>
+                <button onClick={() => { setEditStore({ ...emptyStore }); setIsNew(true); }} style={btnGold}>+<span className="admin-btn-text"> Nouvel article</span></button>
+              </div>
             </div>
 
             <div style={{ marginBottom: '1.25rem' }}>
