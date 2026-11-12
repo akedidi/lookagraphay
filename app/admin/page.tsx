@@ -1467,9 +1467,17 @@ export default function AdminPage() {
                             {new Date(order.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                           </div>
                           <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'rgba(245,240,232,0.38)', marginTop: '0.25rem', lineHeight: 1.6 }}>
-                            {(order.items ?? []).map((item: any, i: number) => (
-                              <span key={i}>{item.qty}× {item.titre}{item.matiere ? ` (${item.matiere})` : ''}{i < (order.items?.length ?? 0) - 1 ? ' · ' : ''}</span>
-                            ))}
+                            {(order.items ?? []).map((item: any, i: number) => {
+                              const variant = [item.matiere, item.quantite_label].filter(Boolean).join(' · ');
+                              return (
+                                <span key={i} style={{ display: 'block', marginBottom: '0.15rem' }}>
+                                  <span style={{ color: light }}>{item.qty}× {item.titre}</span>
+                                  {variant ? (
+                                    <span style={{ color: gold }}> — {variant}</span>
+                                  ) : null}
+                                </span>
+                              );
+                            })}
                           </div>
                           <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.67rem', color: 'rgba(245,240,232,0.32)', marginTop: '0.2rem' }}>
                             {order.delivery_type === 'relay'

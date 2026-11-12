@@ -196,7 +196,9 @@ function SuiviCommandeForm() {
                   {(order.items ?? []).map((item: any, i: number) => (
                     <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}>
                       <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '0.95rem', color: dark, flex: 1 }}>
-                        {item.qty}× {item.titre}{item.matiere ? ` (${item.matiere})` : ''}
+                        {item.qty}× {item.titre}{[item.matiere, item.quantite_label].filter(Boolean).length
+                          ? ` (${[item.matiere, item.quantite_label].filter(Boolean).join(' · ')})`
+                          : ''}
                       </span>
                       <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '0.95rem', color: gold, flexShrink: 0 }}>
                         {(item.prix * item.qty).toFixed(2)} €
